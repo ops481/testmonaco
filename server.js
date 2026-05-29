@@ -41,7 +41,7 @@ const TICKET_PRICE_CENTS = Number(process.env.TICKET_PRICE_CENTS || 260000);
 const MAX_REFERRALS = Number(process.env.MAX_REFERRALS || 2);
 const CURRENCY = String(process.env.CURRENCY || "EUR").toUpperCase();
 
-const DATA_FILE = path.join(__dirname, "data", "referrals.json");
+const DATA_FILE = path.join("/tmp", "referrals.json");
 
 app.use(cookieParser());
 
