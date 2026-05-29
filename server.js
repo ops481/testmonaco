@@ -494,13 +494,14 @@ app.post("/api/dev/mark-paid", requireAdmin, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Monaco referral server running on http://localhost:${PORT}`);
-  console.log(`APP_URL: ${APP_URL}`);
-  console.log(`Whop webhook URL: ${APP_URL}/api/whop/webhook`);
-  console.log(`Admin URL: ${APP_URL}/admin-refunds.html`);
-  console.log("Referral mode: manual local tracking only");
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Monaco referral server running on http://localhost:${PORT}`);
+  });
+}
+
+
+module.exports = app;
 async function handlePaymentSucceeded(store, payment) {
   const session = findCheckoutSession(store, payment);
   const metadata = {
