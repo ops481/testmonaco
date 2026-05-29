@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>You're in · Monaco Content Retreat · Grow Acquisition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #f5f7f4; --card: #ffffff; --fg: #0e0e0e; --muted: #4b4b4b;
+    --line: #e4e8e3; --accent: #0e5732; --gold: #ccb784;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+  body {
+    font-family: "Inter",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color: var(--fg); background: var(--bg); line-height: 1.55; letter-spacing: .012em; -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* confirmation bar */
+  .confirm-bar { background: var(--accent); color: #fff; }
+  .confirm-bar .container { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 24px; font-size: 14.5px; font-weight: 600; text-align: center; }
+  .cb-dot { width: 9px; height: 9px; border-radius: 50%; background: #7be0a4; box-shadow: 0 0 0 4px rgba(123,224,164,.22); flex: 0 0 auto; }
+
+  /* slim header (centered logo) */
+  .ty-top { position: relative; border-bottom: 1px solid var(--line); }
+  .ty-top-row { display: flex; align-items: center; justify-content: center; padding: 16px 24px; }
+  .ty-logo { height: 28px; width: auto; }
+
+  /* hero */
+  .ty { padding: clamp(20px, 3vw, 44px) 0 70px; position: relative; overflow: hidden; }
+  .ty::before {
+    content: ""; position: absolute; top: -180px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 520px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(14,87,50,.10), transparent 70%); pointer-events: none;
+  }
+  .ty-ticket-real {
+    position: absolute; top: 45%; left: 50%; transform: translate(-50%,-50%) rotate(-7deg);
+    width: min(900px, 112%); display: flex; border-radius: 22px; overflow: hidden;
+    background: #272e26; color: #fff; opacity: .05; z-index: 0; pointer-events: none;
+  }
+  .rt-main { flex: 1; padding: 42px 46px; min-width: 0; }
+  .rt-eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: #c9a24a; font-weight: 700; }
+  .rt-title { font-size: clamp(34px, 5vw, 48px); font-weight: 700; letter-spacing: -.025em; line-height: 1.04; margin: 10px 0 0; }
+  .rt-meta { display: flex; gap: 32px; margin-top: 26px; flex-wrap: wrap; }
+  .rt-meta > div { display: flex; flex-direction: column; gap: 3px; }
+  .rt-meta span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+  .rt-meta strong { font-size: 15px; font-weight: 700; }
+  .rt-stub { width: 230px; padding: 40px 26px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+  .rt-stub::before { content: ""; position: absolute; left: 0; top: 18px; bottom: 18px; border-left: 2px dotted rgba(255,255,255,.45); }
+  .rt-admit { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: #c9a24a; font-weight: 700; }
+  .rt-price { font-size: 42px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+  .rt-sub { font-size: 12px; color: rgba(255,255,255,.6); }
+  @media (max-width: 640px) { .ty-ticket-real { flex-direction: column; width: 320px; } .rt-stub { width: 100%; } }
+  @media (max-width: 600px) {
+    .container { padding: 0 18px; }
+    .ty { padding: 18px 0 52px; }
+    .ty-quote { font-size: clamp(20px, 5.6vw, 36px); line-height: 1.1; margin: 0 auto 20px; padding: 0 4px; }
+    .video-wrap {
+      margin: 0 auto 22px;
+      width: calc(100% - 48px);
+    }
+    .btn { padding: 16px 32px; font-size: 17px; }
+    .confirm-bar .container { font-size: clamp(7.5px, 2.1vw, 13px); padding: 9px 6px; white-space: nowrap; }
+  }
+  .ty-wrap { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; text-align: center; }
+
+  .ty-eyebrow { display: inline-block; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); font-weight: 800; margin-bottom: 18px; }
+
+  .ty-quote {
+    position: relative; margin: 0 auto 26px; max-width: 620px;
+    font-size: clamp(28px, 4.6vw, 50px); font-weight: 700; line-height: 1.08; letter-spacing: -.03em;
+  }
+
+  /* premium gold-framed video */
+  .video-wrap {
+    max-width: 680px; margin: 0 auto 30px; aspect-ratio: 16 / 10; position: relative;
+    border-radius: 18px; overflow: hidden; background: #11150f;
+    border: 1px solid rgba(204,183,132,.55);
+    box-shadow: 0 30px 70px rgba(14,87,50,.18), 0 0 0 6px rgba(204,183,132,.10);
+  }
+  .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: rgba(255,255,255,.6); font-size: 14px; background: radial-gradient(120% 120% at 70% 20%, rgba(14,87,50,.55), transparent 60%), linear-gradient(135deg, #1d2a1f, #0d130c); }
+  .vf-big { font-size: 18px; color: rgba(255,255,255,.82); }
+  .vplay { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 56px; height: 56px; border-radius: 999px; background: rgba(255,255,255,.95); color: var(--accent); font-size: 17px; padding-left: 3px; display: grid; place-items: center; cursor: pointer; border: 0; box-shadow: 0 10px 26px rgba(0,0,0,.4); transition: transform .15s ease, opacity .2s ease; z-index: 3; font-family: inherit; }
+  .vplay:hover { transform: translate(-50%,-50%) scale(1.07); }
+  .video-wrap.playing .vplay { opacity: 0; pointer-events: none; }
+  .vctrls { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 20px 14px; display: flex; align-items: center; gap: 13px; z-index: 3; background: linear-gradient(to top, rgba(0,0,0,.55), transparent); opacity: 0; transition: opacity .2s ease; }
+  .video-wrap:hover .vctrls, .video-wrap.paused .vctrls { opacity: 1; }
+  .vprogress { flex: 1; height: 5px; background: rgba(255,255,255,.25); border-radius: 999px; cursor: pointer; position: relative; }
+  .vfill { height: 100%; width: 0%; background: var(--gold); border-radius: 999px; }
+  .vtime { color: rgba(255,255,255,.9); font-size: 12px; white-space: nowrap; }
+  .vmute-btn { background: transparent; border: 0; color: #fff; font-size: 17px; cursor: pointer; padding: 4px 6px; }
+
+  /* buttons */
+  .btn { display: inline-block; text-align: center; background: var(--gold); color: #241d0c; padding: 18px 46px; border-radius: 999px; font-size: 18px; font-weight: 800; letter-spacing: .01em; transition: transform .15s ease, box-shadow .15s ease, filter .15s ease; cursor: pointer; border: 0; box-shadow: 0 8px 20px rgba(120,98,48,.24); font-family: inherit; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(120,98,48,.32); filter: brightness(1.03); }
+  .ty-note { margin: 16px auto 0; max-width: 420px; font-size: 13.5px; color: var(--muted); }
+
+  .sync-note {
+    margin: 12px auto 0;
+    max-width: 520px;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .sync-note.is-ok { color: var(--accent); }
+  .sync-note.is-warn { color: #7a5a13; }
+  .sync-note.is-error { color: #8a1f1f; }
+
+  /* ===== THE DEAL: clean pricing-tier cards, fluid at every width ===== */
+  .deal-viz {
+    max-width: 580px;
+    margin: clamp(20px, 3vw, 32px) auto 0;
+    padding: 0 clamp(16px, 4vw, 24px);
+  }
+  .dv-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(6px, 1.6vw, 14px);
+  }
+  .dv-tier {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: clamp(10px, 1.6vw, 16px);
+    padding: clamp(12px, 2.4vw, 22px) clamp(8px, 2vw, 18px);
+    text-align: center;
+    position: relative;
+    transition: transform .22s ease, box-shadow .22s ease;
+  }
+  .dv-tier:hover { transform: translateY(-5px); box-shadow: 0 18px 34px rgba(14,87,50,.14); }
+  .dv-tier-label {
+    font-size: clamp(8px, 1.6vw, 10.5px); letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted); font-weight: 800;
+    margin-bottom: clamp(6px, 1.4vw, 12px);
+  }
+  .dv-tier-deal {
+    font-size: clamp(14px, 3.4vw, 28px);
+    font-weight: 800; letter-spacing: -.015em; line-height: 1.04;
+    color: var(--fg);
+    margin-bottom: clamp(4px, 1vw, 8px);
+  }
+  .dv-tier-save {
+    font-size: clamp(9px, 1.7vw, 12.5px);
+    color: var(--muted); font-weight: 600;
+    letter-spacing: .01em;
+  }
+  .dv-tier--featured {
+    background: linear-gradient(160deg, #0e5732, #082e1c 55%, #03150b);
+    border: 1px solid #052015;
+    box-shadow: 0 14px 28px rgba(8,46,28,.42);
+  }
+  .dv-tier--featured:hover { box-shadow: 0 22px 40px rgba(8,46,28,.52); }
+  .dv-tier--featured .dv-tier-label { color: #cce8d6; }
+  .dv-tier--featured .dv-tier-deal { color: #ffffff; }
+  .dv-tier--featured .dv-tier-save { color: #b5e0c5; font-weight: 700; }
+
+  /* member login section: shown underneath the referral/video information */
+  .login-section { padding: 0 0 78px; margin-top: -18px; }
+  .login-card-clean {
+    max-width: 620px; margin: 0 auto; padding: clamp(28px, 5vw, 46px);
+    border-radius: 26px; background: rgba(255,255,255,.86); border: 1px solid rgba(14,87,50,.12);
+    box-shadow: 0 24px 70px rgba(14,87,50,.12); text-align: center;
+  }
+  .login-logo { height: 28px; width: auto; margin: 0 auto 24px; }
+  .panel-kicker { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); font-weight: 900; margin-bottom: 10px; }
+  .login-card-clean h2 { margin: 0; font-size: clamp(28px, 4vw, 42px); line-height: 1.06; letter-spacing: -.03em; }
+  .login-card-clean p { margin: 14px auto 0; max-width: 430px; color: var(--muted); font-size: 15px; }
+  .google-btn {
+    margin-top: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    background: #fff; color: #101510; border: 1px solid rgba(14,87,50,.16); box-shadow: 0 12px 30px rgba(14,87,50,.12);
+  }
+  .google-btn svg { width: 18px; height: 18px; flex: 0 0 auto; }
+  .small-note { font-size: 13px !important; color: var(--muted); }
+  @media (max-width: 600px) { .login-section { padding-bottom: 54px; } .login-card-clean { border-radius: 22px; } .google-btn { width: 100%; } }
+
+  /* footer */
+  footer { padding: 54px 0 36px; }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
+  .footer-links a { font-size: 14px; color: var(--muted); }
+  .footer-links a:hover { color: var(--fg); }
+  .copy { font-size: 13px; color: var(--muted); margin-top: 22px; }
+</style>
+</head>
+<body>
+
+<!-- confirmation -->
+<div class="confirm-bar">
+  <div class="container"><span class="cb-dot"></span> <span id="confirmationText">Your spot in Monaco is secured. A confirmation is on its way to your inbox.</span></div>
+</div>
+
+<!-- header -->
+<header class="ty-top">
+  <div class="ty-top-row"><img class="ty-logo" src="ga-wordmark.png" alt="grow acquisition" /></div>
+</header>
+
+<!-- hero -->
+<main class="ty">
+  <div class="ty-ticket-real" aria-hidden="true">
+    <div class="rt-main">
+      <div class="rt-eyebrow">Grow Acquisition presents</div>
+      <div class="rt-title">The Monaco<br>Content Retreat</div>
+      <div class="rt-meta">
+        <div><span>Dates</span><strong>18 &amp; 19 July 2026</strong></div>
+        <div><span>Location</span><strong>Monaco</strong></div>
+        <div><span>Access</span><strong>2 full days, in person</strong></div>
+      </div>
+    </div>
+    <div class="rt-stub">
+      <div class="rt-admit">Admit one</div>
+      <div class="rt-price">&euro;2,600</div>
+      <div class="rt-sub">per seat</div>
+    </div>
+  </div>
+  <div class="ty-wrap">
+    <h1 class="ty-quote">Wait... what if you can get<br>your ticket for free?</h1>
+
+    <!-- VIDEO: drop "referral-video.mp4" into this folder to go live -->
+    <div class="video-wrap" id="heroVideo" aria-label="Referral video">
+      <div class="video-fallback" id="vFallback">
+        <div><span class="vf-big">&#9654; Your video</span></div>
+      </div>
+      <video class="hero-video" id="vEl" playsinline preload="metadata" style="display:none;">
+        <source src="referral-video.mp4" type="video/mp4" />
+      </video>
+      <button class="vplay" id="vplayBtn" type="button" aria-label="Play">&#9654;</button>
+      <div class="vctrls">
+        <div class="vprogress" id="vprog"><div class="vfill" id="vfill"></div></div>
+        <div class="vtime" id="vtime">0:00 / 0:00</div>
+        <button class="vmute-btn" id="muteToggle" type="button" aria-label="Toggle sound">&#128266;</button>
+      </div>
+    </div>
+
+    <a class="btn" id="referFriendBtn" href="/auth/google/start">I want to refer a friend</a>
+    <p class="ty-note">Refer 2 friends who join and your own ticket is on us.</p>
+    <p class="sync-note is-warn" id="paymentSyncNote">Confirming your payment and syncing your booking...</p>
+
+    <!-- ===== THE DEAL: clean pricing tiers under the CTA ===== -->
+    <div class="deal-viz" aria-label="Referral rewards">
+      <div class="dv-grid">
+        <div class="dv-tier">
+          <div class="dv-tier-label">Refer 1 friend</div>
+          <div class="dv-tier-deal">50% off</div>
+          <div class="dv-tier-save">&euro;1,300 refunded</div>
+        </div>
+        <div class="dv-tier dv-tier--featured">
+          <div class="dv-tier-label">Refer 2 friends</div>
+          <div class="dv-tier-deal">Ticket free</div>
+          <div class="dv-tier-save">&euro;2,600 refunded</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- member login, placed after the referral explanation -->
+<section class="login-section" id="dashboard-login">
+  <div class="container">
+    <div class="login-card-clean">
+      <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+      <div class="panel-kicker">Member dashboard</div>
+      <h2>Log in to your Monaco Members dashboard</h2>
+      <p>Continue with the Google account connected to your Monaco booking.</p>
+      <a class="btn google-btn" id="googleLoginBtn" href="/auth/google/start">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.223 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
+        Continue with Google
+      </a>
+      <p class="small-note">Access your profile, referrals, curriculum, and WhatsApp community.</p>
+    </div>
+  </div>
+</section>
+
+<!-- footer -->
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <img src="ga-wordmark.png" alt="grow acquisition" style="height: 30px; width:auto;" />
+      <div class="footer-links">
+        <a href="https://www.instagram.com/niksetting/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.youtube.com/@niksetting" target="_blank" rel="noopener">YouTube</a>
+        <a href="/monaco.html">Home</a>
+      </div>
+    </div>
+    <div class="copy">Grow Acquisition. Copyright 2026. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var wrap=document.getElementById('heroVideo'), v=document.getElementById('vEl'),
+        fallback=document.getElementById('vFallback'), playBtn=document.getElementById('vplayBtn'),
+        prog=document.getElementById('vprog'), fill=document.getElementById('vfill'),
+        timeEl=document.getElementById('vtime'), muteBtn=document.getElementById('muteToggle');
+    if(!v||!wrap) return;
+    var hasVideo=false;
+    v.addEventListener('loadeddata',function(){ hasVideo=true; v.style.display='block'; if(fallback) fallback.style.display='none'; });
+    v.addEventListener('error',function(){});
+    function fmt(s){ if(!isFinite(s)) return '0:00'; s=Math.max(0,s|0); var m=(s/60)|0,sec=s%60; return m+':'+(sec<10?'0':'')+sec; }
+    function updateState(){ wrap.classList.toggle('playing',!v.paused); wrap.classList.toggle('paused',v.paused); playBtn.innerHTML=v.paused?'&#9654;':'&#10074;&#10074;'; }
+    function updateProgress(){ if(!v.duration) return; fill.style.width=(v.currentTime/v.duration*100)+'%'; timeEl.textContent=fmt(v.currentTime)+' / '+fmt(v.duration); }
+    function syncMute(){ muteBtn.innerHTML=v.muted?'&#128263;':'&#128266;'; }
+    playBtn.addEventListener('click',function(){
+      if (v.style.display === 'none') { v.style.display = 'block'; if (fallback) fallback.style.display = 'none'; }
+      if (v.paused) { v.muted = false; syncMute(); v.play().catch(function(){}); }
+      else { v.pause(); }
+    });
+    prog.addEventListener('click',function(e){ var r=prog.getBoundingClientRect(); if(v.duration) v.currentTime=(e.clientX-r.left)/r.width*v.duration; });
+    muteBtn.addEventListener('click',function(){ v.muted=!v.muted; if(!v.muted) v.play(); syncMute(); });
+    v.addEventListener('play',updateState); v.addEventListener('pause',updateState);
+    v.addEventListener('timeupdate',updateProgress); v.addEventListener('loadedmetadata',updateProgress);
+    updateState(); syncMute();
+  })();
+
+  /*
+    This block is the important fix.
+
+    Your checkout page sends abandoned leads before Whop opens.
+    This thank-you page confirms the paid checkout after Whop sends the customer back here.
+
+    It calls:
+      /api/referrals/complete-checkout?session_id=...
+
+    Your backend then:
+      1. checks/syncs the Whop payment,
+      2. runs handlePaymentSucceeded,
+      3. sends the paid customer to Google Apps Script,
+      4. Google Apps Script adds them to Airtable → Paid customers.
+  */
+  (function(){
+    var googleBtn = document.getElementById('googleLoginBtn');
+    var referBtn = document.getElementById('referFriendBtn');
+    var syncNote = document.getElementById('paymentSyncNote');
+    var confirmationText = document.getElementById('confirmationText');
+
+    var params = new URLSearchParams(location.search);
+
+    var checkoutId =
+      params.get('checkout_session_id') ||
+      params.get('session_id') ||
+      params.get('checkout_configuration_id') ||
+      sessionStorage.getItem('monaco_checkout_session_id') ||
+      localStorage.getItem('monaco_checkout_session_id') ||
+      '';
+
+    if (checkoutId) {
+      sessionStorage.setItem('monaco_checkout_session_id', checkoutId);
+      localStorage.setItem('monaco_checkout_session_id', checkoutId);
+    }
+
+    var loginUrl = checkoutId
+      ? '/auth/google/start?checkout_session_id=' + encodeURIComponent(checkoutId)
+      : '/auth/google/start';
+
+    /*
+      Both buttons intentionally do the same thing:
+      they send the customer to Google login so their Monaco booking can be
+      connected to their Members dashboard, course access, and referral tracking.
+    */
+    if (googleBtn) googleBtn.href = loginUrl;
+    if (referBtn) referBtn.href = loginUrl;
+
+    function setSyncNote(message, type) {
+      if (!syncNote) return;
+
+      syncNote.textContent = message;
+      syncNote.className = 'sync-note' + (type ? ' ' + type : '');
+    }
+
+    async function completeCheckoutSync(attempt) {
+      attempt = attempt || 1;
+
+      if (!checkoutId) {
+        setSyncNote('Booking confirmed. Log in with Google to connect your dashboard.', 'is-warn');
+        console.warn('No checkout session ID found on thankyou page. Paid customer sync could not run from browser.');
+        return;
+      }
+
+      setSyncNote('Confirming your payment and syncing your booking...', 'is-warn');
+
+      try {
+        var response = await fetch(
+          '/api/referrals/complete-checkout?session_id=' + encodeURIComponent(checkoutId),
+          {
+            method: 'GET',
+            credentials: 'include',
+            cache: 'no-store',
+            headers: {
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        var data = await response.json().catch(function(){ return {}; });
+
+        console.log('Checkout completion sync response:', data);
+
+        if (data.status === 'complete') {
+          setSyncNote('Payment confirmed. Your Members dashboard is ready.', 'is-ok');
+
+          if (confirmationText) {
+            confirmationText.textContent = 'Your spot in Monaco is secured. Your payment has been confirmed.';
+          }
+
+          return;
+        }
+
+        /*
+          Sometimes Whop payment sync takes a few seconds.
+          Try a few times automatically.
+        */
+        if (attempt < 5) {
+          setTimeout(function(){
+            completeCheckoutSync(attempt + 1);
+          }, 3000);
+          return;
+        }
+
+        setSyncNote('Your payment is still processing. You can log in now, or refresh this page in a moment.', 'is-warn');
+
+      } catch (error) {
+        console.error('Could not complete checkout sync:', error);
+
+        if (attempt < 3) {
+          setTimeout(function(){
+            completeCheckoutSync(attempt + 1);
+          }, 3000);
+          return;
+        }
+
+        setSyncNote('Booking confirmed. If your dashboard is not ready yet, refresh this page in a moment.', 'is-error');
+      }
+    }
+
+    completeCheckoutSync(1);
+  })();
+
+</script>
+
+</body>
+</html>

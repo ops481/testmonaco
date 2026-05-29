@@ -1,0 +1,1210 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Monaco Members Dashboard · Grow Acquisition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/css/intlTelInput.css" />
+<style>
+:root {
+  --bg: #f5f7f4;
+  --card: #ffffff;
+  --fg: #0e0e0e;
+  --muted: #4b4b4b;
+  --line: #e4e8e3;
+  --accent: #0e5732;
+  --accent-2: #174a32;
+  --gold: #ccb784;
+  --sand: #e8e2d2;
+  --soft: #eef4ee;
+  --error: #8a1f1f;
+  --shadow: 0 18px 50px rgba(14,87,50,.06);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.55;
+  letter-spacing: .012em;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+button, input, select, textarea { font: inherit; }
+.container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+.hidden { display: none !important; }
+
+/* top */
+.confirm-bar { background: var(--accent); color: #fff; font-weight: 600; }
+.confirm-bar .container { display: flex; justify-content: center; align-items: center; gap: 10px; padding-top: 7px; padding-bottom: 7px; font-size: 14px; text-align: center; }
+.cb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(204,183,132,.22); }
+.top { position: sticky; top: 0; z-index: 50; background: rgba(245,247,244,.92); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
+.top-row { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.logo { height: 26px; width: auto; }
+.brand-divider { width: 1px; height: 22px; background: var(--line); }
+.brand-title { color: var(--muted); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.top-links { display: flex; align-items: center; gap: 10px; }
+
+/* buttons */
+.btn, button { border: 0; cursor: pointer; }
+.btn, .ghost-btn, .secondary-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  border-radius: 999px; font-weight: 800; white-space: nowrap; transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+}
+.btn { background: var(--accent); color: #fff; padding: 14px 22px; box-shadow: 0 6px 16px rgba(14,87,50,.18); }
+.btn:hover { background: var(--accent-2); transform: translateY(-1px); box-shadow: 0 12px 24px rgba(14,87,50,.24); }
+.ghost-btn, .secondary-btn { background: #fff; color: var(--accent); border: 1.5px solid rgba(14,87,50,.20); padding: 11px 16px; box-shadow: none; }
+.ghost-btn { font-size: 13px; padding: 8px 13px; }
+.secondary-btn:hover, .ghost-btn:hover { background: var(--accent); color: #fff; }
+button:disabled { opacity: .64; cursor: not-allowed; transform: none !important; }
+.google-btn { width: 100%; max-width: 420px; margin: 0 auto; background: #fff; color: #1f1f1f; border: 1px solid #dadce0; box-shadow: 0 8px 20px rgba(0,0,0,.05); }
+.google-btn:hover { background: #fff; color: #1f1f1f; }
+.google-mark { width: 20px; height: 20px; flex: 0 0 auto; }
+
+/* hero */
+.hero { padding: 42px 0 22px; }
+.hero-card {
+  position: relative; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; gap: 0;
+  min-height: 210px; border-radius: 24px; color: #fff;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(204,183,132,.32), transparent 30%),
+    linear-gradient(135deg, #143d2a 0%, #0e5732 48%, #092417 100%);
+  box-shadow: 0 22px 56px rgba(14,87,50,.18);
+}
+.hero-card::before {
+  content: ""; position: absolute; inset: 14px; border: 1px solid rgba(255,255,255,.16);
+  border-radius: 18px; pointer-events: none;
+}
+.hero-card::after {
+  content: ""; position: absolute; right: -80px; top: -120px; width: 270px; height: 270px;
+  border-radius: 50%; background: rgba(204,183,132,.22); pointer-events: none;
+}
+.hero-copy { position: relative; z-index: 1; padding: clamp(28px, 4.5vw, 46px); align-self: center; }
+.eyebrow, .panel-kicker { color: var(--accent); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 800; }
+.hero-card .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #e9d8a5;
+}
+.hero-card .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(204,183,132,.18); }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(34px, 5vw, 58px); line-height: .98; letter-spacing: -.045em; font-weight: 750; }
+h2 { font-size: clamp(25px, 3vw, 34px); line-height: 1.08; letter-spacing: -.03em; font-weight: 700; }
+h3 { font-size: 18px; line-height: 1.15; letter-spacing: -.01em; font-weight: 750; }
+.lead { max-width: 560px; margin-top: 12px; color: rgba(255,255,255,.72); font-size: 16px; font-weight: 500; }
+.hero-accent {
+  position: relative; z-index: 1; width: min(34vw, 330px); min-width: 260px;
+  display: grid; place-items: center; padding: 28px;
+  border-left: 2px dotted rgba(255,255,255,.25);
+  background: #272e26;
+}
+.hero-accent::before, .hero-accent::after {
+  content: ""; position: absolute; left: -13px; width: 26px; height: 26px; border-radius: 50%; background: var(--bg);
+}
+.hero-accent::before { top: -13px; }
+.hero-accent::after { bottom: -13px; }
+.hub-badge {
+  width: 100%; border-radius: 20px; padding: 18px;
+  background: #272e26; color: #fff;
+  box-shadow: 0 20px 46px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.hub-label { display: block; color: var(--gold); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 850; }
+.hub-title { display: block; margin-top: 6px; font-size: 28px; line-height: 1; letter-spacing: -.04em; font-weight: 850; color: #fff; }
+.hub-meta { display: grid; gap: 8px; margin-top: 16px; }
+.hub-meta span, .pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; padding: 7px 11px; background: rgba(204,183,132,.18); color: #6e581c;
+  font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+}
+.hub-meta span { color: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.12); }
+.hub-meta span:first-child { background: var(--gold); color: #241d0c; border-color: transparent; }
+
+/* layout */
+.section { padding: 0 0 64px; }
+.card { background: transparent; border: 0; padding: 0; box-shadow: none; }
+.app-shell { display: grid; grid-template-columns: 235px 1fr; gap: 24px; align-items: start; }
+.sidebar { position: sticky; top: 82px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 10px; box-shadow: var(--shadow); }
+.sidebar-title { padding: 10px 11px 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.sidebar-title strong { display: block; font-size: 14px; font-weight: 800; }
+.sidebar-title span { display: block; margin-top: 1px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.dashboard-nav { display: grid; gap: 4px; }
+.dash-tab { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 11px; border-radius: 12px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 750; text-align: left; }
+.dash-tab:hover { background: #f7f8f5; color: var(--accent); }
+.dash-tab.is-active { background: var(--accent); color: #fff; }
+.dash-icon { width: 24px; height: 24px; border-radius: 8px; display: inline-grid; place-items: center; background: rgba(14,87,50,.08); color: var(--accent); font-size: 13px; }
+.dash-tab.is-active .dash-icon { background: rgba(255,255,255,.16); color: #fff; }
+.main-panel { min-width: 0; }
+.dashboard-page { display: none; }
+.dashboard-page.is-active { display: block; animation: fadeUp .2s ease-out; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: clamp(22px, 3.5vw, 32px); box-shadow: var(--shadow); margin-bottom: 16px; }
+.panel-head { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.panel-head p, .panel p, .card p { color: var(--muted); font-weight: 500; }
+.panel-kicker { margin-bottom: 6px; }
+.small-note { margin-top: 14px; color: var(--muted); font-size: 13px; font-weight: 500; }
+
+/* content */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+.stat-card { border-top: 1px solid var(--line); padding-top: 14px; }
+.stat-card strong { display: block; font-size: 30px; line-height: 1; letter-spacing: -.04em; margin-bottom: 5px; }
+.stat-card span { color: var(--muted); font-size: 13px; font-weight: 650; }
+.link-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 16px; }
+.input, input, select, textarea { width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfb; color: var(--fg); }
+.input::placeholder, input::placeholder { color: #a8ada6; }
+.input:focus, input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,87,50,.12); background: #fff; }
+.inline-actions, .invite-actions, .community-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.compact-note { padding: 14px 0 0; margin-top: 16px; border-top: 1px solid var(--line); }
+.profile-card {
+  position: relative; overflow: hidden; border-radius: 18px; padding: 22px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(204,183,132,.30), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f4f7f2 100%);
+  border: 1px solid rgba(14,87,50,.14);
+}
+.profile-card::after {
+  content: ""; position: absolute; right: -46px; bottom: -70px; width: 170px; height: 170px; border-radius: 50%;
+  background: rgba(14,87,50,.07); pointer-events: none;
+}
+.profile-card-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; align-items: start; }
+.profile-icon {
+  width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-size: 25px; box-shadow: 0 12px 26px rgba(14,87,50,.20);
+}
+.profile-card h3 { margin-bottom: 6px; }
+.profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+.profile-field { border-top: 1px solid var(--line); padding-top: 11px; }
+.profile-field span { display: block; color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+.profile-field strong { display: block; margin-top: 2px; font-size: 14px; word-break: break-word; }
+.profile-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.profile-card .small-note { margin-top: 12px; }
+.placeholder-box { background: transparent; border: 0; border-radius: 0; padding: 0; }
+.notice { margin: 16px 0; padding: 14px 16px; border-radius: 14px; background: rgba(204,183,132,.18); border: 1px solid rgba(204,183,132,.46); color: #6e581c; }
+.notice p { color: #6e581c; font-weight: 700; }
+.course-frame { margin-top: 16px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #fff; }
+.course-frame iframe { width: 100%; height: 720px; border: 0; display: block; }
+.table-wrap { overflow-x: auto; border-top: 1px solid var(--line); margin-top: 6px; }
+table { width: 100%; border-collapse: collapse; min-width: 620px; }
+th, td { padding: 13px 10px; border-bottom: 1px solid var(--line); text-align: left; font-size: 14px; }
+th { color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 800; }
+td { color: var(--fg); font-weight: 550; }
+.status { display: inline-flex; border-radius: 999px; padding: 5px 9px; background: rgba(14,87,50,.08); color: var(--accent); font-size: 12px; font-weight: 800; text-transform: capitalize; }
+.status-pending, .status-processing { background: rgba(204,183,132,.22); color: #6e581c; }
+.status-failed, .status-cancelled { background: rgba(138,31,31,.08); color: var(--error); }
+
+
+.referral-group {
+  display: grid; grid-template-columns: minmax(0, 1.18fr) .82fr; gap: 18px; align-items: stretch; margin-bottom: 18px;
+}
+.referral-card {
+  border: 1px solid var(--line); border-radius: 16px; background: #fbfcfb; padding: 18px;
+}
+.referral-card.feature {
+  background:
+    radial-gradient(circle at 96% 0%, rgba(204,183,132,.24), transparent 34%),
+    #fff;
+}
+.referral-card h3 { margin-bottom: 7px; }
+.referral-progress {
+  display: grid; align-content: space-between; gap: 14px; background: rgba(14,87,50,.055);
+  border-color: rgba(14,87,50,.18);
+}
+.progress-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.progress-top strong { font-size: 34px; letter-spacing: -.05em; line-height: 1; color: var(--accent); }
+.progress-top span { color: var(--muted); font-size: 13px; font-weight: 700; }
+.progress-track { height: 8px; border-radius: 999px; overflow: hidden; background: rgba(14,87,50,.12); }
+.progress-fill { height: 100%; border-radius: inherit; background: var(--accent); }
+.referral-meta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+.referral-meta span { display: block; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 800; }
+.referral-meta strong { display: block; margin-top: 2px; font-size: 15px; }
+.referral-activity-card {
+  position: relative; overflow: hidden; border-radius: 18px; padding: 22px; margin-top: 22px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(204,183,132,.30), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f4f7f2 100%);
+  border: 1px solid rgba(14,87,50,.14);
+}
+.referral-activity-card::after {
+  content: ""; position: absolute; right: -46px; bottom: -70px; width: 170px; height: 170px; border-radius: 50%;
+  background: rgba(14,87,50,.07); pointer-events: none;
+}
+.referral-activity-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; align-items: start; }
+.referral-activity-icon {
+  width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-size: 25px; box-shadow: 0 12px 26px rgba(14,87,50,.20);
+}
+.referral-table-head { display: flex; align-items: start; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+.referral-table-head h3 { margin-bottom: 6px; }
+.referral-table-head p { margin-top: 0; }
+.referral-activity-meta { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: 7px 11px; background: rgba(204,183,132,.18); color: #6e581c; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.referral-activity-card .table-wrap { position: relative; z-index: 1; margin-top: 0; border-top: 1px solid var(--line); }
+.whatsapp-card {
+  position: relative; overflow: hidden; border-radius: 18px; padding: 22px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(204,183,132,.30), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f4f7f2 100%);
+  border: 1px solid rgba(14,87,50,.14);
+}
+.whatsapp-card::after {
+  content: ""; position: absolute; right: -46px; bottom: -70px; width: 170px; height: 170px; border-radius: 50%;
+  background: rgba(14,87,50,.07); pointer-events: none;
+}
+.whatsapp-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; align-items: start; }
+.whatsapp-icon {
+  width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-size: 26px; box-shadow: 0 12px 26px rgba(14,87,50,.20);
+}
+.whatsapp-card h3 { margin-bottom: 6px; }
+.whatsapp-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.whatsapp-card .small-note { margin-top: 12px; }
+.wa-meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+.wa-meta {
+  border-top: 1px solid var(--line); padding-top: 11px;
+}
+.wa-meta span { display: block; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 800; }
+.wa-meta strong { display: block; margin-top: 2px; font-size: 14px; word-break: break-word; }
+
+/* login */
+.login-wrap { min-height: calc(100vh - 150px); display: grid; place-items: center; padding: 44px 0; }
+.login-card-clean { width: min(100%, 440px); text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 42px 34px 36px; box-shadow: var(--shadow); }
+.login-logo { height: 32px; width: auto; margin: 0 auto 30px; }
+.login-card-clean h2 { margin-bottom: 14px; }
+.login-card-clean p { color: var(--muted); font-weight: 500; }
+.login-google-btn { margin-top: 28px; }
+.login-error { margin-top: 20px; text-align: left; }
+.state { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; color: var(--accent); font-weight: 750; box-shadow: var(--shadow); }
+.state.error { color: var(--error); }
+.state.warn { color: #7a5a13; }
+
+/* modal */
+.modal-overlay { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 22px; background: rgba(14,14,14,.48); backdrop-filter: blur(8px); }
+.modal-overlay.is-open { display: flex; }
+.modal-card { width: min(100%, 520px); background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(22px, 4vw, 30px); position: relative; }
+.modal-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 999px; background: #f7f8f5; color: var(--fg); font-size: 22px; line-height: 1; }
+.invite-form { display: grid; gap: 12px; margin-top: 18px; }
+.contact-row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; }
+.invite-message { display: block; color: var(--accent); font-size: 13px; font-weight: 700; }
+.invite-message.error { color: var(--error); }
+.modal-success { display: none; padding: 12px 14px; border-radius: 12px; background: rgba(14,87,50,.08); color: var(--accent); font-weight: 800; }
+.modal-success.is-visible { display: block; }
+.iti { width: 100%; display: block; }
+.iti input, .iti input[type=tel] { width: 100%; min-height: 48px; padding-top: 13px; padding-bottom: 13px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfb; }
+.iti__selected-country { border-radius: 11px 0 0 11px; padding-left: 12px; background: linear-gradient(135deg, rgba(204,183,132,.22), rgba(14,87,50,.07)); }
+.iti__dropdown-content { border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 18px 50px rgba(14,87,50,.16); overflow: hidden; font-family: inherit; }
+
+footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
+.footer-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 13px; font-weight: 600; }
+
+@media (max-width: 900px) {
+  .hero-card { grid-template-columns: 1fr; }
+  .hero-card, .panel-head { display: block; }
+  .hero-accent { width: auto; min-width: 0; display: block; border-left: 0; border-top: 2px dotted rgba(255,255,255,.25); padding: 0 clamp(28px, 4.5vw, 46px) clamp(28px, 4.5vw, 46px); background: transparent; }
+  .hero-accent::before, .hero-accent::after { display: none; }
+  .hub-badge { max-width: 360px; }
+  .app-shell, .referral-group { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .dashboard-nav { grid-template-columns: repeat(4, 1fr); }
+  .dash-tab { justify-content: center; }
+  .sidebar-title { display: none; }
+}
+@media (max-width: 680px) {
+  .container, .top-row { padding-left: 18px; padding-right: 18px; }
+  .brand-title, .brand-divider { display: none; }
+  .hero { padding-top: 30px; }
+  .hero-card, .panel, .login-card-clean { border-radius: 16px; }
+  .stats-grid, .profile-grid, .link-row, .contact-row, .referral-meta, .wa-meta-grid, .whatsapp-grid, .profile-card-grid, .referral-activity-grid { grid-template-columns: 1fr; }
+  .dashboard-nav { grid-template-columns: 1fr 1fr; }
+  .dash-tab { justify-content: flex-start; }
+  .btn, .secondary-btn { width: 100%; }
+  .footer-row { display: grid; justify-items: start; }
+  .course-frame iframe { height: 620px; }
+  .referral-table-head { display: grid; gap: 10px; }
+  .referral-activity-meta { justify-self: start; }
+}
+</style>
+</head>
+<body>
+  <div class="confirm-bar">
+    <div class="container">
+      <span class="cb-dot"></span>
+      Booking confirmed
+    </div>
+  </div>
+
+  <header class="top">
+    <div class="top-row">
+      <a href="/monaco.html" class="brand">
+        <img class="logo" src="ga-wordmark.png" alt="grow acquisition" />
+        <span class="brand-divider"></span>
+        <span class="brand-title">Monaco Content Retreat</span>
+      </a>
+
+      <nav class="top-links">
+        <button class="ghost-btn hidden" id="logoutBtn" type="button">Log out</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="heroSection">
+      <div class="container">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <span class="eyebrow">Member dashboard</span>
+            <h1>Your Monaco hub</h1>
+            <p class="lead">Everything you need before Monaco: referrals, curriculum, and community access.</p>
+          </div>
+          <aside class="hero-accent" aria-label="Booking summary">
+            <div class="hub-badge">
+              <span class="hub-label">Confirmed pass</span>
+              <span class="hub-title">Monaco 2026</span>
+              <div class="hub-meta">
+                <span>Member</span>
+                <span>Referral active</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="card" id="app">
+          <div class="state">Loading dashboard...</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <img src="ga-wordmark.png" alt="grow acquisition" style="height:30px;width:auto;" />
+        <div class="copy">Grow Acquisition. Copyright 2026. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/intlTelInput.min.js"></script>
+  <script>    (function() {
+      const app = document.getElementById("app");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const heroSection = document.getElementById("heroSection");
+      const params = new URLSearchParams(location.search);
+
+      /*
+        IMPORTANT:
+        Replace this with your real WhatsApp group invite link.
+        Example: "https://chat.whatsapp.com/AbCdEfGhIjKlMnOpQrStUv"
+      */
+      const WHATSAPP_GROUP_INVITE_URL = "https://chat.whatsapp.com/GeSjfsgJQDI8iEdoY5jLo0";
+
+      /*
+        Optional fallback. Replace with your team WhatsApp number in international format,
+        with numbers only, no plus sign or spaces. Example: "447700900000"
+      */
+      const WHATSAPP_SUPPORT_NUMBER = "";
+
+      /*
+        Referral invitation Google Apps Script webhook.
+        1) Deploy your Apps Script as a Web app.
+        2) Set access to "Anyone" or "Anyone with the link".
+        3) Paste the /exec URL below.
+      */
+      const REFERRAL_INVITE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkkRFnb_sCXBC_irLMkiiCG8SmeWY1YgY9S3QBfevVWUZtpgwldNJLh_vKGeW_d8_UjQ/exec";
+
+      const INTL_TEL_INPUT_UTILS_URL = "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/utils.js";
+      let invitePhoneInput = null;
+
+      const API = {
+        complete: "/api/referrals/complete-checkout",
+        me: "/api/referrals/me",
+        session: "/api/referrals/session",
+        logout: "/api/referrals/logout",
+        googleStart: "/auth/google/start"
+      };
+
+      const MAX_ATTEMPTS = 10;
+      const RETRY_DELAY_MS = 1200;
+
+      function $(id) {
+        return document.getElementById(id);
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      function esc(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        }[char]));
+      }
+
+      function date(value) {
+        if (!value) return "—";
+        const d = new Date(value);
+
+        return Number.isFinite(d.getTime())
+          ? d.toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric"
+            })
+          : "—";
+      }
+
+      function state(message, type = "success") {
+        app.innerHTML = `<div class="state ${type === "error" ? "error" : type === "warn" ? "warn" : ""}">${esc(message)}</div>`;
+      }
+
+      function googleIcon() {
+        return `
+          <svg class="google-mark" viewBox="0 0 48 48" aria-hidden="true">
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.4-.4-3.5z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/>
+            <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-7.9l-6.6 5.1C9.4 39.6 16.1 44 24 44z"/>
+            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C36.9 39.3 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/>
+          </svg>
+        `;
+      }
+
+      function sessionId() {
+        return (
+          params.get("checkout_session_id") ||
+          params.get("session_id") ||
+          sessionStorage.getItem("monaco_checkout_session_id") ||
+          localStorage.getItem("monaco_checkout_session_id") ||
+          ""
+        );
+      }
+
+      function googleStartUrl() {
+        const id = sessionId();
+        return id ? `${API.googleStart}?checkout_session_id=${encodeURIComponent(id)}` : API.googleStart;
+      }
+
+      async function json(url, options = {}) {
+        const res = await fetch(url, {
+          credentials: "include",
+          cache: "no-store",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          },
+          ...options
+        });
+
+        const text = await res.text();
+        let data = {};
+
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch {
+          throw new Error("The server returned invalid JSON.");
+        }
+
+        if (!res.ok) {
+          throw new Error(data.error || data.message || `Request failed (${res.status}).`);
+        }
+
+        return data;
+      }
+
+      async function completeCheckout(attempt = 1) {
+        const id = sessionId();
+        if (!id) return null;
+
+        const data = await json(`${API.complete}?checkout_session_id=${encodeURIComponent(id)}`);
+
+        if (data.status === "processing" && attempt < MAX_ATTEMPTS) {
+          state(`Finalising your dashboard${".".repeat((attempt % 3) + 1)}`);
+          await sleep(RETRY_DELAY_MS);
+          return completeCheckout(attempt + 1);
+        }
+
+        return data;
+      }
+
+      async function loadMe() {
+        return json(API.me);
+      }
+
+      function normalise(data) {
+        const d = data.dashboard || data.customer || data;
+
+        const referralCode =
+          d.referral_code ||
+          d.referralCode ||
+          "";
+
+        const referralLink =
+          d.referral_link ||
+          d.referralLink ||
+          (referralCode
+            ? `${location.origin}/checkout.html?r=${encodeURIComponent(referralCode)}`
+            : "");
+
+        return {
+          name: d.name || d.full_name || d.fullName || "Founder",
+          email: d.email || "",
+          phone: d.phone || d.phone_number || d.phoneNumber || "",
+          company: d.company || d.business || "",
+
+          google_connected: Boolean(d.google_connected || d.googleConnected),
+          whatsapp: d.whatsapp || {},
+
+          referral_code: referralCode,
+          referral_link: referralLink,
+
+          max_referrals: Number(d.max_referrals ?? d.maxReferrals ?? 2),
+          paid_referrals: Number(d.paid_referrals ?? d.paidReferrals ?? 0),
+
+          referrals: Array.isArray(d.referrals) ? d.referrals : []
+        };
+      }
+
+      function statusClass(status) {
+        return `status status-${String(status || "paid").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+      }
+
+      function configuredWhatsappGroupUrl() {
+        const backendUrl = String(window.__MONACO_WHATSAPP_GROUP_URL || "").trim();
+        const fileUrl = String(WHATSAPP_GROUP_INVITE_URL || "").trim();
+
+        if (backendUrl) return backendUrl;
+
+        if (
+          fileUrl &&
+          !fileUrl.includes("YOUR_INVITE_CODE") &&
+          fileUrl.startsWith("https://chat.whatsapp.com/")
+        ) {
+          return fileUrl;
+        }
+
+        return "";
+      }
+
+      function whatsappSupportUrl(d) {
+        const backendUrl = String(d.whatsapp?.support_url || "").trim();
+        if (backendUrl) return backendUrl;
+
+        const number = String(WHATSAPP_SUPPORT_NUMBER || "").replace(/\D/g, "");
+        if (!number) return "";
+
+        const message = encodeURIComponent(
+          `Hi, I just joined the Monaco Content Retreat. My name is ${d.name || ""} and my booking email is ${d.email || ""}.`
+        );
+
+        return `https://wa.me/${number}?text=${message}`;
+      }
+
+      function openInviteModal() {
+        const modal = $("inviteModal");
+        const msg = $("inviteMessage");
+        const success = $("inviteSuccess");
+
+        if (msg) {
+          msg.textContent = "";
+          msg.classList.remove("error");
+        }
+
+        success?.classList.remove("is-visible");
+        modal?.classList.add("is-open");
+        setTimeout(() => $("inviteContactValue")?.focus(), 50);
+      }
+
+      function closeInviteModal() {
+        $("inviteModal")?.classList.remove("is-open");
+      }
+
+      function initInvitePhonePicker() {
+        const input = $("inviteContactValue");
+        if (!input || !window.intlTelInput || invitePhoneInput) return;
+
+        invitePhoneInput = window.intlTelInput(input, {
+          initialCountry: "auto",
+          separateDialCode: true,
+          nationalMode: false,
+          autoPlaceholder: "aggressive",
+          geoIpLookup: function(success) {
+            fetch("https://ipapi.co/json/")
+              .then((res) => res.json())
+              .then((data) => success(String(data.country_code || "gb").toLowerCase()))
+              .catch(() => success("gb"));
+          },
+          utilsScript: INTL_TEL_INPUT_UTILS_URL
+        });
+      }
+
+      function destroyInvitePhonePicker() {
+        if (!invitePhoneInput) return;
+        invitePhoneInput.destroy();
+        invitePhoneInput = null;
+      }
+
+      function updateInviteContactPlaceholder() {
+        const type = String($("inviteContactType")?.value || "email");
+        const input = $("inviteContactValue");
+        if (!input) return;
+
+        if (type === "phone") {
+          input.type = "tel";
+          input.placeholder = "7700 900000";
+          setTimeout(initInvitePhonePicker, 0);
+        } else {
+          destroyInvitePhonePicker();
+          input.type = "email";
+          input.placeholder = "friend@example.com";
+        }
+      }
+
+      async function sendReferralInvitation(d) {
+        const nameInput = $("inviteFriendName");
+        const contactTypeInput = $("inviteContactType");
+        const contactInput = $("inviteContactValue");
+        const noteInput = $("inviteNote");
+        const btn = $("sendInviteBtn");
+        const msg = $("inviteMessage");
+        const success = $("inviteSuccess");
+
+        const friendName = String(nameInput?.value || "").trim() || "Friend";
+        const contactType = String(contactTypeInput?.value || "email").trim();
+        const rawContactValue = String(contactInput?.value || "").trim();
+        const contactValue = contactType === "phone" && invitePhoneInput
+          ? (invitePhoneInput.getNumber() || rawContactValue)
+          : rawContactValue;
+        const note = String(noteInput?.value || "").trim();
+        const webhookUrl = String(window.__MONACO_REFERRAL_INVITE_SCRIPT_URL || REFERRAL_INVITE_SCRIPT_URL || "").trim();
+
+        function setMessage(text, type = "success") {
+          if (!msg) return;
+          msg.textContent = text;
+          msg.classList.toggle("error", type === "error");
+        }
+
+        if (!contactValue) {
+          setMessage("Add one contact detail first.", "error");
+          return;
+        }
+
+        if (contactType === "phone" && invitePhoneInput && !invitePhoneInput.isValidNumber()) {
+          setMessage("Add a valid WhatsApp phone number with its country code.", "error");
+          return;
+        }
+
+        if (!d.referral_link) {
+          setMessage("Your referral link is not ready yet.", "error");
+          return;
+        }
+
+        if (!webhookUrl || webhookUrl === "PASTE_YOUR_GOOGLE_SCRIPT_EXEC_URL_HERE") {
+          setMessage("Paste your Google Apps Script /exec URL into REFERRAL_INVITE_SCRIPT_URL first.", "error");
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Sending...";
+        setMessage("");
+        success?.classList.remove("is-visible");
+
+        const friendEmail = contactType === "email" ? contactValue : "";
+        const friendPhone = contactType === "phone" ? contactValue : "";
+        const contactMethod = contactType === "phone" ? "WhatsApp" : "Email";
+
+        const payload = new URLSearchParams({
+          event: "monaco_referral_invitation",
+          invited_by_name: d.name || "",
+          invited_by_email: d.email || "",
+          invited_by_company: d.company || "",
+          friend_name: friendName,
+          friend_email: friendEmail,
+          friend_phone: friendPhone,
+          friend_insta: "",
+          contact_method: contactMethod,
+          friend_contact_type: contactType,
+          friend_contact_value: contactValue,
+          referral_link: d.referral_link,
+          note,
+          message: `${friendName}, ${d.name || "Someone"} has invited you to the Monaco Content Retreat. Use their referral link here: ${d.referral_link}`,
+          sent_at: new Date().toISOString()
+        });
+
+        try {
+          await fetch(webhookUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+            },
+            body: payload.toString()
+          });
+
+          if (nameInput) nameInput.value = "";
+          if (contactInput) contactInput.value = "";
+          if (noteInput) noteInput.value = "";
+          if (contactTypeInput) contactTypeInput.value = "email";
+          updateInviteContactPlaceholder();
+
+          success?.classList.add("is-visible");
+          setMessage("Invitation sent.");
+
+          setTimeout(() => {
+            closeInviteModal();
+            success?.classList.remove("is-visible");
+            setMessage("");
+          }, 1400);
+        } catch (err) {
+          setMessage(err.message || "Could not send the invitation.", "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Send invitation";
+        }
+      }
+
+
+      function whatsappCommunityHtml(d) {
+        const whatsapp = d.whatsapp || {};
+        const groupUrl = String(whatsapp.group_invite_url || "").trim() || configuredWhatsappGroupUrl();
+        const supportUrl = whatsappSupportUrl(d);
+        const primaryUrl = groupUrl || supportUrl;
+        const primaryLabel = groupUrl ? "Join WhatsApp" : "Message us";
+
+        if (!d.google_connected) {
+          return `
+            <div class="whatsapp-card">
+              <div class="whatsapp-grid">
+                <div class="whatsapp-icon">◎</div>
+                <div>
+                  <h3>Connect Google first</h3>
+                  <p>Your private WhatsApp link appears here once your booking email is connected.</p>
+                  <div class="whatsapp-actions">
+                    <a class="btn google-btn" href="${googleStartUrl()}">
+                      ${googleIcon()}
+                      Continue with Google
+                    </a>
+                  </div>
+                  <div class="wa-meta-grid">
+                    <div class="wa-meta"><span>Status</span><strong>Google required</strong></div>
+                    <div class="wa-meta"><span>Access</span><strong>Private group</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        if (!primaryUrl) {
+          return `
+            <div class="whatsapp-card">
+              <div class="whatsapp-grid">
+                <div class="whatsapp-icon">✓</div>
+                <div>
+                  <h3>WhatsApp unlocked</h3>
+                  <p>Add the real invite link to <strong>WHATSAPP_GROUP_INVITE_URL</strong>.</p>
+                  <div class="wa-meta-grid">
+                    <div class="wa-meta"><span>Phone on file</span><strong>${esc(whatsapp.customer_phone || d.phone || "—")}</strong></div>
+                    <div class="wa-meta"><span>Status</span><strong>Unlocked</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="whatsapp-card">
+            <div class="whatsapp-grid">
+              <div class="whatsapp-icon">☏</div>
+              <div>
+                <h3>Private WhatsApp group</h3>
+                <p>Use the booking phone on your checkout so access stays matched to your profile.</p>
+                <div class="whatsapp-actions">
+                  <a class="btn" href="${esc(primaryUrl)}" target="_blank" rel="noopener">${esc(primaryLabel)}</a>
+                  ${supportUrl && groupUrl ? `<a class="secondary-btn" href="${esc(supportUrl)}" target="_blank" rel="noopener">Need help?</a>` : ""}
+                </div>
+                <div class="wa-meta-grid">
+                  <div class="wa-meta"><span>Phone on file</span><strong>${esc(whatsapp.customer_phone || d.phone || "your checkout phone")}</strong></div>
+                  <div class="wa-meta"><span>Status</span><strong>${groupUrl ? "Group ready" : "Support"}</strong></div>
+                </div>
+                <p class="small-note">Wrong account opening? Switch to your booking number in WhatsApp.</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function render(d) {
+        heroSection?.classList.remove("hidden");
+
+        const rows = d.referrals.length
+          ? d.referrals.map((r) => `
+              <tr>
+                <td>${esc(r.friend_name || r.name || "Friend")}</td>
+                <td>${esc(r.friend_email_masked || r.email_masked || r.email || "—")}</td>
+                <td><span class="${statusClass(r.friend_payment_status || r.payment_status || "paid")}">${esc(r.friend_payment_status || r.payment_status || "paid")}</span></td>
+                <td>${date(r.paid_at)}</td>
+              </tr>
+            `).join("")
+          : `<tr><td colspan="4">No paid referrals yet.</td></tr>`;
+
+        logoutBtn.classList.remove("hidden");
+
+        app.innerHTML = `
+          <div class="app-shell">
+            <aside class="sidebar">
+              <div class="sidebar-title">
+                <strong>Dashboard</strong>
+                <span>Monaco Content Retreat</span>
+              </div>
+
+              <nav class="dashboard-nav">
+                <button class="dash-tab is-active" data-page="referrals" type="button"><span class="dash-icon">↗</span>Referrals</button>
+                <button class="dash-tab" data-page="profile" type="button"><span class="dash-icon">◉</span>Profile</button>
+                <button class="dash-tab" data-page="community" type="button"><span class="dash-icon">◎</span>Community</button>
+                <button class="dash-tab" data-page="curriculum" type="button"><span class="dash-icon">▣</span>Curriculum</button>
+              </nav>
+            </aside>
+
+            <div class="main-panel">
+              <section class="dashboard-page is-active" id="page-referrals">
+                <div class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <div class="panel-kicker">Referrals</div>
+                      <h2>Your referral link</h2>
+                      <p>Share your link. Paid referrals show below after verification.</p>
+                    </div>
+                    <div class="pill">${d.paid_referrals}/${d.max_referrals} complete</div>
+                  </div>
+
+                  <div class="referral-group">
+                    <div class="referral-card feature">
+                      <h3>Share this link</h3>
+                      <p>Send it directly, or use the invite flow below.</p>
+                      <div class="link-row">
+                        <input id="referralLinkInput" class="input" value="${esc(d.referral_link)}" readonly aria-label="Your referral link" />
+                        <button id="copyReferralBtn" class="btn" type="button">Copy link</button>
+                      </div>
+                      <div class="inline-actions compact-note">
+                        <button id="openInviteModalBtn" class="secondary-btn" type="button">Invite a friend</button>
+                        <p>Rewards are issued after payment verification.</p>
+                      </div>
+                    </div>
+
+                    <div class="referral-card referral-progress">
+                      <div>
+                        <div class="progress-top">
+                          <strong>${d.paid_referrals}/${d.max_referrals}</strong>
+                          <span>complete</span>
+                        </div>
+                        <div class="progress-track" aria-hidden="true">
+                          <div class="progress-fill" style="width:${Math.min(100, Math.max(0, (d.paid_referrals / Math.max(1, d.max_referrals)) * 100))}%"></div>
+                        </div>
+                      </div>
+                      <div class="referral-meta">
+                        <div><span>Remaining</span><strong>${Math.max(0, d.max_referrals - d.paid_referrals)}</strong></div>
+                        <div><span>Link</span><strong>${d.referral_code ? "Ready" : "Pending"}</strong></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="referral-activity-card">
+                    <div class="referral-activity-grid">
+                      <div class="referral-activity-icon">↗</div>
+                      <div>
+                        <div class="referral-table-head">
+                          <div>
+                            <h3>Referral activity</h3>
+                            <p>Paid referrals appear here once verified.</p>
+                          </div>
+                          <span class="referral-activity-meta">Verified only</span>
+                        </div>
+
+                        <div class="table-wrap">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Friend</th>
+                                <th>Email</th>
+                                <th>Payment</th>
+                                <th>Paid date</th>
+                              </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal-overlay" id="inviteModal" aria-hidden="true">
+                  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="inviteModalTitle">
+                    <button class="modal-close" id="closeInviteModalBtn" type="button" aria-label="Close invitation popup">×</button>
+                    <div class="panel-kicker">Invitation</div>
+                    <h2 id="inviteModalTitle">Invite a friend</h2>
+                    <p>Add an email or WhatsApp number.</p>
+
+                    <form class="invite-form" id="inviteFriendForm">
+                      <input id="inviteFriendName" class="input" type="text" placeholder="Friend's name, optional" autocomplete="name" />
+
+                      <div class="contact-row">
+                        <select id="inviteContactType" class="input" aria-label="Contact type">
+                          <option value="email">Email</option>
+                          <option value="phone">WhatsApp</option>
+                        </select>
+                        <input id="inviteContactValue" class="input" type="email" placeholder="friend@example.com" required />
+                      </div>
+
+                      <input id="inviteNote" class="input" type="text" placeholder="Optional note" />
+
+                      <div class="invite-actions">
+                        <button id="sendInviteBtn" class="btn" type="submit">Send invitation</button>
+                        <button class="secondary-btn" id="cancelInviteBtn" type="button">Cancel</button>
+                      </div>
+
+                      <div id="inviteSuccess" class="modal-success" aria-live="polite">Invitation sent.</div>
+                      <span id="inviteMessage" class="invite-message" aria-live="polite"></span>
+                    </form>
+                  </div>
+                </div>
+              </section>
+
+              <section class="dashboard-page" id="page-profile">
+                <div class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <div class="panel-kicker">Profile</div>
+                      <h2>Your details</h2>
+                    </div>
+                    <div class="pill">Active</div>
+                  </div>
+
+                  <div class="profile-card">
+                    <div class="profile-card-grid">
+                      <div class="profile-icon">◉</div>
+                      <div>
+                        <h3>${esc(d.name || "Monaco member")}</h3>
+                        <p>Your booking profile for Monaco access, referrals, curriculum, and community.</p>
+
+                        <div class="profile-grid">
+                          <div class="profile-field"><span>Email</span><strong>${esc(d.email || "—")}</strong></div>
+                          <div class="profile-field"><span>Phone</span><strong>${esc(d.phone || "—")}</strong></div>
+                          <div class="profile-field"><span>Company</span><strong>${esc(d.company || "—")}</strong></div>
+                          <div class="profile-field"><span>Google</span><strong>${d.google_connected ? "Connected" : "Not connected"}</strong></div>
+                          <div class="profile-field"><span>Status</span><strong>Active</strong></div>
+                          <div class="profile-field"><span>Referral code</span><strong>${esc(d.referral_code || "Pending")}</strong></div>
+                        </div>
+
+                        <div class="profile-actions">
+                          ${d.google_connected ? "" : `<a class="secondary-btn" href="${googleStartUrl()}">Connect Google</a>`}
+                        </div>
+
+                        <p class="small-note">Need a change? Contact the Grow Acquisition team.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="dashboard-page" id="page-community">
+                <div class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <div class="panel-kicker">Community</div>
+                      <h2>WhatsApp</h2>
+                    </div>
+                    <div class="pill">${d.google_connected ? "Unlocked" : "Google required"}</div>
+                  </div>
+                  ${whatsappCommunityHtml(d)}
+                </div>
+              </section>
+
+              <section class="dashboard-page" id="page-curriculum">
+                <div class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <div class="panel-kicker">Curriculum</div>
+                      <h2>Course access</h2>
+                      <p>Log in with <strong>${esc(d.email || "your checkout email")}</strong>.</p>
+                    </div>
+                    <a class="secondary-btn" href="https://nikkleinherenbrink.podia.com/view/courses/grow-aqcuisition-content-curriculum" target="_blank" rel="noopener">Open course</a>
+                  </div>
+
+                  <div class="notice">
+                    <p>Use the same email you used for your Monaco booking.</p>
+                  </div>
+
+                  <div class="course-frame">
+                    <iframe
+                      src="https://nikkleinherenbrink.podia.com/view/courses/grow-aqcuisition-content-curriculum"
+                      title="Monaco Podia Course"
+                      loading="lazy"
+                      allow="fullscreen"
+                    ></iframe>
+                  </div>
+
+                  <p class="small-note">If the course does not load, open it in a new tab.</p>
+                </div>
+              </section>
+            </div>
+          </div>
+        `;
+
+        const copyBtn = $("copyReferralBtn");
+        const input = $("referralLinkInput");
+
+        copyBtn?.addEventListener("click", async () => {
+          if (!input.value) return;
+
+          try {
+            await navigator.clipboard.writeText(input.value);
+          } catch {
+            input.select();
+            document.execCommand("copy");
+          }
+
+          copyBtn.textContent = "Copied";
+          setTimeout(() => {
+            copyBtn.textContent = "Copy link";
+          }, 1200);
+        });
+
+        $("openInviteModalBtn")?.addEventListener("click", openInviteModal);
+        $("closeInviteModalBtn")?.addEventListener("click", closeInviteModal);
+        $("cancelInviteBtn")?.addEventListener("click", closeInviteModal);
+        $("inviteContactType")?.addEventListener("change", updateInviteContactPlaceholder);
+        $("inviteModal")?.addEventListener("click", (event) => {
+          if (event.target?.id === "inviteModal") closeInviteModal();
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") closeInviteModal();
+        });
+
+        updateInviteContactPlaceholder();
+
+        $("inviteFriendForm")?.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          await sendReferralInvitation(d);
+        });
+
+        document.querySelectorAll(".dash-tab").forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const page = tab.dataset.page;
+
+            document.querySelectorAll(".dash-tab").forEach((btn) => {
+              btn.classList.remove("is-active");
+            });
+
+            document.querySelectorAll(".dashboard-page").forEach((section) => {
+              section.classList.remove("is-active");
+            });
+
+            tab.classList.add("is-active");
+            document.getElementById(`page-${page}`)?.classList.add("is-active");
+          });
+        });
+      }
+
+      function renderLogin(error = "") {
+        logoutBtn.classList.add("hidden");
+        heroSection?.classList.add("hidden");
+        document.querySelector(".confirm-bar")?.classList.add("hidden");
+
+        app.innerHTML = `
+          <div class="login-wrap">
+            <div class="login-card-clean">
+              <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+              <div class="panel-kicker">Member dashboard</div>
+              <h2>Log in to your Monaco dashboard</h2>
+              <p>Use the Google account connected to your booking.</p>
+
+              ${error ? `<div class="state error login-error">${esc(error)}</div>` : ""}
+
+              <a class="btn google-btn login-google-btn" href="${googleStartUrl()}">
+                ${googleIcon()}
+                Continue with Google
+              </a>
+
+              <p class="small-note">Profile, referrals, curriculum, and WhatsApp access.</p>
+            </div>
+          </div>
+        `;
+      }
+
+async function boot() {
+        try {
+          const token = params.get("token");
+          const googleError = params.get("error");
+
+          if (googleError) {
+            renderLogin(googleError);
+            return;
+          }
+
+          if (token) {
+            await json(API.session, {
+              method: "POST",
+              body: JSON.stringify({ token })
+            });
+
+            history.replaceState({}, "", "/thankyou-referral-dashboard.html");
+          }
+
+          const hasCheckoutReturn =
+            params.has("checkout_session_id") ||
+            params.has("session_id");
+
+          if (hasCheckoutReturn) {
+            const completed = await completeCheckout();
+
+            if (completed?.dashboard) {
+              render(normalise(completed));
+              return;
+            }
+          }
+
+          const me = await loadMe();
+          render(normalise(me));
+        } catch (err) {
+          if (
+            String(err.message || "").toLowerCase().includes("log in") ||
+            String(err.message || "").includes("401")
+          ) {
+            renderLogin();
+            return;
+          }
+
+          state(err.message || "Could not load your dashboard.", "error");
+          setTimeout(() => renderLogin(), 1400);
+        }
+      }
+
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          await json(API.logout, { method: "POST" });
+        } catch {}
+
+        sessionStorage.removeItem("monaco_checkout_session_id");
+        localStorage.removeItem("monaco_checkout_session_id");
+        window.location.href = "/monaco.html";
+      });
+
+      boot();
+    })();
+  </script>
+</body>
+</html>

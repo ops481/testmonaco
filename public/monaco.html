@@ -1,0 +1,1314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Monaco Content Retreat · Grow Acquisition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+
+
+
+
+
+:root {
+    --bg: #f5f7f4;
+    --card: #ffffff;
+    --fg: #0e0e0e;
+    --muted: #4b4b4b;
+    --line: #e4e8e3;
+    --accent: #0e5732;
+    --sand: #e8e2d2;   /* warm placeholder tone, already in brand */
+    --sand-2: #ded6c2;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.55;
+    letter-spacing: 0.012em;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== TOP DEAL BAR + COUNTDOWN ===== */
+  .deal-bar { background: var(--accent); color: #fff; font-weight: 600; }
+  .deal-bar .container {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; padding-top: 7px; padding-bottom: 7px; flex-wrap: wrap;
+  }
+  .deal-text { font-size: 14px; }
+  .deal-text strong { font-weight: 800; }
+  .countdown { display: flex; gap: 5px; }
+  .cd {
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28);
+    border-radius: 7px; padding: 2px 7px; min-width: 40px; text-align: center; line-height: 1.05;
+  }
+  .cd span { font-size: 15px; font-weight: 800; display: block; font-variant-numeric: tabular-nums; }
+  .cd i { font-size: 8px; font-style: normal; text-transform: uppercase; letter-spacing: .08em; opacity: .82; }
+  @media (max-width: 700px) {
+    /* text + countdown sit centered together on one row */
+    .deal-bar .container { flex-wrap: nowrap; justify-content: center; gap: 10px; padding-left: 16px; padding-right: 16px; }
+    .deal-text { font-size: 11.5px; text-align: center; flex: 0 1 auto; min-width: 0; line-height: 1.25; }
+    .countdown { flex-shrink: 0; }
+    .cd { min-width: 34px; padding: 2px 4px; }
+    .cd span { font-size: 12px; }
+    .cd i { font-size: 7px; }
+  }
+
+  /* ===== HERO ===== */
+  .hero { padding: 104px 0 52px; text-align: center; }
+  .hero h1 {
+    font-size: clamp(24px, 5.8vw, 64px);
+    line-height: 1.08; letter-spacing: -0.03em;
+    margin: 0 auto 40px; font-weight: 700; max-width: none;
+    overflow-wrap: break-word;
+  }
+  /* Monaco Grand Prix treatment: checkered-flag underline + little F1 car */
+  .monaco { position: relative; display: inline-block; white-space: nowrap; }
+  /* checkered FINISH LINE hugging the word (em-sized so it scales) */
+  .monaco::after {
+    content: ""; position: absolute; left: -0.05em; right: -0.05em; bottom: -0.08em; height: 0.15em;
+    background-color: #fff;
+    background-image:
+      linear-gradient(45deg, #141414 25%, transparent 25%),
+      linear-gradient(-45deg, #141414 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #141414 75%),
+      linear-gradient(-45deg, transparent 75%, #141414 75%);
+    background-size: 0.16em 0.16em;
+    background-position: 0 0, 0 0.08em, 0.08em -0.08em, -0.08em 0;
+    border-radius: 2px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.16);
+  }
+  .hero-cta { text-align: center; margin-top: 32px; }
+  .cta-note { margin-top: 16px; font-size: 14px; }
+  .cta-note a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; transition: color .15s ease; }
+  .cta-note a:hover { color: var(--accent); }
+
+  /* F1 start lights (overlay, centered on the video) */
+  .f1-start {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 5; text-align: center; cursor: pointer;
+    transition: opacity .5s ease;
+  }
+  .f1-start.done { opacity: 0; pointer-events: none; }
+  .video-wrap.armed .vplay { opacity: 0 !important; pointer-events: none; }
+  .f1-gantry {
+    display: inline-flex; align-items: center; gap: 14px; padding: 15px 22px; border-radius: 16px;
+    background: linear-gradient(#1d1d1d, #0b0b0b);
+    border: 1px solid #2c2c2c;
+    box-shadow: 0 12px 28px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .f1-light {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #2a0d0d; box-shadow: inset 0 2px 5px rgba(0,0,0,.75);
+    transition: background .12s ease, box-shadow .12s ease;
+  }
+  .f1-light.red   { background: radial-gradient(circle at 40% 34%, #ff7676, #e10600 60%, #7a0500); box-shadow: 0 0 16px 2px rgba(225,6,0,.85), inset 0 1px 2px rgba(255,255,255,.45); }
+  .f1-light.amber { background: radial-gradient(circle at 40% 34%, #ffd98a, #ff9a00 60%, #b35e00); box-shadow: 0 0 16px 2px rgba(255,154,0,.85), inset 0 1px 2px rgba(255,255,255,.45); }
+  .f1-light.green { background: radial-gradient(circle at 40% 34%, #93ffae, #14b34a 60%, #0a6b2c); box-shadow: 0 0 20px 3px rgba(20,179,74,.9), inset 0 1px 2px rgba(255,255,255,.45); }
+  /* middle pod = play button */
+  .f1-play { width: 52px; height: 52px; background: rgba(255,255,255,.96); box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 1px 2px rgba(255,255,255,.6); position: relative; }
+  .f1-play::after { content: ""; position: absolute; top: 50%; left: 56%; transform: translate(-50%,-50%); width: 0; height: 0; border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #0e5732; transition: opacity .15s ease; }
+  .f1-play.red::after, .f1-play.amber::after, .f1-play.green::after { opacity: 0; }
+  .f1-hint { margin-top: 11px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: #fff; font-weight: 700; text-shadow: 0 1px 5px rgba(0,0,0,.6); }
+  @media (max-width: 540px) { .f1-light { width: 22px; height: 22px; } .f1-gantry { gap: 10px; padding: 12px 16px; } }
+
+  /* ===== VIDEO (custom player, from careers site) ===== */
+  .video-wrap {
+    max-width: 980px; margin: 0 auto 30px;
+    aspect-ratio: 16 / 10; background: #11150f;
+    border-radius: 16px; overflow: hidden; position: relative;
+    box-shadow: 0 18px 50px rgba(14,87,50,.16);
+  }
+  .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-fallback {
+    position: absolute; inset: 0;
+    display: grid; place-items: center; text-align: center;
+    color: rgba(255,255,255,.55); font-size: 14px; letter-spacing: .04em;
+    background:
+      radial-gradient(120% 120% at 70% 20%, rgba(14,87,50,.55), transparent 60%),
+      linear-gradient(135deg, #1d2a1f, #0d130c);
+  }
+  .video-fallback span { display:block; }
+  .video-fallback .vf-big { font-size: 18px; color: rgba(255,255,255,.8); margin-bottom: 6px; }
+  .vplay {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 84px; height: 84px; border-radius: 999px;
+    background: rgba(255,255,255,.95); color: var(--accent); font-size: 26px;
+    display: grid; place-items: center; cursor: pointer; border: 0;
+    box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    transition: opacity .2s ease, transform .15s ease;
+    z-index: 3; font-family: inherit; padding-left: 6px;
+  }
+  .vplay:hover { transform: translate(-50%, -50%) scale(1.06); }
+  .video-wrap.playing .vplay { opacity: 0; pointer-events: none; }
+  .video-wrap:hover .vplay { opacity: 1; pointer-events: auto; }
+  .vctrls {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 22px 16px;
+    display: flex; align-items: center; gap: 14px; z-index: 3;
+    background: linear-gradient(to top, rgba(0,0,0,.55), transparent);
+    opacity: 0; transition: opacity .2s ease;
+  }
+  .video-wrap:hover .vctrls, .video-wrap.paused .vctrls { opacity: 1; }
+  .vprogress { flex: 1; height: 5px; background: rgba(255,255,255,.25); border-radius: 999px; cursor: pointer; position: relative; transition: height .15s ease; }
+  .vprogress:hover { height: 7px; }
+  .vfill { height: 100%; width: 0%; background: var(--accent); border-radius: 999px; pointer-events: none; transition: width .1s linear; }
+  .vtime { color: rgba(255,255,255,.9); font-size: 12px; white-space: nowrap; letter-spacing: .02em; }
+  .vmute-btn { background: transparent; border: 0; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 6px; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-block;
+    background: #ccb784;
+    color: #241d0c;
+    padding: 18px 44px; border-radius: 999px; font-size: 18px; font-weight: 800; letter-spacing: .01em;
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease; cursor: pointer; border: 0;
+    box-shadow: 0 6px 16px rgba(120,98,48,.22);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(120,98,48,.30); filter: brightness(1.03); }
+  .btn-ghost {
+    background: transparent; color: var(--accent);
+    border: 1.5px solid var(--accent); padding: 13.5px 30px;
+  }
+  .btn-ghost:hover { background: var(--accent); color: #fff; }
+  .cta-pair { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+
+  /* ===== SECTIONS ===== */
+  section { padding: 84px 0; }
+  .section-title {
+    font-size: clamp(30px, 4.4vw, 54px); text-align: center; letter-spacing: -0.03em;
+    margin: 0 auto 14px; max-width: 900px; font-weight: 700; line-height: 1.06;
+  }
+  .section-sub { text-align: center; color: var(--muted); max-width: 620px; margin: 0 auto 48px; font-size: 16px; }
+
+  /* ===== TEAM (portrait cards) ===== */
+  .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .person { text-align: center; }
+  .person .photo {
+    aspect-ratio: 4/3; border-radius: 16px; overflow: hidden;
+    background: linear-gradient(160deg, var(--sand), var(--sand-2));
+    display: grid; place-items: center; margin-bottom: 14px;
+    position: relative;
+  }
+  .person .photo img, .person .photo video { width:100%; height:100%; object-fit: cover; display:block; }
+  .person .mono { font-size: 40px; font-weight: 800; color: rgba(14,87,50,.35); letter-spacing: -.02em; }
+  .person h3 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .person .role { font-size: 13px; color: var(--muted); }
+  .person .photo:has(video) { cursor: pointer; }
+  .person .photo video { background: #11150f; }
+  .vplay-team {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 40px; height: 40px; border-radius: 999px; z-index: 3;
+    background: rgba(255,255,255,.92); color: #0e0e0e; font-size: 14px; padding-left: 2px;
+    display: grid; place-items: center; box-shadow: 0 8px 20px rgba(0,0,0,.3);
+    transition: transform .15s ease, opacity .2s ease; pointer-events: none;
+  }
+  .person .photo:hover .vplay-team { transform: translate(-50%,-50%) scale(1.07); }
+  .person .photo.playing .vplay-team { opacity: 0; }
+  @media (max-width: 760px) { .team-grid { grid-template-columns: 1fr 1fr; gap: 16px; } }
+
+  /* ===== EXPERIENCES (Monaco route: a race track of pinned stops) ===== */
+  .exp-intro { margin-bottom: 44px; color: #fff; }
+  .exp-stage {
+    position: relative; width: 100%; aspect-ratio: 1000 / 640;
+    border-radius: 18px; overflow: visible;
+    border: 1px solid rgba(201,162,74,.28);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 30px 70px rgba(0,0,0,.40);
+    /* green surface with black depth and a gold sheen */
+    background:
+      radial-gradient(130% 90% at 25% 0%, rgba(201,162,74,.16), transparent 55%),
+      linear-gradient(155deg, #0f4a32 0%, #0a2c1d 48%, #061510 100%);
+  }
+  .track-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+  .exp-stage .polaroid {
+    position: absolute; width: 17%; z-index: 2;
+    background: #fff; border-radius: 8px; padding: 12px 10px 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.10), 0 18px 36px rgba(20,30,25,.26);
+    border: 1px solid rgba(196,162,86,.45);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .exp-stage .polaroid:hover { transform: rotate(0deg) translateY(-6px) scale(1.04) !important; box-shadow: 0 26px 50px rgba(0,0,0,.34); z-index: 6; }
+  /* placements along the track */
+  .p1 { left: 8.0%;  top: 10.3%; transform: rotate(-3deg); }
+  .p2 { left: 34.5%; top: 6.6%;  transform: rotate(2.5deg); }
+  .p3 { left: 61.5%; top: 10.3%; transform: rotate(3deg); }
+  .p4 { left: 23.5%; top: 52.3%; transform: rotate(2.5deg); }
+  .p5 { left: 52.5%; top: 52.3%; transform: rotate(-2.5deg); }
+  /* realistic red pushpin */
+  .polaroid .pin {
+    position: absolute; top: -11px; left: 50%; margin-left: -11px;
+    width: 22px; height: 22px; border-radius: 50%; z-index: 7;
+    background: radial-gradient(circle at 34% 30%, #ff938c 0%, #e10600 42%, #a20400 100%);
+    box-shadow: 0 5px 8px rgba(0,0,0,.4), inset -2px -3px 5px rgba(110,8,4,.55), inset 3px 3px 5px rgba(255,255,255,.5);
+  }
+  .polaroid .pin::before { content: ""; position: absolute; top: 3px; left: 4px; width: 8px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.8); filter: blur(.5px); }
+  .polaroid .pin::after { content: ""; position: absolute; top: 17px; left: 50%; transform: translateX(-50%); width: 3px; height: 10px; border-radius: 0 0 2px 2px; background: linear-gradient(#d7d7d7, #9a9a9a 60%, #6f6f6f); box-shadow: 0 3px 3px rgba(0,0,0,.35); }
+  .polaroid .pimg {
+    aspect-ratio: 4/5; border-radius: 4px; overflow: hidden; margin-bottom: 10px;
+    background: linear-gradient(150deg, var(--sand), var(--sand-2));
+    display: grid; place-items: center; color: rgba(14,87,50,.45);
+    font-size: 12px; letter-spacing: .04em; text-align: center;
+  }
+  .polaroid .pimg img { width:100%; height:100%; object-fit: cover; display:block; }
+  .polaroid.p4 .pimg img { object-position: center 80%; }
+  .polaroid .pcap { font-size: 16px; font-weight: 700; letter-spacing: -.01em; line-height: 1.15; text-align: center; color: #1a1a1a; }
+  /* hand-drawn note: arrow tail inside the picture, head pointing right -> text sits right after the arrowhead */
+  .castle-note { position: absolute; left: 55%; top: 22%; width: 120%; pointer-events: none; z-index: 5; transform: rotate(-3deg); display: flex; flex-direction: row; align-items: center; }
+  .polaroid.p3 .castle-note { left: 80%; }
+  .polaroid.p3 .castle-note .cn-text { transform: translateY(25%); }
+  .polaroid.p5 .castle-note .cn-text { transform: translateY(45%); }
+  .castle-note .cn-arrow { flex: 0 0 65%; width: 65%; height: auto; display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.7)); }
+  .castle-note .cn-text { flex: 1; padding-left: 3%; font-family: 'Caveat','Brush Script MT',cursive; color: #ffffff; font-size: clamp(14px, 1.55vw, 22px); font-weight: 700; line-height: 1.05; text-align: left; text-shadow: 0 1px 3px rgba(0,0,0,.65); }
+  .polaroid .psub { font-size: 12px; color: var(--muted); text-align: center; margin-top: 2px; }
+  /* gentle jet float */
+  @keyframes jetfloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+  .track-svg .jet { animation: jetfloat 4.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  /* waving finish flag */
+  .flag-cloth { transform-box: fill-box; transform-origin: left center; animation: flagsway 2.4s ease-in-out infinite; }
+  @keyframes flagsway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-4deg); } }
+  /* Day 1 / Day 2 markers */
+  .day-tag {
+    position: absolute; z-index: 3; background: var(--accent); color: #fff;
+    font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    padding: 5px 13px; border-radius: 999px; box-shadow: 0 5px 14px rgba(0,0,0,.18);
+  }
+  .day1 { left: 2.5%; top: 3%; }
+  .day2 { left: 67%; top: 85%; }
+  /* unique per-board day badge (top-left corner) */
+  .polaroid .daymark {
+    position: absolute; top: -13px; left: -13px; z-index: 8;
+    width: 40px; height: 40px; border-radius: 50%;
+    display: grid; place-items: center; align-content: center; text-align: center; line-height: 1; font-weight: 900;
+    padding-top: 5px;
+    color: #f3e2a6;
+    background: radial-gradient(circle at 35% 28%, #1d4a33, #0b2418 78%);
+    border: 2px solid #c9a24a;
+    box-shadow: 0 5px 12px rgba(0,0,0,.45), inset 0 1px 2px rgba(255,255,255,.18);
+  }
+  .polaroid .daymark i { display: block; font-style: normal; font-size: 9px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #f6e6b0; margin-bottom: 1px; }
+  .polaroid .daymark b { display: block; font-size: 14px; letter-spacing: -.02em; }
+  .stage-wrap { position: relative; }
+  .arrival-jet { position: absolute; width: 27%; left: 33%; top: 69%; z-index: 4; pointer-events: none; filter: drop-shadow(0 14px 10px rgba(0,0,0,.5)); }
+  /* race car parked on the track, layered UNDER the pinned boards */
+  .race-car { position: absolute; width: 21%; left: 12%; top: -2%; transform: rotate(-7deg); z-index: 1; pointer-events: none; }
+  .finish-label {
+    position: absolute; z-index: 3; left: 70%; top: 88%;
+    background: linear-gradient(#e3c25c, #b8902f); color: #3a2c08;
+    font-size: 12px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+    padding: 6px 14px; border-radius: 999px; box-shadow: 0 6px 16px rgba(168,127,40,.45); white-space: nowrap;
+  }
+  /* PHONE: keep the exact desktop race-track layout, just scale it down proportionally.
+     The stage and everything inside is already %-based, so all that's needed is to
+     scale the few px-based elements (caption text, daymark badges, pins) so they
+     stay legible at small sizes. */
+  @media (max-width: 760px) {
+    /* tighten polaroid padding so the picture takes more of the card at small sizes */
+    .exp-stage .polaroid { padding: 5px 4px 6px; border-radius: 4px; }
+    .polaroid .pimg { margin-bottom: 4px; border-radius: 2px; }
+    /* caption + daymark + pin scale with viewport */
+    .polaroid .pcap { font-size: clamp(7px, 1.6vw, 13px); line-height: 1.1; }
+    .polaroid .daymark { width: clamp(20px, 5vw, 34px); height: clamp(20px, 5vw, 34px); top: -7px; left: -7px; padding-top: 3px; border-width: 1.5px; }
+    .polaroid .daymark i { font-size: clamp(5px, 1.1vw, 8px); margin-bottom: 0; }
+    .polaroid .daymark b { font-size: clamp(8px, 1.7vw, 12px); }
+    .polaroid .pin { width: clamp(11px, 2.6vw, 18px); height: clamp(11px, 2.6vw, 18px); top: -6px; margin-left: -7px; }
+    .polaroid .pin::after { top: 9px; width: 2px; height: 7px; }
+    /* day-tag pills shrink to fit */
+    .day-tag { font-size: clamp(7px, 1.4vw, 10px); padding: 3px 8px; }
+    .finish-label { font-size: clamp(7px, 1.4vw, 10px); padding: 4px 9px; }
+    /* hand-drawn castle annotations: keep visible on phone with smaller text so they stay legible */
+    .castle-note .cn-text { font-size: clamp(8px, 2.2vw, 16px); }
+  }
+  /* ===== WORLD MAP on mobile: hover doesn't fire on touch, so use TAP-TO-OPEN ===== */
+  @media (max-width: 900px) {
+    /* disable hover-trigger so the card doesn't flash on tap */
+    .wp:hover .wp-circle { transform: none; box-shadow: none; }
+    .wp:hover .wp-card { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-50%) translateX(12px); }
+    .wp.flip:hover .wp-card { transform: translateY(-50%) translateX(-12px); }
+    /* tapped pin gets .open -> the card pops out as a centered popover below the pin */
+    .wp.open { z-index: 70; }
+    .wp.open .wp-card,
+    .wp.flip.open .wp-card {
+      opacity: 1; visibility: visible; pointer-events: auto;
+      position: absolute;
+      top: calc(100% + 14px); left: 50%; right: auto; bottom: auto;
+      transform: translate(-50%, 0);
+      width: min(280px, 84vw);
+      border-radius: 14px;
+      grid-template-columns: 86px 1fr;
+      gap: 10px; padding: 11px;
+    }
+    .wp.open .wp-card::after, .wp.open .wp-card::before { display: none; }
+    .wp.open .wpc-name { font-size: 17px; }
+    .wp.open .wpc-desc { font-size: 11px; }
+  }
+  /* ===== TOP DEAL BAR + COUNTDOWN ===== */
+.deal-bar {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.deal-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  flex-wrap: wrap;
+}
+
+.deal-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.deal-text {
+  font-size: 14px;
+}
+
+.deal-text strong {
+  font-weight: 800;
+}
+
+.countdown {
+  display: flex;
+  gap: 5px;
+}
+
+.cd {
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 7px;
+  padding: 2px 7px;
+  min-width: 40px;
+  text-align: center;
+  line-height: 1.05;
+}
+
+.cd span {
+  font-size: 15px;
+  font-weight: 800;
+  display: block;
+  font-variant-numeric: tabular-nums;
+}
+
+.cd i {
+  font-size: 8px;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  opacity: .82;
+}
+
+.bar-login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.28);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  line-height: 1;
+  box-shadow: none;
+  transition:
+    background .15s ease,
+    border-color .15s ease,
+    color .15s ease,
+    transform .15s ease;
+}
+
+.bar-login-btn:hover {
+  background: #ccb784;
+  border-color: #ccb784;
+  color: #241d0c;
+  transform: translateY(-1px);
+}
+  /* ===== general mobile padding / hero tightening ===== */
+  @media (max-width: 600px) {
+    section { padding: 56px 0; }
+    .container { padding: 0 18px; }
+    #founders { padding: 40px 0 36px; }
+    #founders .section-title { margin-bottom: -36px !important; font-size: clamp(17px, 5.4vw, 54px); }
+    /* tighten the green band below the world map: smaller gap + smaller CTA button */
+    #founders .center-cta { margin-top: 14px; }
+    #founders .center-cta .btn { padding: 12px 26px; font-size: 14px; }
+    .center-cta { margin-top: 28px; }
+    /* breathing room between the "Your 2-day Pit Stop" headline and the green racetrack stage
+       (#experience id boosts specificity over the later .section-title mobile override) */
+    #experience .exp-intro { margin-bottom: 36px; }
+  }
+
+  /* ===== FOUNDERS (circular avatars — different shape) ===== */
+  .founders-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; max-width: 880px; margin: 0 auto; }
+  .founder { text-align: center; }
+  .founder .ring {
+    width: 100%; max-width: 180px; aspect-ratio: 1/1; border-radius: 999px; margin: 0 auto 16px;
+    background: linear-gradient(160deg, var(--sand), var(--sand-2));
+    display: grid; place-items: center; overflow: hidden;
+    border: 4px solid #fff; box-shadow: 0 10px 26px rgba(0,0,0,.08);
+  }
+  .founder .ring img { width:100%; height:100%; object-fit: cover; object-position: center; transform: scale(1.85); transform-origin: 50% 40%; }
+  .founder .ring .mono { font-size: 34px; font-weight: 800; color: rgba(14,87,50,.35); }
+  .founder h3 { margin: 0; font-size: 18px; font-weight: 700; }
+  .founder .role { font-size: 13px; color: var(--muted); }
+  @media (max-width: 760px) { .founders-grid { grid-template-columns: 1fr 1fr; gap: 24px; } }
+  .founders-map { width: min(100vw - 32px, 1340px); position: relative; left: 50%; transform: translateX(-50%); }
+  .founders-map img { width: 100%; display: block; }
+  #founders { background: #272e26; padding: 56px 0 88px; }
+  .world-stage { position: relative; z-index: 1; width: 100vw; margin-left: calc(50% - 50vw); aspect-ratio: 1920 / 1080; overflow: visible; }
+  .world-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .world-lines { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+  .world-lines .fl { opacity: 0; transition: opacity .85s ease; filter: drop-shadow(0 0 4px rgba(231,194,92,.35)); }
+  .world-stage.drawn .world-lines .fl { opacity: 1; }
+  .world-lines path:nth-of-type(1) { transition-delay: .05s; }
+  .world-lines path:nth-of-type(2) { transition-delay: .16s; }
+  .world-lines path:nth-of-type(3) { transition-delay: .27s; }
+  .world-lines path:nth-of-type(4) { transition-delay: .38s; }
+  .world-lines path:nth-of-type(5) { transition-delay: .49s; }
+  .world-lines path:nth-of-type(6) { transition-delay: .60s; }
+  .wp { position: absolute; width: var(--s); transform: translate(-50%, -50%); z-index: 3; }
+  .wp-circle {
+    display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 50%;
+    border: 2px solid rgba(201,162,74,.6); background: rgba(255,255,255,.05);
+    color: rgba(255,255,255,.42); font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .wp:hover .wp-circle { transform: scale(1.12); box-shadow: 0 8px 22px rgba(0,0,0,.4); }
+  .wp-circle img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+  .wp-circle.ring { border: 0; background: none; }
+  .wp-city {
+    position: absolute; left: 50%; top: calc(100% + 9px); transform: translateX(-50%);
+    white-space: nowrap; font-weight: 800; font-size: clamp(8.5px, .78vw, 11px);
+    letter-spacing: .15em; text-transform: uppercase; color: #f1e2ad;
+    background: rgba(8,12,9,.6); border: 1px solid rgba(231,194,92,.34);
+    padding: 3px 10px; border-radius: 999px; text-shadow: 0 1px 3px rgba(0,0,0,.5);
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+    transition: border-color .2s ease, color .2s ease;
+  }
+  .wp:hover .wp-city { color: #fff; border-color: rgba(231,194,92,.7); }
+  /* hover-reveal founder card */
+  /* hover-reveal founder card: a side callout wired to the pin by a gold leader line */
+  .wp-card {
+    position: absolute; left: calc(100% + 26px); top: 50%;
+    transform: translateY(-50%) translateX(12px);
+    width: 348px; z-index: 50; display: grid; grid-template-columns: 118px 1fr; gap: 13px; align-items: start;
+    background: linear-gradient(160deg, rgba(22,32,26,.96), rgba(10,15,11,.97));
+    border: 1px solid rgba(255,255,255,.5); border-radius: 3px 16px 16px 16px;
+    padding: 13px; box-shadow: 0 26px 54px rgba(0,0,0,.55);
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transition: opacity .22s ease, transform .22s cubic-bezier(.2,.7,.3,1);
+    -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px);
+  }
+  .wp-card::before { content: ""; position: absolute; top: 0; bottom: 0; left: -28px; width: 28px; }
+  .wp-card::after { content: ""; position: absolute; top: 50%; left: -26px; width: 26px; height: 2px; transform: translateY(-50%); background: linear-gradient(90deg, rgba(231,194,92,0), #e7c25c); }
+  .wp:hover { z-index: 60; }
+  .wp:hover .wp-card { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(-50%) translateX(0); }
+  /* flip to the left for right-edge pins */
+  .wp.flip .wp-card { left: auto; right: calc(100% + 26px); transform: translateY(-50%) translateX(-12px); border-radius: 16px 3px 16px 16px; }
+  .wp.flip:hover .wp-card { transform: translateY(-50%) translateX(0); }
+  .wp.flip .wp-card::before { left: auto; right: -28px; }
+  .wp.flip .wp-card::after { left: auto; right: -26px; background: linear-gradient(270deg, rgba(231,194,92,0), #e7c25c); }
+  .wp-card-img { grid-column: 1; grid-row: 1; width: 100%; aspect-ratio: 1; border-radius: 11px; overflow: hidden; border: 1px solid rgba(231,194,92,.45); background: linear-gradient(150deg, #3a4a3f, #232c27); }
+  .wp-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .wpc-head { grid-column: 2; grid-row: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .wpc-name { order: 1; font-size: 21px; font-weight: 800; color: #fff; line-height: 1.0; letter-spacing: -.025em; }
+  .wpc-role { order: 2; display: inline-block; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: #e7c25c; font-weight: 800; border: 1px solid rgba(231,194,92,.55); padding: 3px 9px; border-radius: 999px; }
+  .wpc-prob { order: 3; margin-top: 1px; }
+  .wpc-prob .pl { display: block; font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.42); font-weight: 800; }
+  .wpc-prob .pv { display: block; font-size: 13px; font-weight: 700; color: #f0d99a; margin-top: 2px; line-height: 1.15; }
+  .wpc-desc { grid-column: 1 / 3; font-size: 11.5px; line-height: 1.5; color: rgba(255,255,255,.82); margin: 0; }
+  @media (max-width: 600px) { .wp-card { width: 272px; grid-template-columns: 94px 1fr; } }
+  .mco { position: absolute; transform: translate(-50%, -50%); z-index: 2; text-align: center; }
+  .mco-pin {
+    position: relative; display: block; margin: 0 auto;
+    width: clamp(20px, 2.2vw, 30px); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, #ff938c 0%, #e10600 42%, #a20400 100%);
+    box-shadow: 0 5px 8px rgba(0,0,0,.45), inset -2px -3px 5px rgba(110,8,4,.55), inset 3px 3px 5px rgba(255,255,255,.5);
+  }
+  .mco-pin::before { content: ""; position: absolute; top: 14%; left: 18%; width: 36%; height: 27%; border-radius: 50%; background: rgba(255,255,255,.8); filter: blur(.5px); }
+  .mco-pin::after { content: ""; position: absolute; top: 78%; left: 50%; transform: translateX(-50%); width: 14%; height: 46%; border-radius: 0 0 2px 2px; background: linear-gradient(#d7d7d7, #9a9a9a 60%, #6f6f6f); box-shadow: 0 3px 3px rgba(0,0,0,.35); }
+  .mco-label { display: block; margin-top: 16px; color: #f4e2a0; font-weight: 800; letter-spacing: .2em; font-size: clamp(13px, 1.5vw, 20px); text-shadow: 0 1px 6px rgba(0,0,0,.6); }
+  .fly-jet { position: absolute; left: 38%; top: 50%; width: 6.5%; transform: translate(-50%, -50%) rotate(-19deg); z-index: 4; pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,.3)); }
+  .ig-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; max-width: 1000px; margin: 0 auto; }
+  .ig-av { width: 168px; height: 168px; display: block; }
+  @media (max-width: 600px) { .ig-av { width: 132px; height: 132px; } .ig-grid { gap: 18px; } }
+
+  /* ===== FAQ (split navigator) ===== */
+  .faq2 {
+    display: grid; grid-template-columns: minmax(260px, 380px) 1fr; gap: 0;
+    max-width: 1040px; margin: 0 auto;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 22px; overflow: hidden;
+  }
+  .faq2-list { border-right: 1px solid var(--line); padding: 12px; }
+  .faq2-q {
+    display: flex; gap: 14px; align-items: flex-start; width: 100%; text-align: left;
+    background: transparent; border: 0; cursor: pointer;
+    padding: 15px 16px; border-radius: 12px; font-family: inherit;
+    font-size: 16px; font-weight: 600; color: var(--fg); line-height: 1.35;
+    transition: background .15s ease, color .15s ease;
+  }
+  .faq2-q .qnum { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 22px; padding-top: 3px; letter-spacing: .03em; }
+  .faq2-q:hover { background: var(--bg); }
+  .faq2-q.active { background: var(--accent); color: #fff; }
+  .faq2-q.active .qnum { color: rgba(255,255,255,.7); }
+  .faq2-answers { padding: 48px 46px; position: relative; min-height: 280px; }
+  .faq2-a { display: none; }
+  .faq2-a.active { display: block; animation: faqfade .28s ease; }
+  .faq2-a .a-head { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+  /* race-number plate with a checkered finish-line ring */
+  .faq2-a .qnum-big {
+    flex: 0 0 auto; display: inline-grid; place-items: center;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #fff; border: 4px solid #141414;
+    box-shadow: 0 6px 16px rgba(0,0,0,.14);
+    font-weight: 800; font-size: 24px; color: #0e0e0e;
+    font-variant-numeric: tabular-nums; letter-spacing: -.02em;
+  }
+  .faq2-a h4 { margin: 0; font-size: 25px; font-weight: 700; letter-spacing: -.02em; line-height: 1.18; }
+  .faq2-a p { margin: 0 0 12px; color: var(--muted); font-size: 16px; line-height: 1.65; }
+  .faq2-a p:last-child { margin-bottom: 0; }
+  @keyframes faqfade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 760px) {
+    .faq2 { grid-template-columns: 1fr; }
+    .faq2-list { border-right: 0; border-bottom: 0; padding: 10px; }
+    /* on mobile the JS moves each answer to sit directly under its question,
+       and the original answers panel becomes empty/hidden */
+    .faq2-answers { display: none; }
+    .faq2-q { border-radius: 12px; transition: border-radius .12s ease, background .15s ease, color .15s ease; }
+    .faq2-q.active { border-radius: 12px 12px 0 0; }
+    .faq2-a {
+      display: none;
+      padding: 22px 20px 26px;
+      background: var(--bg);
+      border-radius: 0 0 12px 12px;
+      margin: 0 0 8px;
+      border-top: 1px solid rgba(0,0,0,.05);
+    }
+    .faq2-a.active { display: block; animation: faqfade .28s ease; }
+    /* repeated question + big race-number badge is redundant inline — hide */
+    .faq2-a .a-head { display: none; }
+    .faq2-a p { font-size: 15px; line-height: 1.6; margin-bottom: 10px; }
+  }
+
+  /* ===== CLOSING: the event ticket ===== */
+  .ticket {
+    max-width: 880px; margin: 0 auto; display: flex; position: relative;
+    border-radius: clamp(12px, 1.6vw, 22px); overflow: hidden;
+    background: #272e26; color: #fff;
+    box-shadow: 0 34px 80px rgba(0,0,0,.32);
+  }
+  .ticket-main { flex: 1; padding: clamp(18px, 4vw, 48px) clamp(16px, 4vw, 48px) clamp(16px, 3.6vw, 44px); min-width: 0; }
+  .t-eyebrow { font-size: clamp(9px, .85vw, 12px); letter-spacing: .22em; text-transform: uppercase; color: #c9a24a; font-weight: 700; }
+  .t-title { font-size: clamp(14px, 3.4vw, 50px); font-weight: 700; letter-spacing: -.025em; line-height: 1.04; margin: clamp(4px, 1vw, 10px) 0 0; }
+  .t-meta { display: flex; gap: clamp(10px, 2.4vw, 34px); margin-top: clamp(10px, 2vw, 28px); flex-wrap: wrap; }
+  .t-meta > div { display: flex; flex-direction: column; gap: 3px; }
+  .t-meta span { font-size: clamp(7.5px, .85vw, 11px); letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+  .t-meta strong { font-size: clamp(9.5px, 1.1vw, 16px); font-weight: 700; }
+  .ticket { --stub-w: clamp(118px, 22vw, 264px); }
+  .ticket-stub {
+    width: var(--stub-w); padding: clamp(12px, 3vw, 44px) clamp(6px, 2vw, 30px); background: #272e26;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(4px, 1vw, 14px);
+    text-align: center; position: relative;
+  }
+  .ticket-stub::before {
+    content: ""; position: absolute; left: 0; top: 16px; bottom: 16px;
+    border-left: 2px dotted rgba(255,255,255,.32);
+  }
+  .stub-admit { font-size: clamp(8px, .9vw, 13px); letter-spacing: .18em; text-transform: uppercase; color: #c9a24a; font-weight: 700; }
+  .stub-price { font-size: clamp(15px, 2.9vw, 42px); font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+  .stub-sub { font-size: clamp(7.5px, .85vw, 12px); color: rgba(255,255,255,.55); margin-top: clamp(-8px, -.55vw, -3px); }
+  .ticket .t-btn { width: 100%; padding: clamp(6px, 1.2vw, 16px) clamp(2px, .8vw, 16px); font-size: clamp(7.5px, 1.1vw, 16px); white-space: nowrap; letter-spacing: -.01em; line-height: 1.12; font-weight: 700; }
+  .stub-note { font-size: clamp(7.5px, .85vw, 12px); color: rgba(255,255,255,.55); }
+  /* punched notch holes at the perforation ends */
+  .ticket .hole {
+    position: absolute;
+    width: clamp(14px, 1.8vw, 26px); height: clamp(14px, 1.8vw, 26px);
+    border-radius: 50%; background: var(--bg); z-index: 3;
+    right: var(--stub-w);
+    margin-right: calc(-1 * clamp(14px, 1.8vw, 26px) / 2);
+  }
+  .ticket .hole.top { top: calc(-1 * clamp(14px, 1.8vw, 26px) / 2); }
+  .ticket .hole.bottom { bottom: calc(-1 * clamp(14px, 1.8vw, 26px) / 2); }
+
+  /* ===== FOOTER ===== */
+  footer { padding: 56px 0 36px; }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
+  .footer-links a { font-size: 14px; color: var(--muted); }
+  .footer-links a:hover { color: var(--fg); }
+  .copy { font-size: 13px; color: var(--muted); margin-top: 22px; }
+
+  .center-cta { text-align: center; margin-top: 48px; }
+  /* two more team members, their own band under the green section */
+  #meet-more { padding: clamp(54px, 7vw, 86px) 0; background: #eef1ec; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 900px; margin: 0 auto; }
+  .duo-card { position: relative; }
+  .duo-card:nth-child(2) { margin-top: 32px; }
+  .duo-video {
+    position: relative; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; cursor: pointer;
+    background: #11150f; border: 1px solid rgba(231,194,92,.4); box-shadow: 0 24px 50px rgba(0,0,0,.45);
+  }
+  .duo-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .duo-video::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(0,0,0,.66), transparent 52%); }
+  .duo-video:hover .vplay-team { transform: translate(-50%,-50%) scale(1.07); }
+  .duo-video.playing .vplay-team { opacity: 0; }
+  .duo-meta { position: absolute; left: 16px; bottom: 13px; z-index: 2; }
+  .duo-name { color: #fff; font-size: clamp(17px, 2vw, 21px); font-weight: 800; letter-spacing: -.015em; line-height: 1; }
+  .duo-role { margin-top: 4px; color: #f1e2ad; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; font-weight: 800; }
+  @media (max-width: 600px) { .duo { grid-template-columns: 1fr; gap: 16px; } .duo-card:nth-child(2) { margin-top: 0; } }
+
+  /* ===== FIT-ANY-SCREEN POLISH ===== */
+  /* phones: tighten the long vertical rhythm so the whole page fits comfortably */
+  @media (max-width: 600px) {
+    section { padding: 56px 0; }
+    .hero { padding: 64px 0 40px; }
+    .container { padding: 0 18px; }
+    .section-title { margin-bottom: 10px; }
+    .section-sub { margin-bottom: 34px; }
+    /* video gets a slightly taller aspect-ratio so the play button stays prominent */
+    .video-wrap { aspect-ratio: 16 / 11; border-radius: 12px; margin-bottom: 22px; }
+    .hero-cta { margin-top: 22px; }
+    .btn { padding: 16px 32px; font-size: 17px; }
+    /* world map pins shrink hard on tiny phones, labels overlap; nudge minimums down a touch */
+    .wp-city { font-size: 8px; padding: 2px 6px; letter-spacing: .1em; }
+    .mco-label { letter-spacing: .14em; margin-top: 10px; }
+    /* FAQ list scrolls inline on mobile so long answers don't push the screen */
+    .faq2-list { padding: 8px; }
+    .faq2-q { padding: 12px 12px; font-size: 14px; }
+    .faq2-a h4 { font-size: 20px; }
+    .faq2-a .qnum-big { width: 50px; height: 50px; font-size: 19px; border-width: 3px; }
+    .faq2-answers { padding: 26px 20px; }
+  }
+
+
+/* Backend-preserved dashboard access, styled to stay close to the imported UI. */
+.top-nav { position: absolute; top: 78px; left: 0; right: 0; z-index: 20; pointer-events: none; }
+.top-nav-inner { display:flex; justify-content:flex-end; align-items:center; }
+.login-btn { pointer-events:auto; display:inline-flex; align-items:center; justify-content:center; min-height:34px; padding:8px 16px; border:1px solid rgba(231,194,92,.45); border-radius:999px; color:#f4dfaa; background:rgba(0,0,0,.28); text-decoration:none; font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; backdrop-filter: blur(10px); box-shadow:0 10px 25px rgba(0,0,0,.18); transition: transform .15s ease, background .15s ease, border-color .15s ease; }
+.login-btn:hover { transform: translateY(-1px); background:rgba(231,194,92,.14); border-color:rgba(231,194,92,.75); }
+@media (max-width: 700px) { .top-nav { top: 92px; } .login-btn { min-height:30px; padding:7px 12px; font-size:10px; } }
+
+</style>
+</head>
+<body>
+
+<!-- ===== TOP DEAL BAR (live countdown to end of May) ===== -->
+<div class="deal-bar" id="dealBar">
+  <div class="container deal-bar-inner">
+    <div class="deal-left">
+      <span class="deal-text">Tickets are released in blocks, price increases in:</span>
+      <div class="countdown" id="countdown" aria-label="Time left">
+        <div class="cd"><span id="cdD">00</span><i>days</i></div>
+        <div class="cd"><span id="cdH">00</span><i>hrs</i></div>
+        <div class="cd"><span id="cdM">00</span><i>min</i></div>
+        <div class="cd"><span id="cdS">00</span><i>sec</i></div>
+      </div>
+    </div>
+
+    <a href="/thankyou-referral-dashboard.html" class="bar-login-btn">Login</a>
+  </div>
+</div>
+
+
+
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="container">
+    <h1>Visit me at my 2-day <br>Content Retreat in <span class="monaco">Monaco</span></h1>
+
+    <!-- VIDEO: drop "monaco-hero.mp4" + "monaco-hero-poster.jpg" into this folder to go live -->
+    <div class="video-wrap" id="heroVideo" aria-label="Monaco Retreat intro video">
+      <div class="video-fallback" id="vFallback">
+        <div>
+          <span class="vf-big">▶ Your hero video</span>
+          <span>drop <strong>monaco-hero.mp4</strong> into this folder</span>
+        </div>
+      </div>
+      <video class="hero-video" id="vEl" poster="monaco-hero-poster.jpg" playsinline preload="metadata" style="display:none;">
+        <source src="monaco-hero.mp4" type="video/mp4" />
+      </video>
+      <button class="vplay" id="vplayBtn" type="button" aria-label="Play / Pause">▶</button>
+      <div class="vctrls">
+        <div class="vprogress" id="vprog"><div class="vfill" id="vfill"></div></div>
+        <div class="vtime" id="vtime">0:00 / 0:00</div>
+        <button class="vmute-btn" id="muteToggle" type="button" aria-label="Toggle sound">🔊</button>
+      </div>
+    </div>
+
+    <div class="hero-cta">
+      <a href="/checkout.html" class="btn">Get your ticket</a>
+      <div class="cta-note"><a href="#faq">I have more questions</a></div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== TEAM ===== -->
+<section id="team">
+  <div class="container">
+    <h2 class="section-title" style="margin-bottom:48px;">The Grow Acquisition team you'll meet in Monaco.</h2>
+    <div class="team-grid">
+      <div class="person">
+        <div class="photo"><video src="nik.mp4" poster="nik-cover.jpg" playsinline preload="none"></video></div>
+        <h3>Nik</h3><div class="role">Founder</div>
+      </div>
+      <div class="person">
+        <div class="photo"><video src="lewis.mp4" poster="lewis-cover.jpg" playsinline preload="none"></video></div>
+        <h3>Lewis</h3><div class="role">Head of Ops</div>
+      </div>
+      <div class="person">
+        <div class="photo"><video src="isaiah.mp4" poster="isaiah-cover.jpg" playsinline preload="none"></video></div>
+        <h3>Isaiah</h3><div class="role">Strategist</div>
+      </div>
+      <div class="person">
+        <div class="photo"><video src="max.mp4" poster="max-cover.jpg" playsinline preload="none"></video></div>
+        <h3>Max</h3><div class="role">Creative Director</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EXPERIENCES ===== -->
+<section id="experience" style="background:#08180f;">
+  <div class="container">
+    <h2 class="section-title exp-intro">Your 2-day Pit Stop in Monaco</h2>
+    <div class="stage-wrap">
+    <div class="exp-stage">
+
+      <!-- the route: jet lands top-left, track winds through every pinned stop -->
+      <svg class="track-svg" viewBox="0 0 1000 640" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <pattern id="checker" width="16" height="16" patternUnits="userSpaceOnUse">
+            <rect width="16" height="16" fill="#fff"/>
+            <rect width="8" height="8" fill="#141414"/>
+            <rect x="8" y="8" width="8" height="8" fill="#141414"/>
+          </pattern>
+          <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#f6dd8e"/>
+            <stop offset="0.55" stop-color="#d9b24e"/>
+            <stop offset="1" stop-color="#a87f28"/>
+          </linearGradient>
+          <radialGradient id="goldglow">
+            <stop offset="0" stop-color="#f4d680" stop-opacity="0.55"/>
+            <stop offset="1" stop-color="#f4d680" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- TRACK (winding): white base + red/white kerbs + dark asphalt -->
+        <path d="M-68 188 L135 80 C148 74 158 69 165 66 C255 52 345 42 430 42 C515 42 625 55 700 66 C805 80 878 140 872 235 C866 322 715 332 610 335 C505 337 415 339 320 335 C235 332 175 350 150 410 C120 500 320 588 540 590 C690 591 800 565 880 552"
+              fill="none" stroke="#ffffff" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M-68 188 L135 80 C148 74 158 69 165 66 C255 52 345 42 430 42 C515 42 625 55 700 66 C805 80 878 140 872 235 C866 322 715 332 610 335 C505 337 415 339 320 335 C235 332 175 350 150 410 C120 500 320 588 540 590 C690 591 800 565 880 552"
+              fill="none" stroke="#c9a24a" stroke-width="32" stroke-linecap="butt" stroke-dasharray="13 13"/>
+        <path d="M-68 188 L135 80 C148 74 158 69 165 66 C255 52 345 42 430 42 C515 42 625 55 700 66 C805 80 878 140 872 235 C866 322 715 332 610 335 C505 337 415 339 320 335 C235 332 175 350 150 410 C120 500 320 588 540 590 C690 591 800 565 880 552"
+              id="trackPath" fill="none" stroke="#141414" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- gold ONLY at the very end of the track -->
+        <path d="M736 576 C793 568 840 559 880 552" fill="none" stroke="#f4d680" stroke-width="34" stroke-linecap="round" opacity=".45"/>
+        <path d="M736 576 C793 568 840 559 880 552" fill="none" stroke="#caa24a" stroke-width="22" stroke-linecap="round"/>
+        <path d="M736 576 C793 568 840 559 880 552" fill="none" stroke="#f6dd8e" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="1 16" opacity=".9"/>
+        <!-- checkered finish flag at the end of the track -->
+        <g class="finish-flag" transform="translate(880 552)">
+          <rect x="-1.6" y="-54" width="3.2" height="56" rx="1.5" fill="#5a5a5a"/>
+          <g class="flag-cloth"><rect x="1.6" y="-54" width="38" height="25" fill="url(#checker)"/></g>
+        </g>
+      </svg>
+      <img class="race-car" src="racecar.png" alt="" />
+
+      <div class="polaroid p1">
+        <span class="pin"></span>
+        <span class="daymark"><i>Day</i><b>1</b></span>
+        <div class="pimg"><img src="masterclass.jpg" alt="Live Content Masterclass"></div>
+        <div class="pcap">Live Content Masterclass</div>
+      </div>
+      <div class="polaroid p2">
+        <span class="pin"></span>
+        <span class="daymark"><i>Day</i><b>1</b></span>
+        <div class="pimg"><img src="founders.jpg" alt="Private Founders Network"></div>
+        <div class="pcap">Private Founders Network</div>
+      </div>
+      <div class="polaroid p3">
+        <span class="pin"></span>
+        <span class="daymark"><i>Day</i><b>1</b></span>
+        <div class="pimg"><img src="dinner.jpg" alt="Dinner At Castle"></div>
+        <div class="pcap">Dinner At Castle</div>
+        <div class="castle-note" aria-hidden="true">
+          <svg class="cn-arrow" viewBox="0 0 140 80" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 30 Q 40 58, 80 60 T 130 60"/>
+            <path d="M130 60 L 122 53 M 130 60 L 122 67"/>
+          </svg>
+          <span class="cn-text">our actual castle</span>
+        </div>
+      </div>
+      <div class="polaroid p4">
+        <span class="pin"></span>
+        <span class="daymark"><i>Day</i><b>2</b></span>
+        <div class="pimg"><img src="livecreation.jpg" alt="Live Content Creation"></div>
+        <div class="pcap">Live Content Creation</div>
+      </div>
+      <div class="polaroid p5">
+        <span class="pin"></span>
+        <span class="daymark"><i>Day</i><b>2</b></span>
+        <div class="pimg"><img src="worldcup.jpg" alt="The World Cup Final"></div>
+        <div class="pcap">The World Cup Final</div>
+        <div class="castle-note" aria-hidden="true">
+          <svg class="cn-arrow" viewBox="0 0 140 80" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M55 32 Q 80 55, 100 58 T 130 60"/>
+            <path d="M130 60 L 122 53 M 130 60 L 122 67"/>
+          </svg>
+          <span class="cn-text">our backyard</span>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EVENT TICKET ===== -->
+<section id="claim">
+  <div class="container">
+    <h2 class="section-title" style="margin-top: 28px; margin-bottom: 12px;">Your ticket to Monaco.</h2>
+    <div class="ticket">
+      <span class="hole top"></span>
+      <span class="hole bottom"></span>
+      <div class="ticket-main">
+        <div class="t-eyebrow">Grow Acquisition presents</div>
+        <div class="t-title">The Monaco<br>Content Retreat</div>
+        <div class="t-meta">
+          <div><span>Dates</span><strong>18 &amp; 19 July 2026</strong></div>
+          <div><span>Location</span><strong>Monaco</strong></div>
+          <div><span>Access</span><strong>2 full days, in person</strong></div>
+        </div>
+      </div>
+      <div class="ticket-stub">
+        <div class="stub-admit">Admit one</div>
+        <div class="stub-price">€2,600</div>
+        <div class="stub-sub">per seat</div>
+        <a href="/checkout.html" class="btn t-btn">Get your ticket</a>
+        <div class="stub-note">Seats strictly limited</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOUNDERS ===== -->
+<section id="founders">
+  <div class="container">
+    <h2 class="section-title" style="color:#fff; margin-bottom:-82px; position:relative; z-index:3;">Other like-minded founders<br>you'll meet in Monaco.</h2>
+    <div class="world-stage" id="worldStage">
+      <img class="world-bg" src="founders-map-bare.png" alt="World map of founders flying in to Monaco" />
+      <svg class="world-lines" viewBox="0 0 1000 562" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg1" gradientUnits="userSpaceOnUse" x1="120" y1="230" x2="535" y2="264"><stop offset="0" stop-color="#9a7726" stop-opacity="0.5"/><stop offset="1" stop-color="#f6e29a" stop-opacity="1"/></linearGradient>
+          <linearGradient id="lg2" gradientUnits="userSpaceOnUse" x1="220" y1="253" x2="535" y2="264"><stop offset="0" stop-color="#9a7726" stop-opacity="0.5"/><stop offset="1" stop-color="#f6e29a" stop-opacity="1"/></linearGradient>
+          <linearGradient id="lg3" gradientUnits="userSpaceOnUse" x1="300" y1="320" x2="535" y2="264"><stop offset="0" stop-color="#9a7726" stop-opacity="0.5"/><stop offset="1" stop-color="#f6e29a" stop-opacity="1"/></linearGradient>
+          <linearGradient id="lg4" gradientUnits="userSpaceOnUse" x1="460" y1="180" x2="535" y2="264"><stop offset="0" stop-color="#9a7726" stop-opacity="0.5"/><stop offset="1" stop-color="#f6e29a" stop-opacity="1"/></linearGradient>
+          <linearGradient id="lg5" gradientUnits="userSpaceOnUse" x1="495" y1="332" x2="535" y2="264"><stop offset="0" stop-color="#9a7726" stop-opacity="0.5"/><stop offset="1" stop-color="#f6e29a" stop-opacity="1"/></linearGradient>
+          <linearGradient id="lg6" gradientUnits="userSpaceOnUse" x1="720" y1="309" x2="535" y2="264"><stop offset="0" stop-color="#9a7726" stop-opacity="0.5"/><stop offset="1" stop-color="#f6e29a" stop-opacity="1"/></linearGradient>
+        </defs>
+        <path class="fl" d="M120.1 230.2 L135.1 224.8 L150.1 219.9 L165.0 215.4 L180.0 211.5 L194.9 208.1 L209.9 205.1 L224.8 202.7 L239.7 200.8 L254.5 199.3 L269.4 198.4 L284.2 197.9 L299.1 198.0 L313.9 198.5 L328.7 199.6 L343.4 201.1 L358.2 203.1 L372.9 205.7 L387.6 208.7 L402.3 212.2 L417.0 216.2 L431.7 220.7 L446.3 225.7 L461.0 231.2 L475.6 237.2 L490.2 243.6 L504.8 250.6 L519.3 258.1 L533.9 266.0 L536.1 262.0 L521.4 254.1 L506.6 246.8 L491.8 240.0 L477.1 233.6 L462.3 227.8 L447.5 222.4 L432.7 217.5 L417.9 213.2 L403.1 209.3 L388.2 205.9 L373.4 203.1 L358.6 200.7 L343.7 198.8 L328.8 197.4 L314.0 196.5 L299.1 196.1 L284.2 196.2 L269.3 196.8 L254.4 197.9 L239.5 199.5 L224.6 201.5 L209.7 204.1 L194.7 207.2 L179.8 210.7 L164.8 214.7 L149.9 219.3 L134.9 224.3 L119.9 229.8 Z" fill="url(#lg1)"/>
+        <path class="fl" d="M220.1 253.2 L231.5 248.2 L242.9 243.7 L254.3 239.5 L265.7 235.7 L277.1 232.4 L288.5 229.4 L299.8 226.9 L311.1 224.7 L322.4 223.0 L333.7 221.7 L345.0 220.7 L356.3 220.2 L367.5 220.1 L378.7 220.3 L389.9 221.0 L401.1 222.1 L412.3 223.5 L423.4 225.4 L434.5 227.7 L445.6 230.3 L456.7 233.4 L467.8 236.9 L478.9 240.7 L489.9 245.0 L500.9 249.7 L511.9 254.7 L522.9 260.2 L533.9 266.0 L536.1 262.0 L524.9 256.2 L513.7 250.9 L502.5 245.9 L491.3 241.4 L480.1 237.3 L468.9 233.5 L457.6 230.2 L446.4 227.3 L435.2 224.8 L423.9 222.6 L412.6 220.9 L401.4 219.6 L390.1 218.7 L378.8 218.2 L367.5 218.1 L356.2 218.3 L344.9 219.0 L333.6 220.1 L322.2 221.6 L310.9 223.5 L299.6 225.7 L288.2 228.4 L276.9 231.5 L265.5 235.0 L254.1 238.8 L242.7 243.1 L231.3 247.7 L219.9 252.8 Z" fill="url(#lg2)"/>
+        <path class="fl" d="M300.1 320.2 L308.7 315.3 L317.3 310.7 L325.8 306.3 L334.4 302.1 L342.9 298.1 L351.4 294.3 L359.9 290.8 L368.4 287.5 L376.9 284.4 L385.3 281.5 L393.8 278.8 L402.2 276.3 L410.6 274.1 L419.0 272.1 L427.4 270.2 L435.7 268.6 L444.1 267.3 L452.4 266.1 L460.7 265.2 L469.0 264.4 L477.3 263.9 L485.5 263.6 L493.8 263.5 L502.0 263.6 L510.2 264.0 L518.4 264.5 L526.6 265.3 L534.7 266.3 L535.3 261.7 L527.0 260.9 L518.7 260.3 L510.4 259.9 L502.1 259.8 L493.8 259.8 L485.4 260.1 L477.1 260.6 L468.7 261.3 L460.4 262.2 L452.0 263.3 L443.7 264.7 L435.3 266.2 L426.9 268.0 L418.5 269.9 L410.1 272.1 L401.7 274.5 L393.3 277.1 L384.8 280.0 L376.4 283.0 L367.9 286.2 L359.5 289.7 L351.0 293.4 L342.5 297.3 L334.0 301.3 L325.5 305.6 L317.0 310.1 L308.4 314.9 L299.9 319.8 Z" fill="url(#lg3)"/>
+        <path class="fl" d="M459.9 180.2 L463.4 182.1 L466.9 184.0 L470.2 186.1 L473.6 188.2 L476.8 190.4 L480.0 192.7 L483.1 195.1 L486.1 197.6 L489.1 200.1 L492.0 202.8 L494.8 205.5 L497.6 208.3 L500.3 211.2 L502.9 214.2 L505.5 217.3 L508.0 220.5 L510.4 223.7 L512.8 227.0 L515.1 230.4 L517.4 233.9 L519.5 237.5 L521.6 241.2 L523.7 244.9 L525.6 248.7 L527.5 252.7 L529.4 256.6 L531.2 260.7 L532.9 264.9 L537.1 263.1 L535.2 258.9 L533.2 254.8 L531.2 250.8 L529.1 246.9 L526.9 243.1 L524.6 239.4 L522.3 235.8 L520.0 232.2 L517.6 228.7 L515.1 225.4 L512.5 222.1 L509.9 218.9 L507.3 215.8 L504.6 212.8 L501.8 209.9 L498.9 207.0 L496.0 204.3 L493.1 201.6 L490.0 199.0 L486.9 196.6 L483.8 194.2 L480.6 191.8 L477.3 189.6 L474.0 187.5 L470.6 185.4 L467.2 183.5 L463.7 181.6 L460.1 179.8 Z" fill="url(#lg4)"/>
+        <path class="fl" d="M495.2 332.1 L496.7 329.9 L498.1 327.6 L499.6 325.3 L501.1 323.0 L502.5 320.7 L504.0 318.4 L505.5 316.1 L507.0 313.7 L508.5 311.4 L510.0 309.0 L511.5 306.7 L512.9 304.3 L514.4 301.9 L515.9 299.5 L517.4 297.2 L518.9 294.7 L520.4 292.3 L521.9 289.9 L523.4 287.5 L524.9 285.0 L526.4 282.6 L527.9 280.1 L529.5 277.6 L531.0 275.2 L532.5 272.7 L534.0 270.2 L535.5 267.6 L537.0 265.1 L533.0 262.9 L531.6 265.5 L530.3 268.1 L529.0 270.7 L527.6 273.3 L526.3 275.8 L524.9 278.4 L523.6 280.9 L522.2 283.5 L520.9 286.0 L519.5 288.5 L518.1 291.0 L516.8 293.5 L515.4 296.0 L514.1 298.5 L512.7 300.9 L511.3 303.4 L510.0 305.8 L508.6 308.2 L507.2 310.6 L505.9 313.1 L504.5 315.4 L503.1 317.8 L501.7 320.2 L500.4 322.6 L499.0 324.9 L497.6 327.2 L496.2 329.6 L494.8 331.9 Z" fill="url(#lg5)"/>
+        <path class="fl" d="M720.2 308.8 L713.7 303.6 L707.3 298.7 L700.9 294.0 L694.4 289.6 L687.9 285.5 L681.5 281.6 L675.0 277.9 L668.4 274.5 L661.9 271.4 L655.4 268.6 L648.8 265.9 L642.2 263.6 L635.6 261.5 L629.0 259.7 L622.4 258.1 L615.7 256.8 L609.0 255.8 L602.3 255.0 L595.6 254.5 L588.9 254.3 L582.1 254.3 L575.4 254.6 L568.6 255.1 L561.8 255.9 L554.9 257.0 L548.1 258.3 L541.2 259.9 L534.3 261.8 L535.7 266.2 L542.3 264.2 L549.0 262.4 L555.7 261.0 L562.3 259.7 L569.0 258.8 L575.6 258.0 L582.2 257.6 L588.9 257.4 L595.5 257.5 L602.1 257.8 L608.7 258.4 L615.3 259.3 L621.9 260.4 L628.5 261.8 L635.1 263.5 L641.7 265.4 L648.2 267.6 L654.8 270.0 L661.3 272.7 L667.9 275.7 L674.4 279.0 L680.9 282.5 L687.5 286.3 L694.0 290.3 L700.4 294.6 L706.9 299.2 L713.4 304.1 L719.8 309.2 Z" fill="url(#lg6)"/>
+      </svg>
+      <img class="fly-jet" src="private-jet.png" alt="" />
+      <div class="mco" style="left:53.5%; top:47%;">
+        <span class="mco-pin" aria-hidden="true"></span>
+        <span class="mco-label">MONACO</span>
+      </div>
+      <div class="wp" style="left:12%;   top:41%; --s:6.5%;"><span class="wp-circle ring"><img src="vancouver.png" alt="Vancouver"></span><span class="wp-city">Vancouver</span>
+        <div class="wp-card">
+          <div class="wp-card-img"><img src="card-vancouver.jpg" alt="Aamer" onerror="this.style.display='none'"></div>
+          <div class="wpc-head">
+            <div class="wpc-role">Mindset Coach</div>
+            <div class="wpc-name">Aamer</div>
+            <div class="wpc-prob"><span class="pl">Problem</span><span class="pv">Content-to-cash</span></div>
+          </div>
+          <p class="wpc-desc">What a story! On the checkout page I showcase a video about this. He went from $0 to $200k in a time-span of 60 days. I always call him the nerd in a good way, he didn't only watch the full Curriculum, he actually implemented every single detail of it as he said himself, so much love brother!</p>
+        </div>
+      </div>
+      <div class="wp" style="left:22%;   top:45%; --s:5.5%;"><span class="wp-circle ring"><img src="chicago.png" alt="Chicago"></span><span class="wp-city">Chicago</span>
+        <div class="wp-card">
+          <div class="wp-card-img"><img src="card-chicago.jpg" alt="Conrad" onerror="this.style.display='none'"></div>
+          <div class="wpc-head">
+            <div class="wpc-role">Scaling Contractors</div>
+            <div class="wpc-name">Conrad</div>
+            <div class="wpc-prob"><span class="pl">Problem</span><span class="pv">Content Systems</span></div>
+          </div>
+          <p class="wpc-desc">It all started with "more leads" a year ago. After we solved that, there was an overload of attention, but without any overview or organization within the content, which is why we installed our Internal Content Resources.</p>
+        </div>
+      </div>
+      <div class="wp" style="left:30%;   top:57%; --s:8%;"><span class="wp-circle ring"><img src="newyork.png" alt="New York"></span><span class="wp-city">New York</span>
+        <div class="wp-card">
+          <div class="wp-card-img"><img src="card-newyork.jpg" alt="Aarush" onerror="this.style.display='none'"></div>
+          <div class="wpc-head">
+            <div class="wpc-role">Business Coach</div>
+            <div class="wpc-name">Aarush</div>
+            <div class="wpc-prob"><span class="pl">Problem</span><span class="pv">Content Positioning</span></div>
+          </div>
+          <p class="wpc-desc">You can name it, the amount of Business Coaches. He attended the last In-person Masterclass where we specifically went over "how to separate yourself", resulting in buyers choosing him anytime over his competitors.</p>
+        </div>
+      </div>
+      <div class="wp" style="left:48.5%; top:34.5%; --s:6%;"><span class="wp-circle ring"><img src="london.png" alt="London"></span><span class="wp-city">London</span>
+        <div class="wp-card">
+          <div class="wp-card-img"><img src="card-london.jpg" alt="Daniel" onerror="this.style.display='none'"></div>
+          <div class="wpc-head">
+            <div class="wpc-role">Airbnb Coach</div>
+            <div class="wpc-name">Daniel</div>
+            <div class="wpc-prob"><span class="pl">Problem</span><span class="pv">Content Team</span></div>
+          </div>
+          <p class="wpc-desc">He had a hard time finding a creative director. After Spain's Retreat in April I connected him with Raul, and now they are traveling the world creating extraordinary content.</p>
+        </div>
+      </div>
+      <div class="wp" style="left:49.5%; top:59%; --s:5%;"><span class="wp-circle ring"><img src="barcelona.png" alt="Barcelona"></span><span class="wp-city">Barcelona</span>
+        <div class="wp-card">
+          <div class="wp-card-img"><img src="card-barcelona.jpg" alt="Marc" onerror="this.style.display='none'"></div>
+          <div class="wpc-head">
+            <div class="wpc-role">Business Coach</div>
+            <div class="wpc-name">Marc</div>
+            <div class="wpc-prob"><span class="pl">Problem</span><span class="pv">Content Formats</span></div>
+          </div>
+          <p class="wpc-desc">The Spanish market is saturated, that is what he thought. We used unique content formats to separate him from anybody else and become an industry leader.</p>
+        </div>
+      </div>
+      <div class="wp flip" style="left:72%;   top:55%; --s:6%;"><span class="wp-circle ring"><img src="ebrahim.png" alt="Ebrahim"></span><span class="wp-city">Dubai</span>
+        <div class="wp-card">
+          <div class="wp-card-img"><img src="card-dubai.jpg" alt="Ebrahim" onerror="this.style.display='none'"></div>
+          <div class="wpc-head">
+            <div class="wpc-role">Hypnotist</div>
+            <div class="wpc-name">Ebrahim</div>
+            <div class="wpc-prob"><span class="pl">Problem</span><span class="pv">Content Positioning</span></div>
+          </div>
+          <p class="wpc-desc">Especially in a market like his, finding a reason for people to pay you might be hard. Ebrahim has been a client for 1,5 years now and because of this time we had the chance to fully reposition his brand to attract buyers.</p>
+        </div>
+      </div>
+    </div>
+    <div class="center-cta"><a class="btn" href="/checkout.html">Get your ticket</a></div>
+  </div>
+</section>
+
+<!-- ===== FAQ (real copy) ===== -->
+<section id="faq">
+  <div class="container">
+    <h2 class="section-title" style="margin-bottom:48px;">FAQ</h2>
+    <div class="faq2">
+      <div class="faq2-list">
+        <button class="faq2-q active" data-i="0"><span class="qnum">01</span> What would the 2 days entail?</button>
+        <button class="faq2-q" data-i="1"><span class="qnum">02</span> Who exactly will I meet?</button>
+        <button class="faq2-q" data-i="2"><span class="qnum">03</span> Do we get direct access to Nik?</button>
+        <button class="faq2-q" data-i="3"><span class="qnum">04</span> What do you mean by Content Curriculum?</button>
+        <button class="faq2-q" data-i="4"><span class="qnum">05</span> You mentioned we get b-roll, what do you mean by that?</button>
+        <button class="faq2-q" data-i="5"><span class="qnum">06</span> I already have plans, can I watch the retreat back?</button>
+        <button class="faq2-q" data-i="6"><span class="qnum">07</span> What are the extra costs for accommodation?</button>
+        <button class="faq2-q" data-i="7"><span class="qnum">08</span> Where should I book my flights to?</button>
+        <button class="faq2-q" data-i="8"><span class="qnum">09</span> I'm from the US, what would you recommend?</button>
+        <button class="faq2-q" data-i="9"><span class="qnum">10</span> What if I want to bring a friend?</button>
+        <button class="faq2-q" data-i="10"><span class="qnum">11</span> How could I make sure that what I learn about content is valuable, not the same information?</button>
+      </div>
+      <div class="faq2-answers">
+        <div class="faq2-a active" data-i="0">
+          <div class="a-head"><span class="qnum-big">01</span><h4>What would the 2 days entail?</h4></div>
+          <p>Day 1, we get tactical. From the morning we dive deep into the system behind how my team runs my content operation in a private boardroom in Monaco.</p>
+          <p>We have a quick 1 hour lunch in between that is fully included in your ticket.</p>
+          <p>We continue the Masterclass, at the end you will receive our Internal Content Resources.</p>
+          <p>Day 2, we get actionable. You will come to our Castle in Monaco where we make content, stories &amp; instagram front pictures.</p>
+          <p>This way you experience everything in practice and it becomes easy to replicate.</p>
+          <p>You have the opportunity to chat with me, my team and the other selected members.</p>
+          <p>In the evening we will watch the World Cup Final all together and have the time of our lives.</p>
+        </div>
+        <div class="faq2-a" data-i="1">
+          <div class="a-head"><span class="qnum-big">02</span><h4>Who exactly will I meet?</h4></div>
+          <p>You will meet me, my core team, and other Founders.</p>
+          <p>In the early mornings you can organize a paddle match, in the late evening some might want to visit beach clubs.</p>
+          <p>Outside of the event there's tons of opportunities to connect and experience things.</p>
+          <p>If we don't think you are a good fit, we will refund your ticket because we want to keep the quality of the room high.</p>
+        </div>
+        <div class="faq2-a" data-i="2">
+          <div class="a-head"><span class="qnum-big">03</span><h4>Do we get direct access to Nik?</h4></div>
+          <p>Yes, matter of fact only my Inner Circle clients have direct access to me. The clients that make a yearly 6-figure investment to Grow Acquisition.</p>
+          <p>On the Retreat it's the only chance to speak directly with me and my core executive team members in-person to ask questions that's a part of the reason we organized this.</p>
+        </div>
+        <div class="faq2-a" data-i="3">
+          <div class="a-head"><span class="qnum-big">04</span><h4>What do you mean by Content Curriculum?</h4></div>
+          <p>This content has never been released, not to my team, not to my own clients, not even my inner circle.</p>
+          <p>It's specifically captured for this retreat, this is not just a "course".</p>
+          <p>It's 10+ hours of video material of me and my core team members live strategizing about 8 different content topics on a whiteboard.</p>
+          <p>Positioning, profile optimization, content formats, story sequences, content-to-cash, content communication, content team &amp; content systems.</p>
+          <p>Only those who get a ticket will get free access to this Curriculum.</p>
+          <p>If you can't make the in-person event, we will give you the opportunity to get access to this Curriculum separately for €5000.</p>
+        </div>
+        <div class="faq2-a" data-i="4">
+          <div class="a-head"><span class="qnum-big">05</span><h4>You mentioned we get b-roll, what do you mean by that?</h4></div>
+          <p>My team will be capturing moments for 48 hours straight, this will result in a lot of B-roll, photo's, video's.</p>
+          <p>At the end of the event we create a google drive with all the footage that you can use for your content and instagram.</p>
+        </div>
+        <div class="faq2-a" data-i="5">
+          <div class="a-head"><span class="qnum-big">06</span><h4>I already have plans, can I watch the retreat back?</h4></div>
+          <p>No, this will not be released anywhere.</p>
+          <p>So i suggest you cancel your plans because this is worth more than whatever you've planned already.</p>
+          <p>Besides the experience, you will leave understanding more about content than you've ever learned before.</p>
+          <p>To forever attract buyers, and remove yourself from working in the trenches.</p>
+          <p>if you think about the time, money &amp; effort you will save, it should be an easy decision to make.</p>
+        </div>
+        <div class="faq2-a" data-i="6">
+          <div class="a-head"><span class="qnum-big">07</span><h4>But Nik, what are the extra costs for accommodation?</h4></div>
+          <p>This is why we chose Monaco. It's 15 minutes away from Nice, a big city with the most beautiful locations &amp; places for a very realistic price for 3 nights.</p>
+          <p>The event is the 18th &amp; 19th of July the full day.</p>
+          <p>I'd recommend to book accommodation from the 17th to 20th (3 nights).</p>
+          <p>You might go with friends or a partner, and decide to make it a week trip. This is fully up to you!</p>
+          <p>After you secured your ticket, you will also get private access to our group chat with other members to have the opportunity to connect and potentially stay with other members.</p>
+        </div>
+        <div class="faq2-a" data-i="7">
+          <div class="a-head"><span class="qnum-big">08</span><h4>Where should I book my flights to?</h4></div>
+          <p>The most convenient time to arrive and departure is:</p>
+          <p>Arrive the 17th anytime, Nice Côte d'Azur Airport.<br>Departure 20th anytime, Nice Côte d'Azur Airport.</p>
+          <p>Lock in current rate for €2.600, before the price goes up. So we'll basically pay for your flights.</p>
+          <p>The exact timing and information will be clarified in the your private chat, after checkout.</p>
+        </div>
+        <div class="faq2-a" data-i="8">
+          <div class="a-head"><span class="qnum-big">09</span><h4>I'm from the US, what would you recommend?</h4></div>
+          <p>Perfect! Around 50% of the clients that will visit us in Monaco will fly over from the States because majority of my client database is from there.</p>
+          <p>Not only will you experience European summer, you will visit the best country in Europe, Monaco.</p>
+        </div>
+        <div class="faq2-a" data-i="9">
+          <div class="a-head"><span class="qnum-big">10</span><h4>What if I want to bring a friend?</h4></div>
+          <p>Yes, and it's genuinely worth your while.</p>
+          <p>Once you join, you'll get a short video breaking down our referral program, including a reward generous enough that bringing the right people could change what you pay to be here.</p>
+          <p>It's reserved for confirmed attendees.</p>
+        </div>
+        <div class="faq2-a" data-i="10">
+          <div class="a-head"><span class="qnum-big">11</span><h4>How could I make sure that what I learn about content is valuable, not the same information?</h4></div>
+          <p>For those who know me, know.</p>
+          <p>For those who don't know me, please take a day to get to know me and it'll be an easy decision.</p>
+          <p>Just look at the level of detail within this funnel.</p>
+          <p>Besides the confidence, the thought, depth, detail that goes into content is something I love learning.</p>
+          <p>Every day me and the team are learning something new and because what makes us special is that we don't recycle like most, we create.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <img src="ga-wordmark.png" alt="grow acquisition" style="height: 30px; width:auto;" />
+      <div class="footer-links">
+        <a href="https://www.instagram.com/niksetting/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.youtube.com/@niksetting" target="_blank" rel="noopener">YouTube</a>
+        <a href="#faq">FAQ</a>
+      </div>
+    </div>
+    <div class="copy">Grow Acquisition. Copyright 2026. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var wrap = document.getElementById('heroVideo');
+    var v = document.getElementById('vEl');
+    var fallback = document.getElementById('vFallback');
+    var playBtn = document.getElementById('vplayBtn');
+    var prog = document.getElementById('vprog');
+    var fill = document.getElementById('vfill');
+    var timeEl = document.getElementById('vtime');
+    var muteBtn = document.getElementById('muteToggle');
+    if (!v || !wrap) return;
+
+    // If the video file is missing, keep the styled fallback and hide controls.
+    var hasVideo = false;
+    v.addEventListener('loadeddata', function(){
+      hasVideo = true;
+      v.style.display = 'block';
+      if (fallback) fallback.style.display = 'none';
+    });
+    v.addEventListener('error', function(){ /* no file yet — fallback stays */ });
+
+    function fmt(s){
+      if (!isFinite(s)) return '0:00';
+      s = Math.max(0, s | 0);
+      var m = (s/60) | 0, sec = s % 60;
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+    function updateState(){
+      wrap.classList.toggle('playing', !v.paused);
+      wrap.classList.toggle('paused', v.paused);
+      playBtn.textContent = v.paused ? '▶' : '❚❚';
+    }
+    function updateProgress(){
+      if (!v.duration) return;
+      fill.style.width = (v.currentTime / v.duration * 100) + '%';
+      timeEl.textContent = fmt(v.currentTime) + ' / ' + fmt(v.duration);
+    }
+    function syncMute(){ muteBtn.textContent = v.muted ? '🔇' : '🔊'; }
+
+    playBtn.addEventListener('click', function(){
+      if (!hasVideo) return;
+      if (v.paused) { v.muted = false; syncMute(); v.play(); }
+      else { v.pause(); }
+    });
+    prog.addEventListener('click', function(e){
+      var rect = prog.getBoundingClientRect();
+      var pct = (e.clientX - rect.left) / rect.width;
+      if (v.duration) v.currentTime = pct * v.duration;
+    });
+    muteBtn.addEventListener('click', function(){
+      v.muted = !v.muted; if (!v.muted) v.play(); syncMute();
+    });
+
+    v.addEventListener('play', updateState);
+    v.addEventListener('pause', updateState);
+    v.addEventListener('timeupdate', updateProgress);
+    v.addEventListener('loadedmetadata', updateProgress);
+    updateState(); syncMute();
+  })();
+
+  /* FAQ navigator */
+  (function(){
+    var qs = document.querySelectorAll('.faq2-q');
+    var as = document.querySelectorAll('.faq2-a');
+    if (!qs.length) return;
+    qs.forEach(function(q){
+      q.addEventListener('click', function(){
+        var i = q.getAttribute('data-i');
+        var isMobile = window.matchMedia('(max-width: 760px)').matches;
+        /* mobile: a second tap on the open question collapses it */
+        if (isMobile && q.classList.contains('active')) {
+          q.classList.remove('active');
+          var matchA = document.querySelector('.faq2-a[data-i="' + i + '"]');
+          if (matchA) matchA.classList.remove('active');
+          return;
+        }
+        qs.forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-i') === i); });
+        as.forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-i') === i); });
+      });
+    });
+
+    /* Mobile: move each answer to sit directly under its question (accordion).
+       Desktop: put them back into the right-hand panel. */
+    var listEl = document.querySelector('.faq2-list');
+    var answersEl = document.querySelector('.faq2-answers');
+    if (!listEl || !answersEl) return;
+    var mql = window.matchMedia('(max-width: 760px)');
+    var mode = null;
+    function syncLayout(){
+      var mobile = mql.matches;
+      if (mobile === mode) return;
+      mode = mobile;
+      if (mobile){
+        qs.forEach(function(q){
+          var i = q.getAttribute('data-i');
+          var a = document.querySelector('.faq2-a[data-i="' + i + '"]');
+          if (a) q.insertAdjacentElement('afterend', a);
+        });
+      } else {
+        as.forEach(function(a){ answersEl.appendChild(a); });
+      }
+    }
+    syncLayout();
+    if (mql.addEventListener) mql.addEventListener('change', syncLayout);
+    else if (mql.addListener) mql.addListener(syncLayout);
+  })();
+
+  /* Countdown to end of May (urgency) */
+  (function(){
+    var target = new Date(2026, 5, 7, 23, 59, 59).getTime(); // June 7, 2026 (month index 5 = June)
+    var dEl = document.getElementById('cdD'), hEl = document.getElementById('cdH'),
+        mEl = document.getElementById('cdM'), sEl = document.getElementById('cdS');
+    if (!dEl) return;
+    function pad(n){ return (n < 10 ? '0' : '') + n; }
+    function tick(){
+      var diff = target - Date.now();
+      if (diff <= 0){
+        dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = '00';
+        var t = document.querySelector('.deal-text');
+        if (t) t.innerHTML = '<strong>The current rate has ended.</strong>';
+        return;
+      }
+      var s = Math.floor(diff / 1000);
+      dEl.textContent = pad(Math.floor(s / 86400));
+      hEl.textContent = pad(Math.floor((s % 86400) / 3600));
+      mEl.textContent = pad(Math.floor((s % 3600) / 60));
+      sEl.textContent = pad(s % 60);
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  /* Team videos: click play -> starts WITH sound (one at a time) */
+  (function(){
+    var vids = document.querySelectorAll('.person .photo video, .duo-video video');
+    if (!vids.length) return;
+    vids.forEach(function(v){
+      var wrap = v.parentElement;
+      var btn = document.createElement('span');
+      btn.className = 'vplay-team';
+      btn.textContent = '▶';
+      wrap.appendChild(btn);
+      wrap.addEventListener('click', function(){
+        if (v.paused){
+          vids.forEach(function(o){ if (o !== v) o.pause(); });
+          v.muted = false;
+          v.play();
+        } else {
+          v.pause();
+        }
+      });
+      v.addEventListener('play',  function(){ wrap.classList.add('playing'); });
+      v.addEventListener('pause', function(){ wrap.classList.remove('playing'); });
+      v.addEventListener('ended', function(){ wrap.classList.remove('playing'); });
+    });
+  })();
+
+  /* Founders map: draw the gold lines in when it scrolls into view */
+  (function(){
+    var stage = document.getElementById('worldStage');
+    if (!stage || !('IntersectionObserver' in window)) { if (stage) stage.classList.add('drawn'); return; }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) { stage.classList.add('drawn'); io.disconnect(); } });
+    }, { threshold: 0.3 });
+    io.observe(stage);
+  })();
+
+  /* Founders map: tap a pin to open its card (works on touch where hover doesn't) */
+  (function(){
+    var wps = document.querySelectorAll('.wp');
+    if (!wps.length) return;
+    wps.forEach(function(wp){
+      wp.addEventListener('click', function(e){
+        e.stopPropagation();
+        var wasOpen = wp.classList.contains('open');
+        wps.forEach(function(o){ o.classList.remove('open'); });
+        if (!wasOpen) wp.classList.add('open');
+      });
+    });
+    document.addEventListener('click', function(){
+      wps.forEach(function(o){ o.classList.remove('open'); });
+    });
+  })();
+
+
+</script>
+
+</body>
+</html>

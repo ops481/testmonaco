@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Checkout · Monaco Content Retreat · Grow Acquisition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/css/intlTelInput.css">
+<style>
+
+
+
+
+
+:root {
+    --bg: #f5f7f4;
+    --card: #ffffff;
+    --fg: #0e0e0e;
+    --muted: #4b4b4b;
+    --line: #e4e8e3;
+    --accent: #0e5732;
+    --gold: #ccb784;
+    --sand: #e8e2d2;
+    --sand-2: #ded6c2;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    color: var(--fg);
+    background: var(--bg);
+    line-height: 1.55;
+    letter-spacing: 0.012em;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== TOP DEAL BAR + COUNTDOWN ===== */
+  .deal-bar { background: var(--accent); color: #fff; font-weight: 600; }
+  .deal-bar .container {
+    display: flex; align-items: center; justify-content: center;
+    gap: 12px; padding-top: 7px; padding-bottom: 7px; flex-wrap: wrap;
+  }
+  .deal-text { font-size: 14px; }
+  .deal-text strong { font-weight: 800; }
+  .countdown { display: flex; gap: 5px; }
+  .cd {
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28);
+    border-radius: 7px; padding: 2px 7px; min-width: 40px; text-align: center; line-height: 1.05;
+  }
+  .cd span { font-size: 15px; font-weight: 800; display: block; font-variant-numeric: tabular-nums; }
+  .cd i { font-size: 8px; font-style: normal; text-transform: uppercase; letter-spacing: .08em; opacity: .82; }
+  @media (max-width: 700px) {
+    /* text + countdown sit centered together on one row */
+    .deal-bar .container { flex-wrap: nowrap; justify-content: center; gap: 10px; padding-left: 16px; padding-right: 16px; }
+    .deal-text { font-size: 11.5px; text-align: center; flex: 0 1 auto; min-width: 0; line-height: 1.25; }
+    .countdown { flex-shrink: 0; }
+    .cd { min-width: 34px; padding: 2px 4px; }
+    .cd span { font-size: 12px; }
+    .cd i { font-size: 7px; }
+  }
+
+  /* ===== SLIM CHECKOUT HEADER ===== */
+  .co-topbar { border-bottom: 1px solid var(--line); background: var(--bg); }
+  .co-topbar-row { position: relative; display: flex; align-items: center; justify-content: flex-start; padding: 14px 24px; gap: 16px; }
+  .co-back { font-size: 14px; color: var(--muted); font-weight: 600; }
+  .co-back:hover { color: var(--fg); }
+  .co-logo { height: 26px; width: auto; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  .co-secure { font-size: 13px; color: var(--accent); font-weight: 700; }
+  @media (max-width: 560px) { .co-logo { height: 22px; } .co-secure { display: none; } }
+
+  /* ===== BUTTONS (brand gold) ===== */
+  .btn {
+    display: inline-block; text-align: center;
+    background: var(--gold); color: #241d0c;
+    padding: 18px 44px; border-radius: 999px; font-size: 18px; font-weight: 800; letter-spacing: .01em;
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease; cursor: pointer; border: 0;
+    box-shadow: 0 6px 16px rgba(120,98,48,.22); font-family: inherit;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(120,98,48,.30); filter: brightness(1.03); }
+
+  /* ===== CHECKOUT LAYOUT ===== */
+  .checkout { padding: 40px 0 64px; }
+  .co-head { display: grid; grid-template-columns: 1.05fr .95fr; gap: 30px; align-items: end; margin-bottom: 18px; }
+  .co-eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+  .co-title { font-size: clamp(26px, 3.6vw, 40px); font-weight: 700; letter-spacing: -.025em; line-height: 1.06; margin: 0; }
+  .co-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 30px; align-items: start; }
+  @media (max-width: 900px) {
+    .co-grid { grid-template-columns: 1fr; }
+    .co-head { grid-template-columns: 1fr; }
+    .co-head .sum-title { display: none; }
+    /* mobile reading order: show what's included FIRST, then payment, then prior-event video */
+    .co-summary { order: 1; }
+    .co-form { order: 2; }
+  }
+
+  /* ----- LEFT: info + payment capture ----- */
+  .co-form {
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 28px 30px; box-shadow: 0 18px 50px rgba(14,87,50,.06);
+  }
+  .grp-label { display: block; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 800; margin-bottom: 16px; }
+  .pay-label { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; font-weight: 700; color: var(--fg); margin-bottom: 6px; }
+  .field input {
+    width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px;
+    font-family: inherit; font-size: 15px; color: var(--fg); background: #fbfcfb;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .field input::placeholder { color: #a8ada6; }
+  .field input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,87,50,.12); background: #fff; }
+
+  .iti {
+    width: 100%;
+    display: block;
+  }
+  .iti input,
+  .iti input[type=tel] {
+    width: 100%;
+    min-height: 48px;
+    padding-top: 13px;
+    padding-bottom: 13px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--fg);
+    background: #fbfcfb;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .iti input::placeholder { color: #a8ada6; }
+  .iti input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(14,87,50,.12);
+    background: #fff;
+  }
+  .iti__country-container {
+    border-radius: 11px 0 0 11px;
+  }
+  .iti__selected-country {
+    border-radius: 11px 0 0 11px;
+    padding-left: 13px;
+    padding-right: 11px;
+    background: linear-gradient(135deg, rgba(204,183,132,.22), rgba(14,87,50,.07));
+    transition: background .15s ease;
+  }
+  .iti__selected-country:hover,
+  .iti__selected-country:focus {
+    background: linear-gradient(135deg, rgba(204,183,132,.32), rgba(14,87,50,.12));
+  }
+  .iti__dropdown-content {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 18px 50px rgba(14,87,50,.16);
+    overflow: hidden;
+    font-family: inherit;
+  }
+  .iti__search-input {
+    padding: 12px 14px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--line) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fbfcfb !important;
+  }
+  .iti__country {
+    padding: 9px 12px;
+    font-size: 14px;
+  }
+  .iti__country.iti__highlight {
+    background: rgba(14,87,50,.08);
+  }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 420px) {
+    .row2 { grid-template-columns: 1fr; }
+  }
+  .pay-line {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 24px 0 18px; padding-top: 20px; border-top: 1px dashed var(--line); font-size: 15px; gap: 12px;
+  }
+  .pay-line strong { font-size: 22px; font-weight: 800; white-space: nowrap; }
+  .co-btn { width: 100%; padding: 17px; font-size: 17px; background: var(--accent); color: #fff; box-shadow: 0 6px 16px rgba(14,87,50,.22); }
+  .co-btn:hover { box-shadow: 0 12px 24px rgba(14,87,50,.32); }
+  /* promo code near payment */
+  .promo { margin: 2px 0 16px; }
+  .promo-label { display: block; font-size: 13px; font-weight: 700; color: var(--fg); margin-bottom: 6px; }
+  .promo-row { display: flex; gap: 10px; }
+  .promo-row input {
+    flex: 1; min-width: 0; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px;
+    font-family: inherit; font-size: 15px; color: var(--fg); background: #fbfcfb;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .promo-row input::placeholder { color: #a8ada6; }
+  .promo-row input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,87,50,.12); background: #fff; }
+  .promo-apply {
+    flex: 0 0 auto; padding: 0 22px; border: 1.5px solid var(--accent); background: transparent; color: var(--accent);
+    font-family: inherit; font-weight: 800; font-size: 14px; border-radius: 11px; cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .promo-apply:hover { background: var(--accent); color: #fff; }
+  .promo-msg { display: block; font-size: 12.5px; font-weight: 600; margin-top: 8px; color: var(--accent); }
+  .secure-note { font-size: 12.5px; color: var(--muted); text-align: center; margin: 14px 0 0; }
+
+  /* ----- RIGHT: order summary ----- */
+  .co-summary { position: sticky; top: 18px; }
+  @media (max-width: 900px) { .co-summary { position: static; } }
+  .sum-title { font-size: 18px; font-weight: 800; letter-spacing: .02em; margin: 0; }
+  .sum-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px;
+  }
+  /* groups the in-person ticket + deliverables, tinted apart from the digital curriculum */
+  .sum-group {
+    background: rgba(14,87,50,.085); border: 1px solid rgba(14,87,50,.32);
+    border-radius: 14px; padding: 5px; margin-bottom: 14px;
+  }
+  .field select {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--fg);
+  background: #fbfcfb;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.field select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(14,87,50,.12);
+  background: #fff;
+}
+  .sum-group .incl-row { margin-bottom: 0; }
+  .ticket-sum { justify-content: space-between; align-items: flex-start; border-left: 4px solid var(--gold); }
+  .ts-eyebrow { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #b08d2f; font-weight: 800; }
+  .ticket-sum h3 { margin: 5px 0 3px; font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+  .ts-meta { font-size: 13px; color: var(--muted); }
+  .ts-price { font-size: 22px; font-weight: 800; white-space: nowrap; }
+  /* Monaco ticket replica (matches the landing page ticket, stacked for this column) */
+  .sum-ticket {
+    position: relative; display: flex; flex-direction: row; align-items: stretch; margin-bottom: 14px;
+    border-radius: 18px; overflow: hidden; background: #272e26; color: #fff;
+    box-shadow: 0 20px 50px rgba(0,0,0,.28);
+  }
+  .sum-ticket .st-main { flex: 1; min-width: 0; padding: 24px 22px; display: flex; flex-direction: column; justify-content: center; }
+  .sum-ticket .t-title { font-size: clamp(20px, 2.6vw, 26px); font-weight: 700; letter-spacing: -.025em; line-height: 1.08; margin: 0; }
+  .sum-ticket .t-sub { margin-top: 10px; font-size: 13px; color: rgba(255,255,255,.6); letter-spacing: .01em; }
+  .sum-ticket .st-stub {
+    position: relative; flex: 0 0 auto; width: 132px; padding: 22px 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-align: center;
+  }
+  .sum-ticket .st-stub::before {
+    content: ""; position: absolute; left: 0; top: 16px; bottom: 16px;
+    border-left: 2px dotted rgba(255,255,255,.32);
+  }
+  .sum-ticket .hole { position: absolute; left: -9px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); z-index: 2; }
+  .sum-ticket .hole.top { top: -9px; }
+  .sum-ticket .hole.bottom { bottom: -9px; }
+  .sum-ticket .stub-admit { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #c9a24a; font-weight: 700; }
+  .sum-ticket .stub-price { font-size: 26px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+  .sum-ticket .stub-sub { font-size: 11px; color: rgba(255,255,255,.55); }
+  .doc-card h3 { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.0; }
+  .doc-sub { display: block; font-size: 13px; color: var(--muted); line-height: 1.25; margin-top: 2px; }
+  .doc-stack { position: relative; width: 40px; height: 46px; flex: 0 0 auto; }
+  .doc-stack span {
+    position: absolute; width: 30px; height: 40px; border-radius: 4px;
+    background: center/cover no-repeat #0c1f15; border: 1px solid rgba(0,0,0,.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,.22);
+  }
+  .doc-stack span:nth-child(1) { left: 0;  top: 6px; transform: rotate(-7deg); background-image: url('curriculum-cover-1.jpg'); filter: brightness(.82); }
+  .doc-stack span:nth-child(2) { left: 4px; top: 3px; transform: rotate(3deg);  background-image: url('curriculum-cover-2.jpg'); filter: brightness(.92); }
+  .doc-stack span:nth-child(3) { left: 9px; top: 0;                              background-image: url('curriculum-cover-3.jpg'); }
+  .doc-card.doc-expanded { flex-direction: column; align-items: stretch; gap: 12px; padding: 18px 20px 8px; }
+  .doc-head { display: flex; align-items: center; gap: 12px; }
+  .doc-meta {
+    margin-left: auto; font-size: 11px; font-weight: 800; letter-spacing: .04em; color: #241d0c;
+    background: var(--gold); border: 0;
+    padding: 5px 12px; border-radius: 999px; white-space: nowrap;
+  }
+  .doc-list { list-style: none; margin: 0; padding: 4px 0 0; border-top: 1px solid var(--line); display: block; }
+  .doc-list li {
+    position: relative; display: flex; align-items: center; gap: 12px;
+    padding: 5px 2px; border-bottom: 1px solid var(--line);
+    font-size: 14px; font-weight: 700; letter-spacing: -.01em; color: var(--fg);
+    transition: color .15s ease;
+  }
+  .doc-list li:last-child { border-bottom: 0; }
+  .doc-list li:hover { color: var(--accent); }
+  .doc-num {
+    flex: 0 0 auto; width: 22px; text-align: center;
+    font-size: 14px; font-weight: 800; color: #b08d2f; font-variant-numeric: tabular-nums; letter-spacing: .01em;
+  }
+  .doc-time {
+    margin-left: auto; font-size: 12px; font-weight: 700; color: #9a7a25;
+    border: 1px solid rgba(176,141,47,.42); border-radius: 999px; padding: 3px 11px;
+    font-variant-numeric: tabular-nums; white-space: nowrap; letter-spacing: .02em;
+  }
+  .incl-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 14px; }
+  .incl {
+    background: var(--card); border: 1px solid var(--line); border-radius: 13px;
+    padding: 10px 7px 11px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 7px;
+  }
+  .incl-thumb { width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; background: linear-gradient(150deg, var(--sand), var(--sand-2)); overflow: hidden; }
+  .incl-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .incl-name { font-size: 14px; font-weight: 700; line-height: 1.1; }
+  @media (max-width: 560px) {
+    .incl-row { grid-template-columns: 1fr 1fr; }
+    .incl-name { font-size: 15px; }
+  }
+  .incl-tag {
+    margin-top: auto; font-size: 9px; font-weight: 800; letter-spacing: .04em; color: #241d0c;
+    background: var(--gold); padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+  }
+  .sum-total {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 4px 18px; margin: 2px 0 6px; border-top: 1px solid var(--line); font-size: 15px;
+  }
+  .sum-total strong { font-size: 24px; font-weight: 800; }
+  .sum-note { font-size: 12.5px; color: var(--muted); text-align: center; margin: 14px 0 0; }
+
+  /* ===== PRIOR EVENT VIDEO ===== */
+  .prior { text-align: center; padding: 26px 0 8px; }
+  .prior h2 { font-size: clamp(20px, 2.4vw, 28px); font-weight: 700; letter-spacing: -.01em; margin: 0 0 10px; }
+  .video-wrap {
+    max-width: 760px; margin: 0 auto; aspect-ratio: 16 / 10; background: #11150f;
+    border-radius: 16px; overflow: hidden; position: relative; box-shadow: 0 18px 50px rgba(14,87,50,.16);
+  }
+  .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-fallback {
+    position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+    color: rgba(255,255,255,.55); font-size: 14px; letter-spacing: .04em;
+    background: radial-gradient(120% 120% at 70% 20%, rgba(14,87,50,.55), transparent 60%), linear-gradient(135deg, #1d2a1f, #0d130c);
+  }
+  .video-fallback span { display: block; }
+  .video-fallback .vf-big { font-size: 18px; color: rgba(255,255,255,.8); margin-bottom: 6px; }
+  .vplay {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 50px; height: 50px; border-radius: 999px; background: rgba(255,255,255,.95); color: var(--accent);
+    font-size: 16px; display: grid; place-items: center; cursor: pointer; border: 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,.35); transition: opacity .2s ease, transform .15s ease;
+    z-index: 3; font-family: inherit; padding-left: 3px;
+  }
+  .vplay:hover { transform: translate(-50%, -50%) scale(1.06); }
+  .video-wrap.playing .vplay { opacity: 0; pointer-events: none; }
+  .video-wrap:hover .vplay { opacity: 1; pointer-events: auto; }
+  .vctrls {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 22px 16px;
+    display: flex; align-items: center; gap: 14px; z-index: 3;
+    background: linear-gradient(to top, rgba(0,0,0,.55), transparent); opacity: 0; transition: opacity .2s ease;
+  }
+  .video-wrap:hover .vctrls, .video-wrap.paused .vctrls { opacity: 1; }
+  .vprogress { flex: 1; height: 5px; background: rgba(255,255,255,.25); border-radius: 999px; cursor: pointer; position: relative; transition: height .15s ease; }
+  .vprogress:hover { height: 7px; }
+  .vfill { height: 100%; width: 0%; background: var(--accent); border-radius: 999px; pointer-events: none; transition: width .1s linear; }
+  .vtime { color: rgba(255,255,255,.9); font-size: 12px; white-space: nowrap; letter-spacing: .02em; }
+  .vmute-btn { background: transparent; border: 0; color: #fff; font-size: 18px; cursor: pointer; padding: 4px 6px; }
+
+  /* ===== FOOTER ===== */
+  footer { padding: 56px 0 36px; }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
+  .footer-links a { font-size: 14px; color: var(--muted); }
+  .footer-links a:hover { color: var(--fg); }
+  .copy { font-size: 13px; color: var(--muted); margin-top: 22px; }
+
+
+/* Backend checkout/referral states adapted to the imported UI styling. */
+.referral-note { 
+  display:none; 
+  margin: 10px 0 4px; 
+  padding: 12px 14px; 
+  border: 1px solid rgba(14,87,50,.22); 
+  border-radius: 14px; 
+  background: rgba(14,87,50,.07); 
+  color: var(--accent); 
+  font-size: 13px; 
+  font-weight: 700; 
+}
+.co-error {
+  background: #fff3ef;
+  color: #8f1f1f;
+  border: 1px solid rgba(166, 42, 42, .28);
+  font-weight: 700;
+}
+.co-error.is-success { border-color: rgba(231,194,92,.40); background: rgba(231,194,92,.10); color: #f1e2ad; }
+.whop-checkout-shell {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  padding: 24px;
+  background: rgba(14,14,14,.45);
+  align-items: center;
+  justify-content: center;
+}
+
+.whop-checkout-shell.is-ready {
+  display: flex;
+}
+
+.whop-popup-card {
+  position: relative;
+  width: min(100%, 720px);
+  max-height: 90vh;
+  overflow: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.28);
+}
+
+.whop-popup-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: #f5f7f4;
+  color: var(--fg);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.whop-checkout-embed {
+  min-height: 560px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+}
+.co-btn[disabled] { opacity:.65; cursor:progress; transform:none; filter:grayscale(.15); }
+
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/intlTelInput.min.js"></script>
+  <script async defer src="https://js.whop.com/static/checkout/loader.js"></script>
+</head>
+<body>
+
+<!-- ===== TOP DEAL BAR ===== -->
+<div class="deal-bar" id="dealBar">
+  <div class="container">
+    <span class="deal-text">Tickets are released in blocks, price increases in:</span>
+    <div class="countdown" id="countdown" aria-label="Time left">
+      <div class="cd"><span class="js-d">00</span><i>days</i></div>
+      <div class="cd"><span class="js-h">00</span><i>hrs</i></div>
+      <div class="cd"><span class="js-m">00</span><i>min</i></div>
+      <div class="cd"><span class="js-s">00</span><i>sec</i></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SLIM HEADER ===== -->
+<header class="co-topbar">
+  <div class="co-topbar-row">
+    <a href="/monaco.html" class="co-back">&larr; Back</a>
+    <img src="ga-wordmark.png" alt="grow acquisition" class="co-logo" />
+  </div>
+</header>
+
+<!-- ===== CHECKOUT ===== -->
+<main class="checkout">
+  <div class="container">
+    <div class="co-head">
+      <h1 class="co-title">Complete your booking.</h1>
+      <h2 class="sum-title">Order Summary</h2>
+    </div>
+
+    <form class="co-grid" id="checkoutForm">
+
+      <!-- LEFT: information + payment capture -->
+      <section class="co-form">
+        <span class="grp-label">Your details</span>
+
+        <div class="field">
+          <label for="fname">Full name</label>
+          <input id="fname" name="fname" type="text" autocomplete="name" placeholder="Jane Founder" required />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required />
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="7123 456789" />
+          </div>
+          <div class="field">
+            <label for="company">Company (optional)</label>
+            <input id="company" name="company" type="text" placeholder="Your brand" />
+          </div>
+        </div>
+
+        <div class="field">
+  <label for="instagram">Instagram</label>
+  <input 
+    id="instagram" 
+    name="instagram" 
+    type="text" 
+    autocomplete="off"
+    placeholder="@yourhandle" 
+  />
+</div>
+
+<div class="field">
+  <label for="leadSource">Where did you hear about this opportunity?</label>
+  <select id="leadSource" name="leadSource" required>
+    <option value="">Select one</option>
+    <option value="instagram">Instagram</option>
+    <option value="youtube">YouTube</option>
+    <option value="referral">Referral</option>
+    <option value="other">Other</option>
+  </select>
+</div>
+
+        <div class="referral-note" id="referralNote"></div>
+
+        <!-- Payment is handled by the working backend/Whop flow. -->
+        <span class="grp-label pay-label">Payment</span>
+
+        <div class="pay-line">
+          <span>Your ticket to the Monaco Content Retreat</span>
+          <strong>&euro;2,600</strong>
+        </div>
+
+        <button type="submit" class="btn co-btn" id="checkoutButton">Confirm details &amp; open payment</button>
+        <div class="co-error" id="checkoutMessage" role="alert"></div>
+
+     <div class="whop-checkout-shell" id="whopShell" aria-live="polite">
+  <div class="whop-popup-card">
+    <button class="whop-popup-close" id="whopClose" type="button" aria-label="Close checkout">&times;</button>
+
+    <div id="whopMount"></div>
+    <p class="secure-note">After payment, you will be redirected to your referral dashboard.</p>
+  </div>
+</div>
+      </section>
+
+      <!-- RIGHT: order summary -->
+      <aside class="co-summary">
+        <div class="sum-group">
+        <div class="sum-ticket">
+          <div class="st-main">
+            <div class="t-title">The Monaco<br>Content Retreat</div>
+            <div class="t-sub">18 &amp; 19 July 2026 &middot; Monaco</div>
+          </div>
+          <div class="st-stub">
+            <span class="hole top"></span><span class="hole bottom"></span>
+            <div class="stub-admit">Admit one</div>
+            <div class="stub-price">&euro;2,600</div>
+            <div class="stub-sub">per seat</div>
+          </div>
+        </div>
+
+        <div class="incl-row">
+          <div class="incl"><div class="incl-thumb"><img src="masterclass-thumb.jpg" alt=""></div><span class="incl-name">The Live Content Masterclass</span><span class="incl-tag">Included</span></div>
+          <div class="incl"><div class="incl-thumb"><img src="founders-thumb.jpg" alt=""></div><span class="incl-name">Private Founders Network</span><span class="incl-tag">Included</span></div>
+          <div class="incl"><div class="incl-thumb"><img src="internal-resources.jpg" alt=""></div><span class="incl-name">Our Internal Content Resources</span><span class="incl-tag">Included</span></div>
+          <div class="incl"><div class="incl-thumb"><img src="livecreation-thumb.jpg" alt=""></div><span class="incl-name">Live Content<br>Creation</span><span class="incl-tag">Included</span></div>
+          <div class="incl"><div class="incl-thumb"><img src="dinner-worldcup.jpg" alt=""></div><span class="incl-name">Dinner at Castle + World Cup</span><span class="incl-tag">Included</span></div>
+          <div class="incl"><div class="incl-thumb"><img src="broll.jpg" alt=""></div><span class="incl-name">B-roll, photo's &amp; video's</span><span class="incl-tag">Included</span></div>
+        </div>
+        </div>
+
+        <div class="sum-card doc-card doc-expanded">
+          <div class="doc-head">
+            <div class="doc-stack" aria-hidden="true"><span></span><span></span><span></span></div>
+            <div>
+              <h3>Content Curriculum</h3>
+              <span class="doc-sub">Receive your unreleased material to prepare for Monaco</span>
+            </div>
+            <span class="doc-meta">Included</span>
+          </div>
+          <ol class="doc-list">
+            <li><span class="doc-num">01</span>Content Positioning<span class="doc-time">70 min</span></li>
+            <li><span class="doc-num">02</span>Content-to-Profile<span class="doc-time">60 min</span></li>
+            <li><span class="doc-num">03</span>Content Formats<span class="doc-time">80 min</span></li>
+            <li><span class="doc-num">04</span>Content Sequences<span class="doc-time">65 min</span></li>
+            <li><span class="doc-num">05</span>Content-to-cash<span class="doc-time">50 min</span></li>
+            <li><span class="doc-num">06</span>Communication<span class="doc-time">65 min</span></li>
+            <li><span class="doc-num">07</span>Content Team<span class="doc-time">90 min</span></li>
+            <li><span class="doc-num">08</span>Content Systems<span class="doc-time">55 min</span></li>
+          </ol>
+        </div>
+
+      </aside>
+
+    </form>
+
+    <!-- PRIOR EVENT -->
+    <section class="prior">
+      <h2>The Founders you will see in Monaco</h2>
+      <div class="video-wrap" id="heroVideo" aria-label="Prior event video">
+        <div class="video-fallback" id="vFallback">
+          <div>
+            <span class="vf-big">&#9654; Prior event</span>
+          </div>
+        </div>
+        <video class="hero-video" id="vEl" playsinline preload="metadata" style="display:none;">
+          <source src="prior-event.mp4" type="video/mp4" />
+        </video>
+        <button class="vplay" id="vplayBtn" type="button" aria-label="Play / Pause">&#9654;</button>
+        <div class="vctrls">
+          <div class="vprogress" id="vprog"><div class="vfill" id="vfill"></div></div>
+          <div class="vtime" id="vtime">0:00 / 0:00</div>
+          <button class="vmute-btn" id="muteToggle" type="button" aria-label="Toggle sound">&#128266;</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <img src="ga-wordmark.png" alt="grow acquisition" style="height: 30px; width:auto;" />
+      <div class="footer-links">
+        <a href="https://www.instagram.com/niksetting/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.youtube.com/@niksetting" target="_blank" rel="noopener">YouTube</a>
+        <a href="/monaco.html#faq">FAQ</a>
+      </div>
+    </div>
+    <div class="copy">Grow Acquisition. Copyright 2026. All rights reserved.</div>
+  </div>
+</footer>
+
+<script>
+  /* Custom video player (prior event) */
+  (function(){
+    var wrap = document.getElementById('heroVideo');
+    var v = document.getElementById('vEl');
+    var fallback = document.getElementById('vFallback');
+    var playBtn = document.getElementById('vplayBtn');
+    var prog = document.getElementById('vprog');
+    var fill = document.getElementById('vfill');
+    var timeEl = document.getElementById('vtime');
+    var muteBtn = document.getElementById('muteToggle');
+    if (!v || !wrap) return;
+
+    var hasVideo = false;
+    v.addEventListener('loadeddata', function(){
+      hasVideo = true; v.style.display = 'block';
+      if (fallback) fallback.style.display = 'none';
+    });
+    v.addEventListener('error', function(){ /* no file yet — fallback stays */ });
+
+    function fmt(s){
+      if (!isFinite(s)) return '0:00';
+      s = Math.max(0, s | 0);
+      var m = (s/60) | 0, sec = s % 60;
+      return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+    function updateState(){
+      wrap.classList.toggle('playing', !v.paused);
+      wrap.classList.toggle('paused', v.paused);
+      playBtn.innerHTML = v.paused ? '&#9654;' : '&#10074;&#10074;';
+    }
+    function updateProgress(){
+      if (!v.duration) return;
+      fill.style.width = (v.currentTime / v.duration * 100) + '%';
+      timeEl.textContent = fmt(v.currentTime) + ' / ' + fmt(v.duration);
+    }
+    function syncMute(){ muteBtn.innerHTML = v.muted ? '&#128263;' : '&#128266;'; }
+
+    playBtn.addEventListener('click', function(){
+      if (!hasVideo) return;
+      if (v.paused) { v.muted = false; syncMute(); v.play(); } else { v.pause(); }
+    });
+    prog.addEventListener('click', function(e){
+      var rect = prog.getBoundingClientRect();
+      var pct = (e.clientX - rect.left) / rect.width;
+      if (v.duration) v.currentTime = pct * v.duration;
+    });
+    muteBtn.addEventListener('click', function(){
+      v.muted = !v.muted; if (!v.muted) v.play(); syncMute();
+    });
+
+    v.addEventListener('play', updateState);
+    v.addEventListener('pause', updateState);
+    v.addEventListener('timeupdate', updateProgress);
+    v.addEventListener('loadedmetadata', updateProgress);
+    updateState(); syncMute();
+  })();
+
+  /* Promo code apply (wire to your discount logic) */
+  (function(){
+    var btn = document.getElementById('promoApply');
+    var input = document.getElementById('promo');
+    var msg = document.getElementById('promoMsg');
+    if (!btn || !input || !msg) return;
+    btn.addEventListener('click', function(){
+      var v = input.value.trim();
+      if (!v) { msg.style.color = '#9a9a9a'; msg.textContent = 'Enter a code to apply.'; return; }
+      msg.style.color = '';
+      msg.textContent = 'Code "' + v + '" applied.';
+    });
+  })();
+
+  /* Countdown (top bar) */
+  (function(){
+    var target = new Date(2026, 5, 7, 23, 59, 59).getTime(); // June 7, 2026
+    var dEls = document.querySelectorAll('.js-d'), hEls = document.querySelectorAll('.js-h'),
+        mEls = document.querySelectorAll('.js-m'), sEls = document.querySelectorAll('.js-s');
+    if (!dEls.length) return;
+    function pad(n){ return (n < 10 ? '0' : '') + n; }
+    function setAll(list, val){ list.forEach(function(el){ el.textContent = val; }); }
+    function tick(){
+      var diff = target - Date.now();
+      if (diff <= 0){
+        setAll(dEls, '00'); setAll(hEls, '00'); setAll(mEls, '00'); setAll(sEls, '00');
+        var t = document.querySelector('.deal-text');
+        if (t) t.innerHTML = '<strong>This block has closed.</strong>';
+        return;
+      }
+      var s = Math.floor(diff / 1000);
+      setAll(dEls, pad(Math.floor(s / 86400)));
+      setAll(hEls, pad(Math.floor((s % 86400) / 3600)));
+      setAll(mEls, pad(Math.floor((s % 3600) / 60)));
+      setAll(sEls, pad(s % 60));
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  /* Working backend checkout: referral capture + Whop embedded payment */
+  (function() {
+    var CHECKOUT_ID = "whop-embedded-checkout";
+    var WHOP_LOADER_URL = "https://js.whop.com/static/checkout/loader.js";
+    var DEFAULT_PLAN_ID = "plan_5mpgW1X0Qwlb8";
+    var REFERRAL_STORAGE_KEY = "monaco_referral_code";
+
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyx20Cj1KV_JjIJGjg9zbqmo7XDE5iKTiEfUkLdO9t5yeECvYyRAF8SQG38fV-gZn7A/exec";
+
+    var preparing = false;
+    var preparedSignature = "";
+    var phoneInputInstance = null;
+
+    function $(id) { return document.getElementById(id); }
+
+    function cleanReferralCode(value) {
+      return String(value || "")
+        .trim()
+        .replace(/[^a-zA-Z0-9_-]/g, "")
+        .slice(0, 80)
+        .toUpperCase();
+    }
+
+    function getReferralCode() {
+      var params = new URLSearchParams(window.location.search);
+      var fromUrl = params.get("r") || params.get("ref") || params.get("referral_code") || "";
+      var cleaned = cleanReferralCode(fromUrl);
+      if (cleaned) {
+        localStorage.setItem(REFERRAL_STORAGE_KEY, cleaned);
+        sessionStorage.setItem(REFERRAL_STORAGE_KEY, cleaned);
+        return cleaned;
+      }
+      return cleanReferralCode(
+        sessionStorage.getItem(REFERRAL_STORAGE_KEY) ||
+        localStorage.getItem(REFERRAL_STORAGE_KEY) ||
+        ""
+      );
+    }
+
+    function updateReferralNote() {
+      var note = $("referralNote");
+      var code = getReferralCode();
+      if (!note) return;
+      if (code) {
+        note.style.display = "block";
+        note.textContent = "Referral code applied: " + code;
+      } else {
+        note.style.display = "none";
+        note.textContent = "";
+      }
+    }
+
+    function setMessage(message, isError) {
+      var el = $("checkoutMessage");
+      if (!el) return;
+      el.style.display = message ? "block" : "none";
+      el.classList.toggle("is-success", Boolean(message && !isError));
+      el.textContent = message || "";
+    }
+
+    function value(id) {
+      var el = $(id);
+      return el ? el.value.trim() : "";
+    }
+
+    function normalizeInstagram(value) {
+      var handle = String(value || "").trim();
+      if (!handle) return "";
+      handle = handle.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "");
+      handle = handle.replace(/^instagram\.com\//i, "");
+      handle = handle.replace(/^@+/, "");
+      handle = handle.split(/[/?#]/)[0].trim();
+      return handle ? "@" + handle : "";
+    }
+
+    function fullPhoneNumber() {
+      var rawPhone = value("phone");
+      if (!rawPhone) return "";
+
+      if (phoneInputInstance) {
+        var intlNumber = phoneInputInstance.getNumber();
+        if (intlNumber) return intlNumber;
+
+        var selectedCountry = phoneInputInstance.getSelectedCountryData();
+        if (selectedCountry && selectedCountry.dialCode) {
+          return "+" + selectedCountry.dialCode + " " + rawPhone.replace(/^\+/, "").trim();
+        }
+      }
+
+      return rawPhone;
+    }
+
+function formPayload() {
+  return {
+    full_name: value("fname"),
+    email: value("email").toLowerCase(),
+    phone: fullPhoneNumber(),
+    company: value("company"),
+    instagram: normalizeInstagram(value("instagram")),
+    lead_source: value("leadSource"),
+    referral_code: getReferralCode(),
+    referred_by: getReferralCode(),
+    source_url: window.location.href
+  };
+}
+
+function validatePayload(payload) {
+  if (!payload.full_name) return "Enter your full name.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) return "Enter a valid email.";
+  if (!payload.lead_source) return "Select where you came from.";
+  return "";
+}
+
+function sendLeadToAirtable(payload) {
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("PASTE_") === 0) return;
+
+  var leadPayload = Object.assign({ event_type: "checkout_opened" }, payload);
+  var body = JSON.stringify(leadPayload);
+
+  try {
+    // sendBeacon is very reliable for fire-and-forget lead capture.
+    // It sends the abandoned lead even while the Whop checkout is opening.
+    if (navigator.sendBeacon) {
+      var blob = new Blob([body], { type: "text/plain;charset=UTF-8" });
+      var queued = navigator.sendBeacon(GOOGLE_SCRIPT_URL, blob);
+      if (queued) return;
+    }
+
+    // Fallback for browsers that do not queue sendBeacon.
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      keepalive: true,
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: body
+    });
+  } catch (error) {
+    console.warn("Could not send checkout lead to Airtable:", error);
+  }
+}
+
+    async function jsonFetch(url, options) {
+      var res = await fetch(url, {
+        credentials: "include",
+        cache: "no-store",
+        headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        ...(options || {})
+      });
+      var text = await res.text();
+      var data = {};
+      try { data = text ? JSON.parse(text) : {}; }
+      catch(e) { throw new Error("The server returned invalid JSON."); }
+      if (!res.ok) throw new Error(data.error || data.message || "Request failed.");
+      return data;
+    }
+
+    async function ensureWhopLoader() {
+      if (window.WhopCheckout || document.querySelector('script[src="' + WHOP_LOADER_URL + '"]')) return;
+      await new Promise(function(resolve, reject) {
+        var script = document.createElement("script");
+        script.src = WHOP_LOADER_URL;
+        script.async = true;
+        script.defer = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    async function prepareCheckout(event) {
+      event.preventDefault();
+      if (preparing) return;
+
+      var payload = formPayload();
+      var error = validatePayload(payload);
+      if (error) { setMessage(error, true); return; }
+
+      // This is the abandoned-lead trigger.
+      // It runs as soon as the user submits valid details, before Whop opens.
+      sendLeadToAirtable(payload);
+
+      var signature = JSON.stringify(payload);
+      if (signature === preparedSignature && $(CHECKOUT_ID)) {
+        $("whopShell").classList.add("is-ready");
+        return;
+      }
+
+      preparing = true;
+      preparedSignature = signature;
+      var button = $("checkoutButton");
+      if (button) { button.disabled = true; button.textContent = "Opening payment..."; }
+      setMessage("");
+
+      try {
+        var session = await jsonFetch("/api/referrals/create-whop-session", {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        sessionStorage.setItem("monaco_checkout_session_id", session.session_id);
+        localStorage.setItem("monaco_checkout_session_id", session.session_id);
+
+        await ensureWhopLoader();
+
+        var mount = $("whopMount");
+        mount.innerHTML = "";
+
+        var checkout = document.createElement("div");
+        checkout.id = CHECKOUT_ID;
+        checkout.className = "whop-checkout-embed";
+        checkout.setAttribute("data-whop-checkout-environment", session.environment || "sandbox");
+        checkout.setAttribute("data-whop-checkout-session", session.session_id);
+        checkout.setAttribute("data-whop-checkout-plan-id", session.plan_id || DEFAULT_PLAN_ID);
+        checkout.setAttribute("data-whop-checkout-prefill-email", payload.email);
+        checkout.setAttribute("data-whop-checkout-hide-email", "true");
+        checkout.setAttribute("data-whop-checkout-disable-email", "true");
+        mount.appendChild(checkout);
+
+        $("whopShell").classList.add("is-ready");
+      
+        if (window.WhopCheckout && window.WhopCheckout.setup) window.WhopCheckout.setup();
+      } catch(error) {
+        console.error(error);
+        preparedSignature = "";
+        setMessage(error.message || "Could not open checkout.", true);
+      } finally {
+        preparing = false;
+        if (button) { button.disabled = false; button.textContent = "Confirm details & open payment"; }
+      }
+    }
+var whopClose = $("whopClose");
+if (whopClose) {
+  whopClose.addEventListener("click", function() {
+    var shell = $("whopShell");
+    if (shell) shell.classList.remove("is-ready");
+  });
+}
+
+    var phoneInput = $("phone");
+    if (phoneInput && window.intlTelInput) {
+      phoneInputInstance = window.intlTelInput(phoneInput, {
+        initialCountry: "gb",
+        separateDialCode: true,
+        nationalMode: true,
+        autoPlaceholder: "aggressive",
+        showSearchBox: true,
+        loadUtils: function() {
+          return import("https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/utils.js");
+        }
+      });
+    }
+
+    updateReferralNote();
+
+    var instagramInput = $("instagram");
+    if (instagramInput) {
+      instagramInput.addEventListener("input", function() {
+        if (instagramInput.value && instagramInput.value.charAt(0) !== "@") {
+          instagramInput.value = "@" + instagramInput.value.replace(/^@+/, "");
+        }
+      });
+      instagramInput.addEventListener("blur", function() {
+        instagramInput.value = normalizeInstagram(instagramInput.value);
+      });
+    }
+
+    var form = $("checkoutForm");
+    if (form) form.addEventListener("submit", prepareCheckout);
+  })();
+</script>
+
+</body>
+</html>

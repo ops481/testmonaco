@@ -1,0 +1,1365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Referral refund queue · Monaco Content Retreat</title>
+
+  <style>
+    :root {
+      --bg: #f5f7f4;
+      --card: #ffffff;
+      --fg: #0e0e0e;
+      --muted: #4b4b4b;
+      --line: #e4e8e3;
+      --accent: #0e5732;
+      --accent-soft: rgba(14, 87, 50, .08);
+      --gold: #ccb784;
+      --gold-soft: rgba(204, 183, 132, .22);
+      --error: #8a1f1f;
+      --error-soft: rgba(170, 38, 38, .08);
+      --warn: #7a5a13;
+      --warn-soft: rgba(122, 90, 19, .10);
+      --soft: #eef4ee;
+      --shadow: 0 18px 60px rgba(14, 87, 50, .08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(204, 183, 132, .20), transparent 34rem),
+        var(--bg);
+      color: var(--fg);
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 34px 22px 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 250px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid rgba(14, 87, 50, .16);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(34px, 5vw, 62px);
+      line-height: .96;
+      letter-spacing: -.055em;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 26px;
+      letter-spacing: -.025em;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: -.015em;
+    }
+
+    p {
+      color: var(--muted);
+      font-weight: 650;
+      line-height: 1.5;
+      margin: 0 0 14px;
+    }
+
+    .hero-copy {
+      max-width: 720px;
+      font-size: 16px;
+    }
+
+    .login-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 950;
+      color: var(--fg);
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #fbfcfb;
+      border-radius: 14px;
+      padding: 14px;
+      font: inherit;
+      margin: 8px 0 12px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(14, 87, 50, .10);
+      background: #fff;
+    }
+
+    button,
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 17px;
+      font: inherit;
+      font-weight: 950;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    button.secondary,
+    .btn.secondary {
+      background: #28332b;
+    }
+
+    button.light,
+    .btn.light {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(14, 87, 50, .16);
+      box-shadow: none;
+    }
+
+    button.warn,
+    .btn.warn {
+      background: var(--gold-soft);
+      color: #5f4a14;
+      border: 1px solid rgba(204, 183, 132, .45);
+      box-shadow: none;
+    }
+
+    button.danger,
+    .btn.danger {
+      background: var(--error-soft);
+      color: var(--error);
+      border: 1px solid rgba(170, 38, 38, .18);
+      box-shadow: none;
+    }
+
+    button:disabled,
+    .btn.disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .top-actions,
+    .row-actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .state {
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(14, 87, 50, .16);
+      font-weight: 850;
+      margin-top: 14px;
+    }
+
+    .state.error {
+      background: var(--error-soft);
+      color: var(--error);
+      border-color: rgba(170, 38, 38, .18);
+    }
+
+    .state.warn {
+      background: var(--gold-soft);
+      color: var(--warn);
+      border-color: rgba(204, 183, 132, .50);
+    }
+
+    .state.neutral {
+      background: #fbfcfb;
+      color: var(--muted);
+      border-color: var(--line);
+    }
+
+    .dashboard-card {
+      margin-top: 18px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .summary-box {
+      border: 1px solid var(--line);
+      background: #fbfcfb;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .summary-box.priority {
+      background: linear-gradient(135deg, rgba(204, 183, 132, .26), #fbfcfb);
+      border-color: rgba(204, 183, 132, .65);
+    }
+
+    .summary-box.blocked {
+      background: linear-gradient(135deg, rgba(170, 38, 38, .10), #fbfcfb);
+      border-color: rgba(170, 38, 38, .22);
+    }
+
+    .summary-box strong {
+      display: block;
+      font-size: 30px;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+
+    .summary-box span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+      padding: 6px;
+      border-radius: 999px;
+      width: fit-content;
+      background: rgba(255, 255, 255, .75);
+      border: 1px solid var(--line);
+    }
+
+    .tabs button {
+      background: transparent;
+      color: var(--muted);
+      border: 0;
+      box-shadow: none;
+      padding: 10px 15px;
+    }
+
+    .tabs button.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin: 18px 0 8px;
+    }
+
+    .search {
+      margin: 0;
+    }
+
+    .queue-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .refund-item {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr .8fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 17px;
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 18px;
+    }
+
+    .refund-item.done {
+      opacity: .64;
+      background: #fbfcfb;
+    }
+
+    .refund-item.ineligible {
+      background: linear-gradient(135deg, rgba(170, 38, 38, .06), #fff);
+      border-color: rgba(170, 38, 38, .26);
+    }
+
+    .refund-title {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .num {
+      flex: 0 0 auto;
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: var(--gold-soft);
+      color: #5f4a14;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .refund-item.ineligible .num {
+      background: var(--error-soft);
+      color: var(--error);
+    }
+
+    .person-line strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 2px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .tiny {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .amount {
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: -.02em;
+    }
+
+    .status {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 950;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      background: rgba(14, 87, 50, .1);
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .status-pending,
+    .status-action-needed {
+      background: var(--gold-soft);
+      color: #6e581c;
+    }
+
+    .status-paid,
+    .status-complete,
+    .status-refunded-locally {
+      background: rgba(14, 87, 50, .1);
+      color: var(--accent);
+    }
+
+    .status-over-referral-limit,
+    .status-not-eligible {
+      background: var(--error-soft);
+      color: var(--error);
+    }
+
+    .status-no-action {
+      background: #eef1ee;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+      margin-top: 14px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 980px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 13px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      background: #fbfcfb;
+    }
+
+    .helper-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .helper-box {
+      padding: 14px;
+      border-radius: 16px;
+      background: #fbfcfb;
+      border: 1px solid var(--line);
+    }
+
+    .helper-box strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+
+    .referrer-group {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, .72);
+      box-shadow: 0 10px 30px rgba(14, 87, 50, .04);
+    }
+
+    .referrer-group + .referrer-group {
+      margin-top: 16px;
+    }
+
+    .referrer-group-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 15px 17px;
+      background: linear-gradient(90deg, var(--group-soft), rgba(255, 255, 255, .86));
+      border-left: 8px solid var(--group);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .referrer-group-head strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+
+    .referrer-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: var(--group-soft);
+      color: var(--group-dark);
+      border: 1px solid color-mix(in srgb, var(--group) 35%, transparent);
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .group-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--group);
+      box-shadow: 0 0 0 4px var(--group-soft);
+    }
+
+    .referrer-group .queue-list {
+      margin-top: 0;
+      padding: 12px;
+      background: #fbfcfb;
+    }
+
+    .referrer-group .refund-item {
+      border-left: 6px solid var(--group);
+    }
+
+
+    @media (max-width: 1100px) {
+      .summary-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .toolbar,
+      .refund-item {
+        grid-template-columns: 1fr;
+      }
+
+      .helper-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .tabs {
+        border-radius: 18px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .wrap {
+        padding: 24px 14px 42px;
+      }
+
+      .card {
+        padding: 20px;
+        border-radius: 20px;
+      }
+
+      .summary-grid,
+      .helper-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row-actions {
+        align-items: stretch;
+      }
+
+      .row-actions .btn,
+      .row-actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="card hero-main">
+        <div>
+          <span class="eyebrow">Referral refund desk</span>
+          <h1>Only the first two referrals count.</h1>
+          <p class="hero-copy">
+            This dashboard turns your existing referral data into a simple assistant workflow:
+            refund only the first two paid referrals per referrer. Any paid referrals after two
+            are clearly marked as over the limit and should not receive a refund.
+          </p>
+        </div>
+
+        <div class="helper-grid">
+          <div class="helper-box">
+            <strong>1. Review eligible queue</strong>
+            <span class="muted">Only referrals #1 and #2 count.</span>
+          </div>
+          <div class="helper-box">
+            <strong>2. Ignore over-limit rows</strong>
+            <span class="muted">They are shown but marked not eligible.</span>
+          </div>
+          <div class="helper-box">
+            <strong>3. Refund in Whop</strong>
+            <span class="muted">Then mark handled locally.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card login-card">
+        <div>
+          <h2>Admin access</h2>
+          <p>Paste the same admin key you already use. This page still reads the same backend data.</p>
+
+          <label for="adminKey">Admin API key</label>
+          <input id="adminKey" type="password" placeholder="Paste ADMIN_API_KEY from .env / Render" />
+        </div>
+
+        <div>
+          <div class="top-actions">
+            <button id="saveKey" type="button">Load dashboard</button>
+            <button id="clearKey" class="secondary" type="button">Clear key</button>
+          </div>
+          <div id="message"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card dashboard-card" id="dashboard">
+      <div class="state">Enter your admin key above.</div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "";
+    const KEY_STORAGE = "monaco_admin_key";
+    const REFUND_DONE_STORAGE = "monaco_refund_done_ids";
+    const MAX_REFUNDS_PER_REFERRER = 2;
+
+    const WHOP_PAYMENTS_URL = "https://whop.com/dashboard/payments";
+
+    const adminKeyInput = document.getElementById("adminKey");
+    const dashboard = document.getElementById("dashboard");
+    const message = document.getElementById("message");
+
+    let latestData = null;
+    let activeTab = "refunds";
+    let searchTerm = "";
+
+    adminKeyInput.value = localStorage.getItem(KEY_STORAGE) || "";
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function date(value) {
+      if (!value) return "—";
+
+      const d = new Date(value);
+
+      return Number.isFinite(d.getTime())
+        ? d.toLocaleString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          })
+        : "—";
+    }
+
+    function statusClass(status) {
+      return `status status-${String(status || "pending").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+    }
+
+    function adminKey() {
+      return adminKeyInput.value.trim();
+    }
+
+    function refundDoneIds() {
+      try {
+        return JSON.parse(localStorage.getItem(REFUND_DONE_STORAGE) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function saveRefundDoneIds(ids) {
+      localStorage.setItem(REFUND_DONE_STORAGE, JSON.stringify([...new Set(ids)]));
+    }
+
+    function refundKey(row) {
+      return row.id || `${row.referrer_email || ""}:${row.friend_email || ""}:${row.friend_whop_payment_id || ""}`;
+    }
+
+    function isRefundDone(row) {
+      return refundDoneIds().includes(refundKey(row));
+    }
+
+    function refundAmountLabel() {
+      const cents = Number(latestData?.summary?.ticket_price_cents || 260000);
+      const currency = latestData?.summary?.currency || "EUR";
+      const half = cents / 2 / 100;
+
+      try {
+        return new Intl.NumberFormat(undefined, {
+          style: "currency",
+          currency
+        }).format(half);
+      } catch {
+        return `${currency} ${half.toFixed(2)}`;
+      }
+    }
+
+
+    function hashString(value) {
+      let hash = 0;
+      const text = String(value || "unknown");
+
+      for (let i = 0; i < text.length; i += 1) {
+        hash = ((hash << 5) - hash) + text.charCodeAt(i);
+        hash |= 0;
+      }
+
+      return Math.abs(hash);
+    }
+
+    function referrerTheme(value) {
+      const palettes = [
+        { group: "#0e5732", soft: "rgba(14, 87, 50, .10)", dark: "#0b3f25" },
+        { group: "#7a5a13", soft: "rgba(204, 183, 132, .25)", dark: "#5f4a14" },
+        { group: "#355c7d", soft: "rgba(53, 92, 125, .12)", dark: "#24435d" },
+        { group: "#6c4f8f", soft: "rgba(108, 79, 143, .12)", dark: "#493562" },
+        { group: "#9a4f2b", soft: "rgba(154, 79, 43, .12)", dark: "#69351d" },
+        { group: "#2f6f73", soft: "rgba(47, 111, 115, .12)", dark: "#214e51" }
+      ];
+
+      return palettes[hashString(value) % palettes.length];
+    }
+
+    function groupStyle(value) {
+      const theme = referrerTheme(value);
+
+      return `--group:${theme.group};--group-soft:${theme.soft};--group-dark:${theme.dark};`;
+    }
+
+
+    async function api(path, options = {}) {
+      const response = await fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers: {
+          "Accept": "application/json",
+          "X-Admin-Key": adminKey(),
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
+          ...(options.headers || {})
+        }
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || "Request failed.");
+      }
+
+      return data;
+    }
+
+    function setMessage(text, type = "success") {
+      message.innerHTML = text
+        ? `<div class="state ${type === "error" ? "error" : type === "warn" ? "warn" : ""}">${escapeHtml(text)}</div>`
+        : "";
+    }
+
+    async function loadDashboard() {
+      localStorage.setItem(KEY_STORAGE, adminKey());
+
+      dashboard.innerHTML = `<div class="state">Loading referral data...</div>`;
+      setMessage("");
+
+      try {
+        latestData = await api("/api/admin/referrals");
+        renderDashboard();
+      } catch (error) {
+        dashboard.innerHTML = `<div class="state error">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function referralRowsWithEligibility() {
+      const referrals = latestData?.referrals || [];
+      const paidRows = referrals
+        .filter((r) => String(r.friend_payment_status || "").toLowerCase() === "paid")
+        .sort((a, b) => String(a.paid_at || a.created_at).localeCompare(String(b.paid_at || b.created_at)));
+
+      const countByReferrer = {};
+
+      return paidRows.map((r) => {
+        const referrerKey = String(r.referrer_email || r.referrer_referral_code || "unknown").toLowerCase();
+        countByReferrer[referrerKey] = (countByReferrer[referrerKey] || 0) + 1;
+
+        const referralNumber = countByReferrer[referrerKey];
+        const eligible = referralNumber <= MAX_REFUNDS_PER_REFERRER;
+
+        return {
+          ...r,
+          referral_number_for_referrer: referralNumber,
+          refund_eligible: eligible,
+          refund_done_locally: eligible ? isRefundDone(r) : false
+        };
+      }).sort((a, b) => {
+        if (a.refund_eligible !== b.refund_eligible) {
+          return a.refund_eligible ? -1 : 1;
+        }
+
+        if (a.refund_done_locally !== b.refund_done_locally) {
+          return a.refund_done_locally ? 1 : -1;
+        }
+
+        return String(b.paid_at || b.created_at).localeCompare(String(a.paid_at || a.created_at));
+      });
+    }
+
+    function refundQueue() {
+      return referralRowsWithEligibility();
+    }
+
+    function filteredRows(rows) {
+      const q = searchTerm.trim().toLowerCase();
+      if (!q) return rows;
+
+      return rows.filter((row) =>
+        JSON.stringify(row).toLowerCase().includes(q)
+      );
+    }
+
+    function summaryHtml(summary) {
+      const queue = refundQueue();
+      const eligible = queue.filter((r) => r.refund_eligible);
+      const openRefunds = eligible.filter((r) => !r.refund_done_locally).length;
+      const doneRefunds = eligible.filter((r) => r.refund_done_locally).length;
+      const overLimit = queue.filter((r) => !r.refund_eligible).length;
+
+      return `
+        <div class="summary-grid">
+          <div class="summary-box priority">
+            <strong>${openRefunds}</strong>
+            <span>Eligible refunds awaiting action</span>
+          </div>
+
+          <div class="summary-box">
+            <strong>${doneRefunds}</strong>
+            <span>Eligible refunds marked handled</span>
+          </div>
+
+          <div class="summary-box blocked">
+            <strong>${overLimit}</strong>
+            <span>Over limit — do not refund</span>
+          </div>
+
+          <div class="summary-box">
+            <strong>${MAX_REFUNDS_PER_REFERRER}</strong>
+            <span>Max refunds per referrer</span>
+          </div>
+
+          <div class="summary-box">
+            <strong>${summary.paid_referral_relationships || queue.length || 0}</strong>
+            <span>Paid referral relationships</span>
+          </div>
+
+          <div class="summary-box">
+            <strong>${summary.pending_checkout_sessions || 0}</strong>
+            <span>Pending checkout sessions</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function tabsHtml() {
+      return `
+        <div class="tabs">
+          <button class="${activeTab === "refunds" ? "active" : ""}" onclick="setTab('refunds')">Refund queue</button>
+          <button class="${activeTab === "referrals" ? "active" : ""}" onclick="setTab('referrals')">Who referred who</button>
+          <button class="${activeTab === "customers" ? "active" : ""}" onclick="setTab('customers')">Customers</button>
+          <button class="${activeTab === "sessions" ? "active" : ""}" onclick="setTab('sessions')">Checkout sessions</button>
+        </div>
+      `;
+    }
+
+    function toolbarHtml(placeholder = "Search name, email, code, payment ID…") {
+      return `
+        <div class="toolbar">
+          <input
+            class="search"
+            value="${escapeHtml(searchTerm)}"
+            placeholder="${escapeHtml(placeholder)}"
+            oninput="setSearch(this.value)"
+          />
+
+          <div class="top-actions">
+            <a class="btn light" href="${WHOP_PAYMENTS_URL}" target="_blank" rel="noopener">Open Whop payments</a>
+            <button class="light" type="button" onclick="loadDashboard()">Refresh data</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function refundQueueHtml() {
+      const rows = filteredRows(refundQueue());
+      const eligibleOpen = rows.filter((r) => r.refund_eligible && !r.refund_done_locally).length;
+      const overLimit = rows.filter((r) => !r.refund_eligible).length;
+
+      if (!rows.length) {
+        return `
+          <h2>Refund queue</h2>
+          <p>Paid referral relationships will appear here when someone earns a manual referral refund.</p>
+          ${toolbarHtml()}
+          <div class="state">No refund queue items found.</div>
+        `;
+      }
+
+      const grouped = rows.reduce((acc, row) => {
+        const key = String(row.referrer_email || row.referrer_referral_code || "Unknown referrer").toLowerCase();
+
+        if (!acc[key]) {
+          acc[key] = {
+            key,
+            name: row.referrer_name || "Referrer",
+            email: row.referrer_email || "",
+            code: row.referrer_referral_code || row.created_from_referral_code || "",
+            rows: []
+          };
+        }
+
+        acc[key].rows.push(row);
+        return acc;
+      }, {});
+
+      const groups = Object.values(grouped).sort((a, b) => {
+        const aHasOpen = a.rows.some((r) => r.refund_eligible && !r.refund_done_locally);
+        const bHasOpen = b.rows.some((r) => r.refund_eligible && !r.refund_done_locally);
+
+        if (aHasOpen !== bHasOpen) return aHasOpen ? -1 : 1;
+
+        return String(a.name || a.email).localeCompare(String(b.name || b.email));
+      });
+
+      const groupHtml = groups.map((group) => {
+        const eligible = group.rows.filter((r) => r.refund_eligible).length;
+        const open = group.rows.filter((r) => r.refund_eligible && !r.refund_done_locally).length;
+        const over = group.rows.filter((r) => !r.refund_eligible).length;
+
+        const cards = group.rows.map((r) => {
+          const done = r.refund_done_locally;
+          const eligibleRow = r.refund_eligible;
+          const key = escapeHtml(refundKey(r));
+          const status = !eligibleRow ? "Over referral limit" : done ? "Refunded locally" : "Action needed";
+          const paymentId = r.friend_whop_payment_id || "";
+
+          return `
+            <div class="refund-item ${done ? "done" : ""} ${!eligibleRow ? "ineligible" : ""}">
+              <div class="refund-title">
+                <div class="num">#${escapeHtml(r.referral_number_for_referrer)}</div>
+                <div class="person-line">
+                  <strong>${escapeHtml(r.friend_name || "Friend")}</strong>
+                  <span class="muted">${escapeHtml(r.friend_email || "—")}</span><br>
+                  <span class="tiny">referred by ${escapeHtml(group.name || group.email || "this referrer")}</span>
+                </div>
+              </div>
+
+              <div>
+                <span class="${statusClass(status)}">${escapeHtml(status)}</span><br><br>
+                <span class="tiny">Eligibility</span><br>
+                <span class="muted">${
+                  eligibleRow
+                    ? `Referral ${escapeHtml(r.referral_number_for_referrer)} of ${MAX_REFUNDS_PER_REFERRER}. Refund allowed.`
+                    : `Referral ${escapeHtml(r.referral_number_for_referrer)}. Limit is ${MAX_REFUNDS_PER_REFERRER}, so do not refund.`
+                }</span><br><br>
+                <span class="tiny">Code used</span><br>
+                <span class="mono">${escapeHtml(r.created_from_referral_code || r.referrer_referral_code || "—")}</span>
+              </div>
+
+              <div>
+                <span class="tiny">Suggested refund</span><br>
+                <div class="amount">${eligibleRow ? escapeHtml(refundAmountLabel()) : "Not eligible"}</div>
+                <span class="muted">${eligibleRow ? "50% of the ticket price" : "Over the 2-referral cap"}</span><br><br>
+                <span class="tiny">Payment ID</span><br>
+                <span class="mono">${escapeHtml(paymentId || "—")}</span>
+              </div>
+
+              <div class="row-actions">
+                <a class="btn ${eligibleRow ? "" : "disabled"}" href="${WHOP_PAYMENTS_URL}" target="_blank" rel="noopener">Open Whop</a>
+                <button class="light" type="button" onclick="copyText('${escapeHtml(paymentId)}')">Copy payment ID</button>
+                ${
+                  !eligibleRow
+                    ? `<button class="danger" type="button" disabled>Do not refund</button>`
+                    : done
+                      ? `<button class="warn" type="button" onclick="unmarkRefund('${key}')">Undo local mark</button>`
+                      : `<button class="secondary" type="button" onclick="markRefund('${key}')">Mark handled</button>`
+                }
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        return `
+          <section class="referrer-group" style="${escapeHtml(groupStyle(group.key))}">
+            <div class="referrer-group-head">
+              <div>
+                <strong>${escapeHtml(group.name || "Referrer")}</strong>
+                <span class="muted">${escapeHtml(group.email || "—")}</span>
+                ${group.code ? `<br><span class="tiny">Referral code:</span> <span class="mono">${escapeHtml(group.code)}</span>` : ""}
+              </div>
+
+              <div class="referrer-chip">
+                <span class="group-dot"></span>
+                ${open} open · ${eligible}/${MAX_REFUNDS_PER_REFERRER} eligible · ${over} over limit
+              </div>
+            </div>
+
+            <div class="queue-list">${cards}</div>
+          </section>
+        `;
+      }).join("");
+
+      return `
+        <h2>Refund queue</h2>
+        <p>
+          ${eligibleOpen} eligible refund${eligibleOpen === 1 ? "" : "s"} need admin action.
+          ${overLimit} paid referral${overLimit === 1 ? "" : "s"} are over the two-referral limit and should not be refunded.
+        </p>
+
+        <div class="state warn">
+          Rule: only the first ${MAX_REFUNDS_PER_REFERRER} paid referrals per referrer are eligible for a refund.
+          Rows are now grouped and colour-coded by referrer so your assistant can scan one person at a time.
+        </div>
+
+        ${toolbarHtml()}
+        <div class="queue-list">${groupHtml}</div>
+      `;
+    }
+
+    function referralsTable(referrals) {
+      const eligibilityById = {};
+      referralRowsWithEligibility().forEach((row) => {
+        eligibilityById[refundKey(row)] = row;
+      });
+
+      referrals = filteredRows(referrals);
+
+      if (!referrals.length) {
+        return `
+          <h2>Who referred who</h2>
+          ${toolbarHtml()}
+          <div class="state">No referral relationships found.</div>
+        `;
+      }
+
+      const rows = referrals.map((r) => {
+        const eligibility = eligibilityById[refundKey(r)];
+        const eligible = !eligibility || eligibility.refund_eligible;
+        const referralNumber = eligibility?.referral_number_for_referrer || "—";
+
+        return `
+          <tr>
+            <td>
+              <strong>${escapeHtml(r.referrer_name || "Referrer")}</strong><br>
+              ${escapeHtml(r.referrer_email || "—")}<br>
+              <span class="muted">Code:</span>
+              <span class="mono">${escapeHtml(r.referrer_referral_code || "—")}</span>
+            </td>
+
+            <td>
+              <strong>${escapeHtml(r.friend_name || "Friend")}</strong><br>
+              ${escapeHtml(r.friend_email || "—")}<br>
+              <span class="muted">Payment:</span>
+              <span class="mono">${escapeHtml(r.friend_whop_payment_id || "—")}</span>
+            </td>
+
+            <td>
+              <span class="${statusClass(r.friend_payment_status || "paid")}">${escapeHtml(r.friend_payment_status || "paid")}</span><br>
+              <span class="${statusClass(eligible ? "eligible" : "not eligible")}" style="margin-top:6px">
+                ${eligible ? `Eligible #${escapeHtml(referralNumber)}` : `Not eligible #${escapeHtml(referralNumber)}`}
+              </span>
+            </td>
+
+            <td>
+              <span class="mono">${escapeHtml(r.created_from_referral_code || "—")}</span>
+            </td>
+
+            <td>
+              <span class="mono">${escapeHtml(r.created_from_checkout_session_id || "—")}</span>
+            </td>
+
+            <td>${date(r.paid_at || r.created_at)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <h2>Who referred who</h2>
+        <p>These rows are created when a paid buyer used another customer’s local referral code.</p>
+        ${toolbarHtml()}
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Referrer</th>
+                <th>Referred friend</th>
+                <th>Payment / eligibility</th>
+                <th>Code used</th>
+                <th>Checkout session</th>
+                <th>Paid date</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function customersTable(customers) {
+      customers = filteredRows(customers);
+
+      if (!customers.length) {
+        return `
+          <h2>Customers</h2>
+          ${toolbarHtml()}
+          <div class="state">No customers found.</div>
+        `;
+      }
+
+      const rows = customers.map((c) => `
+        <tr>
+          <td>
+            <strong>${escapeHtml(c.name || "Customer")}</strong><br>
+            ${escapeHtml(c.email || "—")}<br>
+            <span class="muted">${escapeHtml(c.phone || "")}</span>
+          </td>
+
+          <td>
+            <span class="${statusClass(c.status || "pending")}">${escapeHtml(c.status || "pending")}</span><br>
+            <span class="muted">${date(c.paid_at)}</span>
+          </td>
+
+          <td>
+            <span class="mono">${escapeHtml(c.referral_code || "—")}</span><br>
+            ${c.referral_link ? `<span class="mono">${escapeHtml(c.referral_link)}</span>` : ""}
+          </td>
+
+          <td>${Number(c.referred_friend_count || 0)}</td>
+
+          <td>
+            ${
+              c.referred_by_email
+                ? `<strong>${escapeHtml(c.referred_by_name || "Referrer")}</strong><br>${escapeHtml(c.referred_by_email)}<br><span class="mono">${escapeHtml(c.referred_by_code || "")}</span>`
+                : c.referred_by_code
+                  ? `<span class="mono">${escapeHtml(c.referred_by_code)}</span>`
+                  : "—"
+            }
+          </td>
+
+          <td>
+            <span class="mono">${escapeHtml(c.checkout_session_id || "—")}</span><br>
+            <span class="mono">${escapeHtml(c.whop_payment_id || "—")}</span>
+          </td>
+        </tr>
+      `).join("");
+
+      return `
+        <h2>Customers</h2>
+        <p>Everyone who has started or completed checkout.</p>
+        ${toolbarHtml()}
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Referral code/link</th>
+                <th>Friends referred</th>
+                <th>Referred by</th>
+                <th>Checkout / payment IDs</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function sessionsTable(sessions) {
+      sessions = filteredRows(sessions);
+
+      if (!sessions.length) {
+        return `
+          <h2>Checkout sessions</h2>
+          ${toolbarHtml()}
+          <div class="state">No checkout sessions found.</div>
+        `;
+      }
+
+      const rows = sessions.map((s) => `
+        <tr>
+          <td>
+            <strong>${escapeHtml(s.full_name || "Customer")}</strong><br>
+            ${escapeHtml(s.email || "—")}
+          </td>
+
+          <td>
+            <span class="${statusClass(s.payment_status || "pending")}">${escapeHtml(s.payment_status || "pending")}</span>
+          </td>
+
+          <td>
+            <span class="mono">${escapeHtml(s.referred_by || "—")}</span>
+          </td>
+
+          <td>
+            <span class="mono">${escapeHtml(s.id || "—")}</span><br>
+            <span class="mono">${escapeHtml(s.whop_payment_id || "—")}</span>
+          </td>
+
+          <td>${date(s.created_at)}</td>
+          <td>${date(s.updated_at)}</td>
+        </tr>
+      `).join("");
+
+      return `
+        <h2>Checkout sessions</h2>
+        <p>Raw checkout sessions created through the checkout page.</p>
+        ${toolbarHtml()}
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Payment</th>
+                <th>Referral code used</th>
+                <th>Session / payment IDs</th>
+                <th>Created</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function activeTableHtml() {
+      if (!latestData) return "";
+
+      if (activeTab === "refunds") {
+        return refundQueueHtml();
+      }
+
+      if (activeTab === "customers") {
+        return customersTable(latestData.customers || []);
+      }
+
+      if (activeTab === "sessions") {
+        return sessionsTable(latestData.sessions || []);
+      }
+
+      return referralsTable(latestData.referrals || []);
+    }
+
+    function renderDashboard() {
+      if (!latestData) return;
+
+      dashboard.innerHTML = `
+        <h2>Admin overview</h2>
+        <p>
+          Manual local referral tracking only. Refund eligibility is calculated visually here:
+          the first ${MAX_REFUNDS_PER_REFERRER} paid referrals per referrer are eligible.
+        </p>
+
+        ${summaryHtml(latestData.summary || {})}
+        ${tabsHtml()}
+        <div style="margin-top:22px">${activeTableHtml()}</div>
+      `;
+    }
+
+    window.setTab = function(tab) {
+      activeTab = tab;
+      searchTerm = "";
+      renderDashboard();
+    };
+
+    window.setSearch = function(value) {
+      searchTerm = value;
+      renderDashboard();
+    };
+
+    window.copyText = async function(value) {
+      if (!value) {
+        setMessage("No payment ID available to copy.", "warn");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(value);
+        setMessage("Payment ID copied.");
+      } catch {
+        setMessage("Could not copy automatically. Select the payment ID and copy it manually.", "warn");
+      }
+    };
+
+    window.markRefund = function(key) {
+      const ids = refundDoneIds();
+      ids.push(key);
+      saveRefundDoneIds(ids);
+      setMessage("Marked as handled locally. Remember: the actual refund must be done in Whop.");
+      renderDashboard();
+    };
+
+    window.unmarkRefund = function(key) {
+      saveRefundDoneIds(refundDoneIds().filter((id) => id !== key));
+      setMessage("Local refund mark removed.", "warn");
+      renderDashboard();
+    };
+
+    document.getElementById("saveKey").addEventListener("click", loadDashboard);
+
+    document.getElementById("clearKey").addEventListener("click", () => {
+      localStorage.removeItem(KEY_STORAGE);
+      adminKeyInput.value = "";
+      latestData = null;
+      setMessage("Saved admin key cleared.", "warn");
+      dashboard.innerHTML = `<div class="state">Enter your admin key above.</div>`;
+    });
+
+    if (adminKey()) {
+      loadDashboard();
+    }
+  </script>
+</body>
+</html>
