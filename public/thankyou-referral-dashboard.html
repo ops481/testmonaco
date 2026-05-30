@@ -495,20 +495,38 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         `;
       }
 
-      function sessionId() {
-        return (
-          params.get("checkout_session_id") ||
-          params.get("session_id") ||
-          sessionStorage.getItem("monaco_checkout_session_id") ||
-          localStorage.getItem("monaco_checkout_session_id") ||
-          ""
-        );
-      }
+function sessionId() {
+  return (
+    params.get("checkout_session_id") ||
+    params.get("session_id") ||
+    params.get("checkout_configuration_id") ||
+    ""
+  );
+}
 
-      function googleStartUrl() {
-        const id = sessionId();
-        return id ? `${API.googleStart}?checkout_session_id=${encodeURIComponent(id)}` : API.googleStart;
-      }
+function googleStartUrl() {
+  /*
+    Normal dashboard login should never depend on localStorage,
+    sessionStorage, checkout cookies, or the original checkout browser.
+
+    If a paid customer comes back later from a new browser, this sends them to:
+      /auth/google/start
+
+    server.js then checks:
+      Google email === paid customer email in Supabase
+  */
+  return API.googleStart;
+}
+
+function googleStartUrlForCheckoutLinkingOnly() {
+  /*
+    Only use this on the immediate thank-you page flow, not normal login.
+    This lets someone link a different Google account right after checkout,
+    but it does not affect normal later logins.
+  */
+  const id = sessionId();
+  return id ? `${API.googleStart}?checkout_session_id=${encodeURIComponent(id)}` : API.googleStart;
+}
 
       async function json(url, options = {}) {
         const res = await fetch(url, {

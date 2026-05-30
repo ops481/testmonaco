@@ -449,25 +449,16 @@
 
     var params = new URLSearchParams(location.search);
 
+    
     var checkoutId =
-      params.get('checkout_session_id') ||
-      params.get('session_id') ||
-      params.get('checkout_configuration_id') ||
-      sessionStorage.getItem('monaco_checkout_session_id') ||
-      localStorage.getItem('monaco_checkout_session_id') ||
-      '';
+  params.get('checkout_session_id') ||
+  params.get('session_id') ||
+  params.get('checkout_configuration_id') ||
+  '';
 
-    if (checkoutId) {
-      sessionStorage.setItem('monaco_checkout_session_id', checkoutId);
-      localStorage.setItem('monaco_checkout_session_id', checkoutId);
-    }
-
-    var bookingEmail = (
-      params.get('email') ||
-      sessionStorage.getItem('monaco_booking_email') ||
-      localStorage.getItem('monaco_booking_email') ||
-      ''
-    );
+var bookingEmail =
+  params.get('email') ||
+  '';
 
     var dashboardPasswordSet = null;
     var hasCheckoutSessionCookie = false;
@@ -477,8 +468,7 @@
       if (!email) return;
 
       bookingEmail = email;
-      sessionStorage.setItem('monaco_booking_email', email);
-      localStorage.setItem('monaco_booking_email', email);
+
 
       if (emailLoginInput) {
         emailLoginInput.placeholder = email;
@@ -493,12 +483,23 @@
 
     setBookingEmail(bookingEmail);
 
-    var loginUrl = checkoutId
-      ? '/auth/google/start?checkout_session_id=' + encodeURIComponent(checkoutId)
-      : '/auth/google/start';
+    var normalGoogleLoginUrl = '/auth/google/start';
 
-    if (googleBtn) googleBtn.href = loginUrl;
-    if (modalGoogleBtn) modalGoogleBtn.href = loginUrl;
+var checkoutGoogleLinkingUrl = checkoutId
+  ? '/auth/google/start?checkout_session_id=' + encodeURIComponent(checkoutId)
+  : normalGoogleLoginUrl;
+
+/*
+  On the immediate thank-you page, passing checkout_session_id is okay.
+  It is signed by the server in OAuth state and only helps with immediate
+  post-checkout Google linking.
+
+  But if there is no checkout ID in the current URL, the button must be a
+  pure database-backed login:
+    /auth/google/start
+*/
+if (googleBtn) googleBtn.href = checkoutGoogleLinkingUrl;
+if (modalGoogleBtn) modalGoogleBtn.href = checkoutGoogleLinkingUrl;
 
 function showEmailLoginMode() {
   if (modalTitle) modalTitle.textContent = 'Log in to your Monaco dashboard';

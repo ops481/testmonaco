@@ -104,8 +104,12 @@ const SESSION_TTL_MS = cleanEnvNumber(
   1000 * 60 * 60 * 24 * 30
 );
 
-const GOOGLE_STATE_COOKIE = "monaco_google_state";
-const GOOGLE_CHECKOUT_COOKIE = "monaco_google_checkout_session";
+const OAUTH_STATE_SECRET =
+  cleanEnv(process.env.OAUTH_STATE_SECRET) ||
+  ADMIN_API_KEY ||
+  SUPABASE_SERVICE_ROLE_KEY;
+
+const GOOGLE_OAUTH_STATE_TTL_MS = 1000 * 60 * 10;
 
 let supabaseClient = null;
 
@@ -573,7 +577,56 @@ app.post("/api/referrals/password-set", async (req, res) => {
     res.status(500).json({ error: error.message || "Could not set password." });
   }
 });
+function signGoogleOAuthState(payload) {
+  const body = Buffer
+    .from(JSON.stringify(payload), "utf8")
+    .toString("base64url");
 
+  const signature = crypto
+    .createHmac("sha256", OAUTH_STATE_SECRET)
+    .update(body)
+    .digest("base64url");
+
+  return `${body}.${signature}`;
+}
+
+function verifyGoogleOAuthState(state) {
+  const parts = String(state || "").split(".");
+
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const body = parts[0];
+  const signature = parts[1];
+
+  const expectedSignature = crypto
+    .createHmac("sha256", OAUTH_STATE_SECRET)
+    .update(body)
+    .digest("base64url");
+
+  if (!safeEqualString(signature, expectedSignature)) {
+    return null;
+  }
+
+  let payload;
+
+  try {
+    payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
+  } catch {
+    return null;
+  }
+
+  if (!payload || payload.purpose !== "google_login") {
+    return null;
+  }
+
+  if (!payload.expires_at || Number(payload.expires_at) < Date.now()) {
+    return null;
+  }
+
+  return payload;
+}
 app.get("/api/referrals/password-setup-token", async (req, res) => {
   try {
     const token = cleanText(req.query?.token || req.body?.token || "", 300);
@@ -735,14 +788,24 @@ app.get("/auth/google/start", async (req, res) => {
   try {
     requireEnv(["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"]);
 
-    const state = crypto.randomBytes(24).toString("hex");
-    const checkoutSessionId = cleanText(req.query.checkout_session_id || req.query.session_id || "", 200);
-
-    res.cookie(GOOGLE_STATE_COOKIE, state, cookieOptions(10 * 60 * 1000));
-
-    if (checkoutSessionId) {
-      res.cookie(GOOGLE_CHECKOUT_COOKIE, checkoutSessionId, cookieOptions(10 * 60 * 1000));
+    if (!OAUTH_STATE_SECRET) {
+      throw new Error("Missing OAUTH_STATE_SECRET, ADMIN_API_KEY, or SUPABASE_SERVICE_ROLE_KEY for Google state signing.");
     }
+
+    const checkoutSessionId = cleanText(
+      req.query.checkout_session_id ||
+        req.query.session_id ||
+        "",
+      200
+    );
+
+    const state = signGoogleOAuthState({
+      purpose: "google_login",
+      checkout_session_id: checkoutSessionId || "",
+      return_to: "/thankyou-referral-dashboard.html",
+      created_at: Date.now(),
+      expires_at: Date.now() + GOOGLE_OAUTH_STATE_TTL_MS
+    });
 
     const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
     url.searchParams.set("client_id", GOOGLE_CLIENT_ID);
@@ -755,7 +818,9 @@ app.get("/auth/google/start", async (req, res) => {
     res.redirect(url.toString());
   } catch (error) {
     console.error("google start failed:", error);
-    res.redirect(`/thankyou-referral-dashboard.html?error=${encodeURIComponent(error.message || "Google login failed.")}`);
+    res.redirect(
+      `/thankyou-referral-dashboard.html?error=${encodeURIComponent(error.message || "Google login failed.")}`
+    );
   }
 });
 
@@ -764,14 +829,17 @@ app.get("/auth/google/callback", async (req, res) => {
     requireEnv(["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"]);
 
     const code = cleanText(req.query.code, 3000);
-    const state = cleanText(req.query.state, 200);
-    const expectedState = cleanText(req.cookies?.[GOOGLE_STATE_COOKIE], 200);
-    const checkoutSessionId = cleanText(req.cookies?.[GOOGLE_CHECKOUT_COOKIE], 200);
+    const state = cleanText(req.query.state, 4000);
 
-    res.clearCookie(GOOGLE_STATE_COOKIE, cookieOptions(0));
-    res.clearCookie(GOOGLE_CHECKOUT_COOKIE, cookieOptions(0));
+    if (!code || !state) {
+      return res.redirect(
+        `/thankyou-referral-dashboard.html?error=${encodeURIComponent("Google login expired. Please try again.")}`
+      );
+    }
 
-    if (!code || !state || !expectedState || state !== expectedState) {
+    const statePayload = verifyGoogleOAuthState(state);
+
+    if (!statePayload || statePayload.purpose !== "google_login") {
       return res.redirect(
         `/thankyou-referral-dashboard.html?error=${encodeURIComponent("Google login expired. Please try again.")}`
       );
@@ -822,16 +890,47 @@ app.get("/auth/google/callback", async (req, res) => {
     let customerEmail = "";
 
     /*
-      Best case: user has just paid and clicked Google from thankyou page.
-      We link whichever Google account they choose to the paid checkout email.
-      This handles “paid with one email, signs in with another”.
+      Most important robust login rule:
+      If the Google email is the same email that paid, log them in.
+      This works today, tomorrow, in a new browser, or months later.
+      It does not depend on checkout cookies.
     */
-    if (checkoutSessionId) {
-      let session = await getCheckoutSession(checkoutSessionId);
+    const exactCustomer = await getCustomer(googleEmail);
+
+    if (exactCustomer && exactCustomer.status === "paid") {
+      customerEmail = cleanEmail(exactCustomer.email);
+    }
+
+    /*
+      Secondary path:
+      If this Google email was previously linked to a paid customer, allow it.
+      This handles people who paid with email A and intentionally linked Google email B.
+    */
+    if (!customerEmail) {
+      const linked = await getIdentity("google_email", googleEmail);
+
+      if (linked) {
+        const linkedCustomer = await getCustomer(linked.customer_email);
+
+        if (linkedCustomer && linkedCustomer.status === "paid") {
+          customerEmail = cleanEmail(linkedCustomer.email);
+        }
+      }
+    }
+
+    /*
+      Optional immediate-after-checkout path:
+      If Google login was started from the thank-you page with a checkout_session_id
+      inside signed state, and that checkout session is paid, link this Google email
+      to the paid checkout email.
+      This does not use cookies. It uses signed state from the OAuth flow.
+    */
+    if (!customerEmail && statePayload.checkout_session_id) {
+      let session = await getCheckoutSession(statePayload.checkout_session_id);
 
       if (session && session.payment_status !== "paid") {
         await syncPaidWhopPaymentForSession(session);
-        session = await getCheckoutSession(checkoutSessionId);
+        session = await getCheckoutSession(statePayload.checkout_session_id);
       }
 
       if (session && session.payment_status === "paid") {
@@ -840,28 +939,10 @@ app.get("/auth/google/callback", async (req, res) => {
       }
     }
 
-    /*
-      Otherwise, use existing verified Google identity.
-    */
-    if (!customerEmail) {
-      const linked = await getIdentity("google_email", googleEmail);
-      if (linked) customerEmail = cleanEmail(linked.customer_email);
-    }
-
-    /*
-      Last fallback: exact email match to a paid booking.
-    */
-    if (!customerEmail) {
-      const exactCustomer = await getCustomer(googleEmail);
-      if (exactCustomer && exactCustomer.status === "paid") {
-        customerEmail = cleanEmail(exactCustomer.email);
-      }
-    }
-
     if (!customerEmail) {
       return res.redirect(
         `/thankyou-referral-dashboard.html?error=${encodeURIComponent(
-          "We could not match this Google account to a paid Monaco booking. Use the email you paid with, or ask support to link your Google email."
+          "We could not find a paid Monaco booking for this Google email. Please use the same Google email you paid with, or ask support to link this Google account."
         )}`
       );
     }
