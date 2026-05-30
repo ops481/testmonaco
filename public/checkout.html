@@ -746,14 +746,33 @@
     var WHOP_LOADER_URL = "https://js.whop.com/static/checkout/loader.js";
     var DEFAULT_PLAN_ID = "plan_5mpgW1X0Qwlb8";
     var REFERRAL_STORAGE_KEY = "monaco_referral_code";
+    var VISITOR_ID_STORAGE_KEY = "monaco_checkout_visitor_id";
 
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyx20Cj1KV_JjIJGjg9zbqmo7XDE5iKTiEfUkLdO9t5yeECvYyRAF8SQG38fV-gZn7A/exec";
+    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhp_MYVdpxn8C5XN9eALDdgCoDKFgKsUm2OfJU7vBviLvQo44sUDtJb2tGLUK-K1xQ/exec";
 
     var preparing = false;
     var preparedSignature = "";
     var phoneInputInstance = null;
 
     function $(id) { return document.getElementById(id); }
+
+    function getVisitorId() {
+      var existing =
+        localStorage.getItem(VISITOR_ID_STORAGE_KEY) ||
+        sessionStorage.getItem(VISITOR_ID_STORAGE_KEY) ||
+        "";
+
+      if (existing) return existing;
+
+      var id = "visitor_" + Date.now() + "_" + Math.random().toString(36).slice(2, 12);
+      localStorage.setItem(VISITOR_ID_STORAGE_KEY, id);
+      sessionStorage.setItem(VISITOR_ID_STORAGE_KEY, id);
+      return id;
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || ""));
+    }
 
     function cleanReferralCode(value) {
       return String(value || "")
@@ -842,26 +861,55 @@ function formPayload() {
     lead_source: value("leadSource"),
     referral_code: getReferralCode(),
     referred_by: getReferralCode(),
+    visitor_id: getVisitorId(),
     source_url: window.location.href
   };
 }
 
 function validatePayload(payload) {
   if (!payload.full_name) return "Enter your full name.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) return "Enter a valid email.";
+  if (!isValidEmail(payload.email)) return "Enter a valid email.";
   if (!payload.lead_source) return "Select where you came from.";
   return "";
 }
 
-function sendLeadToAirtable(payload) {
-  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("PASTE_") === 0) return;
+var lastLeadCaptureSignature = "";
+var leadCaptureTimer = null;
 
-  var leadPayload = Object.assign({ event_type: "checkout_opened" }, payload);
+function hasUsablePhone(phone) {
+  return String(phone || "").replace(/\D/g, "").length >= 7;
+}
+
+function canCaptureLeadProgress(payload) {
+  // Capture as soon as we have ANY useful contact route.
+  // Priority later is email, then Instagram, then phone.
+  return (
+    isValidEmail(payload.email) ||
+    Boolean(payload.instagram) ||
+    hasUsablePhone(payload.phone)
+  );
+}
+
+function sendLeadToAirtable(payload, checkoutStatus) {
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("PASTE_") === 0) return;
+  if (!canCaptureLeadProgress(payload)) return;
+
+  var leadPayload = Object.assign(
+    {
+      event_type: "checkout_progress",
+      checkout_status: checkoutStatus || "Details started"
+    },
+    payload
+  );
+
+  var signature = JSON.stringify(leadPayload);
+  if (signature === lastLeadCaptureSignature) return;
+  lastLeadCaptureSignature = signature;
+
   var body = JSON.stringify(leadPayload);
 
   try {
-    // sendBeacon is very reliable for fire-and-forget lead capture.
-    // It sends the abandoned lead even while the Whop checkout is opening.
+    // sendBeacon is reliable for fire-and-forget lead capture.
     if (navigator.sendBeacon) {
       var blob = new Blob([body], { type: "text/plain;charset=UTF-8" });
       var queued = navigator.sendBeacon(GOOGLE_SCRIPT_URL, blob);
@@ -881,6 +929,19 @@ function sendLeadToAirtable(payload) {
   } catch (error) {
     console.warn("Could not send checkout lead to Airtable:", error);
   }
+}
+
+function captureLeadProgressNow() {
+  var payload = formPayload();
+
+  if (!canCaptureLeadProgress(payload)) return;
+
+  sendLeadToAirtable(payload, "Details started");
+}
+
+function scheduleLeadProgressCapture() {
+  clearTimeout(leadCaptureTimer);
+  leadCaptureTimer = setTimeout(captureLeadProgressNow, 800);
 }
 
     async function jsonFetch(url, options) {
@@ -919,9 +980,8 @@ function sendLeadToAirtable(payload) {
       var error = validatePayload(payload);
       if (error) { setMessage(error, true); return; }
 
-      // This is the abandoned-lead trigger.
-      // It runs as soon as the user submits valid details, before Whop opens.
-      sendLeadToAirtable(payload);
+      // Upgrade the same abandoned-lead record from "Details started" to "Payment opened".
+      sendLeadToAirtable(payload, "Payment opened");
 
       var signature = JSON.stringify(payload);
       if (signature === preparedSignature && $(CHECKOUT_ID)) {
@@ -1010,7 +1070,23 @@ if (whopClose) {
     }
 
     var form = $("checkoutForm");
-    if (form) form.addEventListener("submit", prepareCheckout);
+    if (form) {
+      form.addEventListener("submit", prepareCheckout);
+
+      ["fname", "email", "phone", "company", "instagram", "leadSource"].forEach(function(id) {
+        var field = $(id);
+        if (!field) return;
+
+        field.addEventListener("input", scheduleLeadProgressCapture);
+        field.addEventListener("change", scheduleLeadProgressCapture);
+        field.addEventListener("blur", captureLeadProgressNow);
+      });
+
+      window.addEventListener("pagehide", captureLeadProgressNow);
+      document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState === "hidden") captureLeadProgressNow();
+      });
+    }
   })();
 </script>
 
