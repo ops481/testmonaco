@@ -900,97 +900,21 @@ const referredByCode = cleanReferralCode(
     updated_at: now()
   };
 }
+
+
 function isSuccessfulWhopPayment(eventType, object = {}) {
-  const type = String(eventType || "").toLowerCase();
-  const status = String(object.status || object.payment_status || "").toLowerCase();
-
-  return (
-    Boolean(object.paid_at) ||
-    type.includes("payment.succeeded") ||
-    type.includes("payment.paid") ||
-    type.includes("payment.success") ||
-    status === "paid" ||
-    status === "succeeded" ||
-    status === "complete" ||
-    status === "completed"
-  );
-}
-
-function findCheckoutSession(store, payment) {
-  const metadata = payment.metadata || {};
-
-  const possibleIds = [
-    payment.checkout_configuration_id,
-    payment.checkoutConfigurationId,
-    payment.checkout_config_id,
-    payment.checkoutConfigId,
-    payment.checkout_session_id,
-    payment.checkoutSessionId,
-    payment.session_id,
-    payment.sessionId,
-    payment.configuration_id,
-    payment.configurationId,
-    metadata.checkout_configuration_id,
-    metadata.checkoutConfigurationId,
-    metadata.checkout_config_id,
-    metadata.checkoutConfigId,
-    metadata.checkout_session_id,
-    metadata.checkoutSessionId,
-    metadata.session_id,
-    metadata.sessionId
-  ]
-    .map((v) => cleanText(v, 200))
-    .filter(Boolean);
-
-  for (const id of possibleIds) {
-    if (store.checkout_sessions[id]) {
-      return store.checkout_sessions[id];
-    }
-  }
-
-  const localSessionId = cleanText(
-    metadata.local_session_id ||
-      payment.local_session_id ||
-      payment.localSessionId,
-    200
-  );
-
-  if (localSessionId) {
-    const byLocalId = Object.values(store.checkout_sessions).find(
-      (s) => s.local_session_id === localSessionId
-    );
-
-    if (byLocalId) return byLocalId;
-  }
-
-  const email = cleanEmail(
-    metadata.email ||
-      payment.user?.email ||
-      payment.customer?.email
-  );
-
-  if (email) {
-    const matchingPending = Object.values(store.checkout_sessions)
-      .filter((s) => cleanEmail(s.email) === email && s.payment_status !== "paid")
-      .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
-
-    if (matchingPending[0]) return matchingPending[0];
-  }
-
-  return null;
-}
-function isSuccessfulWhopPayment(eventType, object) {
   const type = String(eventType || "").toLowerCase();
 
   const status = String(
     object.status ||
-    object.payment_status ||
-    object.checkout_status ||
-    object.substatus ||
-    ""
+      object.payment_status ||
+      object.checkout_status ||
+      object.substatus ||
+      ""
   ).toLowerCase();
 
   return (
+    Boolean(object.paid_at) ||
     type.includes("payment.succeeded") ||
     type.includes("payment.paid") ||
     type.includes("payment.success") ||
@@ -1065,6 +989,9 @@ function findCheckoutSession(store, payment) {
 
   return null;
 }
+
+
+
 
 function buildDashboard(store, email) {
   const customer = store.customers[email];
