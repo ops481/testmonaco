@@ -289,14 +289,22 @@ td { color: var(--fg); font-weight: 550; }
 /* modal */
 .modal-overlay { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 22px; background: rgba(14,14,14,.48); backdrop-filter: blur(8px); }
 .modal-overlay.is-open { display: flex; }
-.modal-card { width: min(100%, 520px); background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(22px, 4vw, 30px); position: relative; }
+.modal-card { width: min(100%, 720px); background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(22px, 4vw, 30px); position: relative; }
 .modal-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 999px; background: #f7f8f5; color: var(--fg); font-size: 22px; line-height: 1; }
 .invite-form { display: grid; gap: 12px; margin-top: 18px; }
-.contact-row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; }
+.contact-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; }
 .invite-message { display: block; color: var(--accent); font-size: 13px; font-weight: 700; }
 .invite-message.error { color: var(--error); }
-.modal-success { display: none; padding: 12px 14px; border-radius: 12px; background: rgba(14,87,50,.08); color: var(--accent); font-weight: 800; }
-.modal-success.is-visible { display: block; }
+.modal-success {
+  display: none; align-items: flex-start; gap: 12px; padding: 15px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(14,87,50,.10), rgba(204,183,132,.18));
+  border: 1px solid rgba(14,87,50,.14); color: var(--accent); font-weight: 800;
+  box-shadow: 0 12px 30px rgba(14,87,50,.08);
+}
+.modal-success.is-visible { display: flex; }
+.success-icon { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 999px; display: grid; place-items: center; background: var(--accent); color: #fff; font-weight: 900; }
+.success-copy strong { display: block; color: var(--accent); font-size: 15px; line-height: 1.2; }
+.success-copy span { display: block; margin-top: 3px; color: var(--muted); font-size: 13px; font-weight: 650; }
 .iti { width: 100%; display: block; }
 .iti input, .iti input[type=tel] { width: 100%; min-height: 48px; padding-top: 13px; padding-bottom: 13px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfb; }
 .iti__selected-country { border-radius: 11px 0 0 11px; padding-left: 12px; background: linear-gradient(135deg, rgba(204,183,132,.22), rgba(14,87,50,.07)); }
@@ -647,16 +655,11 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         if (!input || !window.intlTelInput || invitePhoneInput) return;
 
         invitePhoneInput = window.intlTelInput(input, {
-          initialCountry: "auto",
+          initialCountry: "gb",
           separateDialCode: true,
-          nationalMode: false,
+          nationalMode: true,
           autoPlaceholder: "aggressive",
-          geoIpLookup: function(success) {
-            fetch("https://ipapi.co/json/")
-              .then((res) => res.json())
-              .then((data) => success(String(data.country_code || "gb").toLowerCase()))
-              .catch(() => success("gb"));
-          },
+          formatAsYouType: true,
           utilsScript: INTL_TEL_INPUT_UTILS_URL
         });
       }
@@ -667,26 +670,113 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         invitePhoneInput = null;
       }
 
-      function updateInviteContactPlaceholder() {
-        const type = String($("inviteContactType")?.value || "email");
+      function normaliseWhatsappNumber(rawValue) {
+        const raw = String(rawValue || "").trim();
+
+        if (!raw) {
+          return {
+            ok: false,
+            value: "",
+            message: "Add one contact detail first."
+          };
+        }
+
+        const selectedCountry = invitePhoneInput?.getSelectedCountryData?.() || {};
+        const dialCode = String(selectedCountry.dialCode || "").replace(/\D/g, "");
+        let digits = raw.replace(/[^\d+]/g, "");
+
+        if (digits.startsWith("+")) {
+          digits = `+${digits.slice(1).replace(/\D/g, "")}`;
+        } else {
+          let nationalDigits = digits.replace(/\D/g, "");
+
+          if (dialCode && nationalDigits.startsWith("0")) {
+            nationalDigits = nationalDigits.replace(/^0+/, "");
+          }
+
+          digits = dialCode ? `+${dialCode}${nationalDigits}` : `+${nationalDigits}`;
+        }
+
+        const e164 = `+${digits.replace(/\D/g, "")}`;
+
+        if (!/^\+[1-9]\d{7,14}$/.test(e164)) {
+          return {
+            ok: false,
+            value: e164,
+            message: "Add a valid WhatsApp phone number."
+          };
+        }
+
+        return {
+          ok: true,
+          value: e164,
+          message: ""
+        };
+      }
+
+      function resetInviteContactInputForType(type) {
         const input = $("inviteContactValue");
         if (!input) return;
 
+        input.value = "";
+
         if (type === "phone") {
           input.type = "tel";
-          input.placeholder = "7700 900000";
+          input.placeholder = "7939 299 167";
+          input.inputMode = "tel";
+          input.autocomplete = "tel";
           setTimeout(initInvitePhonePicker, 0);
-        } else {
-          destroyInvitePhonePicker();
-          input.type = "email";
-          input.placeholder = "friend@example.com";
+          return;
         }
+
+        destroyInvitePhonePicker();
+        input.type = "email";
+        input.placeholder = "friend@example.com";
+        input.inputMode = "email";
+        input.autocomplete = "email";
+      }
+
+
+      function normaliseInstagramHandle(value) {
+        const trimmed = String(value || "").trim().replace(/\s+/g, "");
+        const handle = trimmed.replace(/^@+/, "");
+        return handle ? `@${handle}` : "";
+      }
+
+      function handleInstagramFocus(event) {
+        const input = event.target;
+        if (!String(input.value || "").trim()) {
+          input.value = "@";
+          requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
+        }
+      }
+
+      function handleInstagramInput(event) {
+        const input = event.target;
+        const rawValue = String(input.value || "").replace(/\s+/g, "");
+        const nextValue = rawValue ? `@${rawValue.replace(/^@+/, "")}` : "";
+        if (input.value !== nextValue) {
+          input.value = nextValue;
+        }
+      }
+
+      function handleInstagramBlur(event) {
+        const input = event.target;
+        if (String(input.value || "").trim() === "@") {
+          input.value = "";
+        }
+      }
+
+      function updateInviteContactPlaceholder() {
+        const type = String($("inviteContactType")?.value || "email");
+        resetInviteContactInputForType(type);
       }
 
       async function sendReferralInvitation(d) {
         const nameInput = $("inviteFriendName");
         const contactTypeInput = $("inviteContactType");
         const contactInput = $("inviteContactValue");
+        const instagramInput = $("inviteInstagramHandle");
         const noteInput = $("inviteNote");
         const btn = $("sendInviteBtn");
         const msg = $("inviteMessage");
@@ -695,9 +785,13 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         const friendName = String(nameInput?.value || "").trim() || "Friend";
         const contactType = String(contactTypeInput?.value || "email").trim();
         const rawContactValue = String(contactInput?.value || "").trim();
-        const contactValue = contactType === "phone" && invitePhoneInput
-          ? (invitePhoneInput.getNumber() || rawContactValue)
+        const phoneResult = contactType === "phone"
+          ? normaliseWhatsappNumber(rawContactValue)
+          : null;
+        const contactValue = contactType === "phone"
+          ? phoneResult.value
           : rawContactValue;
+        const friendInstagram = normaliseInstagramHandle(instagramInput?.value || "");
         const note = String(noteInput?.value || "").trim();
         const webhookUrl = String(window.__MONACO_REFERRAL_INVITE_SCRIPT_URL || REFERRAL_INVITE_SCRIPT_URL || "").trim();
 
@@ -712,8 +806,8 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
           return;
         }
 
-        if (contactType === "phone" && invitePhoneInput && !invitePhoneInput.isValidNumber()) {
-          setMessage("Add a valid WhatsApp phone number with its country code.", "error");
+        if (contactType === "phone" && phoneResult && !phoneResult.ok) {
+          setMessage(phoneResult.message, "error");
           return;
         }
 
@@ -732,28 +826,39 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         setMessage("");
         success?.classList.remove("is-visible");
 
-        const friendEmail = contactType === "email" ? contactValue : "";
-        const friendPhone = contactType === "phone" ? contactValue : "";
+const friendEmail = contactType === "email" ? contactValue : "";
+
+const friendPhoneE164 = contactType === "phone"
+  ? contactValue
+  : "";
+
+const friendPhoneDigits = contactType === "phone"
+  ? contactValue.replace(/\D/g, "")
+  : "";
         const contactMethod = contactType === "phone" ? "WhatsApp" : "Email";
 
-        const payload = new URLSearchParams({
-          event: "monaco_referral_invitation",
-          invited_by_name: d.name || "",
-          invited_by_email: d.email || "",
-          invited_by_company: d.company || "",
-          friend_name: friendName,
-          friend_email: friendEmail,
-          friend_phone: friendPhone,
-          friend_insta: "",
-          contact_method: contactMethod,
-          friend_contact_type: contactType,
-          friend_contact_value: contactValue,
-          referral_link: d.referral_link,
-          note,
-          message: `${friendName}, ${d.name || "Someone"} has invited you to the Monaco Content Retreat. Use their referral link here: ${d.referral_link}`,
-          sent_at: new Date().toISOString()
-        });
+       const payload = new URLSearchParams({
+  event: "monaco_referral_invitation",
+  invited_by_name: d.name || "",
+  invited_by_email: d.email || "",
+  invited_by_company: d.company || "",
+  friend_name: friendName,
+  friend_email: friendEmail,
 
+  friend_phone: friendPhoneDigits,
+  friend_phone_digits: friendPhoneDigits,
+  friend_phone_e164: friendPhoneE164,
+
+  friend_insta: friendInstagram,
+  friend_instagram: friendInstagram,
+  contact_method: contactMethod,
+  friend_contact_type: contactType,
+  friend_contact_value: contactType === "phone" ? friendPhoneDigits : contactValue,
+  referral_link: d.referral_link,
+  note,
+  message: `${friendName}, ${d.name || "Someone"} has invited you to the Monaco Content Retreat. Use their referral link here: ${d.referral_link}`,
+  sent_at: new Date().toISOString()
+});
         try {
           await fetch(webhookUrl, {
             method: "POST",
@@ -766,18 +871,28 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
 
           if (nameInput) nameInput.value = "";
           if (contactInput) contactInput.value = "";
+          if (instagramInput) instagramInput.value = "";
           if (noteInput) noteInput.value = "";
           if (contactTypeInput) contactTypeInput.value = "email";
           updateInviteContactPlaceholder();
 
-          success?.classList.add("is-visible");
-          setMessage("Invitation sent.");
+          if (success) {
+            success.innerHTML = `
+              <span class="success-icon">✓</span>
+              <span class="success-copy">
+                <strong>Invitation sent to ${esc(friendName)}.</strong>
+                <span>We’ve logged their details and included your referral link.</span>
+              </span>
+            `;
+            success.classList.add("is-visible");
+          }
+          setMessage("");
 
           setTimeout(() => {
             closeInviteModal();
             success?.classList.remove("is-visible");
             setMessage("");
-          }, 1400);
+          }, 2400);
         } catch (err) {
           setMessage(err.message || "Could not send the invitation.", "error");
         } finally {
@@ -948,7 +1063,7 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
                     <p>Add an email or WhatsApp number.</p>
 
                     <form class="invite-form" id="inviteFriendForm">
-                      <input id="inviteFriendName" class="input" type="text" placeholder="Friend's name, optional" autocomplete="name" />
+                      <input id="inviteFriendName" class="input" type="text" placeholder="Friend's name" autocomplete="name" />
 
                       <div class="contact-row">
                         <select id="inviteContactType" class="input" aria-label="Contact type">
@@ -958,6 +1073,8 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
                         <input id="inviteContactValue" class="input" type="email" placeholder="friend@example.com" required />
                       </div>
 
+                      <input id="inviteInstagramHandle" class="input" type="text" placeholder="@instagram_handle" autocomplete="off" inputmode="text" />
+
                       <input id="inviteNote" class="input" type="text" placeholder="Optional note" />
 
                       <div class="invite-actions">
@@ -965,7 +1082,10 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
                         <button class="secondary-btn" id="cancelInviteBtn" type="button">Cancel</button>
                       </div>
 
-                      <div id="inviteSuccess" class="modal-success" aria-live="polite">Invitation sent.</div>
+                      <div id="inviteSuccess" class="modal-success" aria-live="polite">
+                        <span class="success-icon">✓</span>
+                        <span class="success-copy"><strong>Invitation sent.</strong><span>Your referral link has been shared.</span></span>
+                      </div>
                       <span id="inviteMessage" class="invite-message" aria-live="polite"></span>
                     </form>
                   </div>
@@ -1097,6 +1217,9 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         $("closeInviteModalBtn")?.addEventListener("click", closeInviteModal);
         $("cancelInviteBtn")?.addEventListener("click", closeInviteModal);
         $("inviteContactType")?.addEventListener("change", updateInviteContactPlaceholder);
+        $("inviteInstagramHandle")?.addEventListener("focus", handleInstagramFocus);
+        $("inviteInstagramHandle")?.addEventListener("input", handleInstagramInput);
+        $("inviteInstagramHandle")?.addEventListener("blur", handleInstagramBlur);
         $("inviteModal")?.addEventListener("click", (event) => {
           if (event.target?.id === "inviteModal") closeInviteModal();
         });
