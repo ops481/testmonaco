@@ -277,6 +277,11 @@ td { color: var(--fg); font-weight: 550; }
 .login-card-clean p { color: var(--muted); font-weight: 500; }
 .login-google-btn { margin-top: 28px; }
 .login-error { margin-top: 20px; text-align: left; }
+.login-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 18px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.login-divider::before, .login-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.login-form { display: grid; gap: 10px; margin-top: 14px; text-align: left; }
+.login-form label { font-size: 13px; font-weight: 800; }
+.login-form .small-note { text-align: center; margin-top: 6px; }
 .state { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; color: var(--accent); font-weight: 750; box-shadow: var(--shadow); }
 .state.error { color: var(--error); }
 .state.warn { color: #7a5a13; }
@@ -426,8 +431,12 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         complete: "/api/referrals/complete-checkout",
         me: "/api/referrals/me",
         session: "/api/referrals/session",
+        login: "/api/referrals/login",
         logout: "/api/referrals/logout",
-        googleStart: "/auth/google/start"
+        googleStart: "/auth/google/start",
+        passwordLogin: "/api/referrals/password-login",
+        passwordSet: "/api/referrals/password-set",
+        passwordSetWithToken: "/api/referrals/password-set-with-token"
       };
 
       const MAX_ATTEMPTS = 10;
@@ -516,7 +525,10 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         }
 
         if (!res.ok) {
-          throw new Error(data.error || data.message || `Request failed (${res.status}).`);
+          const error = new Error(data.error || data.message || `Request failed (${res.status}).`);
+          error.status = res.status;
+          error.data = data;
+          throw error;
         }
 
         return data;
@@ -563,6 +575,7 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
           company: d.company || d.business || "",
 
           google_connected: Boolean(d.google_connected || d.googleConnected),
+          password_set: Boolean(d.password_set || d.passwordSet),
           whatsapp: d.whatsapp || {},
 
           referral_code: referralCode,
@@ -780,30 +793,7 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
         const supportUrl = whatsappSupportUrl(d);
         const primaryUrl = groupUrl || supportUrl;
         const primaryLabel = groupUrl ? "Join WhatsApp" : "Message us";
-
-        if (!d.google_connected) {
-          return `
-            <div class="whatsapp-card">
-              <div class="whatsapp-grid">
-                <div class="whatsapp-icon">◎</div>
-                <div>
-                  <h3>Connect Google first</h3>
-                  <p>Your private WhatsApp link appears here once your booking email is connected.</p>
-                  <div class="whatsapp-actions">
-                    <a class="btn google-btn" href="${googleStartUrl()}">
-                      ${googleIcon()}
-                      Continue with Google
-                    </a>
-                  </div>
-                  <div class="wa-meta-grid">
-                    <div class="wa-meta"><span>Status</span><strong>Google required</strong></div>
-                    <div class="wa-meta"><span>Access</span><strong>Private group</strong></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          `;
-        }
+        const accessLabel = d.google_connected ? "Google connected" : "Email verified";
 
         if (!primaryUrl) {
           return `
@@ -812,10 +802,10 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
                 <div class="whatsapp-icon">✓</div>
                 <div>
                   <h3>WhatsApp unlocked</h3>
-                  <p>Add the real invite link to <strong>WHATSAPP_GROUP_INVITE_URL</strong>.</p>
+                  <p>Your booking email is verified. Add the real invite link to <strong>WHATSAPP_GROUP_INVITE_URL</strong>.</p>
                   <div class="wa-meta-grid">
                     <div class="wa-meta"><span>Phone on file</span><strong>${esc(whatsapp.customer_phone || d.phone || "—")}</strong></div>
-                    <div class="wa-meta"><span>Status</span><strong>Unlocked</strong></div>
+                    <div class="wa-meta"><span>Access</span><strong>${esc(accessLabel)}</strong></div>
                   </div>
                 </div>
               </div>
@@ -829,14 +819,14 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
               <div class="whatsapp-icon">☏</div>
               <div>
                 <h3>Private WhatsApp group</h3>
-                <p>Use the booking phone on your checkout so access stays matched to your profile.</p>
+                <p>Your access is matched to your paid booking email. Google is optional.</p>
                 <div class="whatsapp-actions">
                   <a class="btn" href="${esc(primaryUrl)}" target="_blank" rel="noopener">${esc(primaryLabel)}</a>
                   ${supportUrl && groupUrl ? `<a class="secondary-btn" href="${esc(supportUrl)}" target="_blank" rel="noopener">Need help?</a>` : ""}
                 </div>
                 <div class="wa-meta-grid">
                   <div class="wa-meta"><span>Phone on file</span><strong>${esc(whatsapp.customer_phone || d.phone || "your checkout phone")}</strong></div>
-                  <div class="wa-meta"><span>Status</span><strong>${groupUrl ? "Group ready" : "Support"}</strong></div>
+                  <div class="wa-meta"><span>Access</span><strong>${esc(accessLabel)}</strong></div>
                 </div>
                 <p class="small-note">Wrong account opening? Switch to your booking number in WhatsApp.</p>
               </div>
@@ -1003,7 +993,7 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
                           <div class="profile-field"><span>Email</span><strong>${esc(d.email || "—")}</strong></div>
                           <div class="profile-field"><span>Phone</span><strong>${esc(d.phone || "—")}</strong></div>
                           <div class="profile-field"><span>Company</span><strong>${esc(d.company || "—")}</strong></div>
-                          <div class="profile-field"><span>Google</span><strong>${d.google_connected ? "Connected" : "Not connected"}</strong></div>
+                          <div class="profile-field"><span>Google</span><strong>${d.google_connected ? "Connected" : "Optional"}</strong></div>
                           <div class="profile-field"><span>Status</span><strong>Active</strong></div>
                           <div class="profile-field"><span>Referral code</span><strong>${esc(d.referral_code || "Pending")}</strong></div>
                         </div>
@@ -1017,6 +1007,27 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
                     </div>
                   </div>
                 </div>
+
+                <div class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <div class="panel-kicker">Password login</div>
+                      <h2>${d.password_set ? "Change your dashboard password" : "Set your dashboard password"}</h2>
+                      <p>${d.password_set ? "Use this only if you want to change the password you already use to log in." : "Create this once so you can log in later with your checkout email and password."}</p>
+                    </div>
+                  </div>
+
+                  <form class="login-form" id="setPasswordForm">
+                    <label for="newDashboardPassword">New password</label>
+                    <input id="newDashboardPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+
+                    <label for="currentDashboardPassword">Current password, only if changing it later</label>
+                    <input id="currentDashboardPassword" type="password" autocomplete="current-password" placeholder="Leave blank if setting it for the first time" />
+
+                    <button class="secondary-btn" type="submit">${d.password_set ? "Update password" : "Save password"}</button>
+                    <p class="small-note" id="setPasswordNote">Your login email is always your paid booking email.</p>
+                  </form>
+                </div>
               </section>
 
               <section class="dashboard-page" id="page-community">
@@ -1026,7 +1037,7 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
                       <div class="panel-kicker">Community</div>
                       <h2>WhatsApp</h2>
                     </div>
-                    <div class="pill">${d.google_connected ? "Unlocked" : "Google required"}</div>
+                    <div class="pill">${d.google_connected ? "Google connected" : "Email verified"}</div>
                   </div>
                   ${whatsappCommunityHtml(d)}
                 </div>
@@ -1117,9 +1128,63 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
             document.getElementById(`page-${page}`)?.classList.add("is-active");
           });
         });
-      }
 
-      function renderLogin(error = "") {
+        bindSetPasswordForm();
+      }
+function bindSetPasswordForm() {
+  const form = $("setPasswordForm");
+  const passwordInput = $("newDashboardPassword");
+  const currentPasswordInput = $("currentDashboardPassword");
+  const note = $("setPasswordNote");
+
+  if (!form || !passwordInput || !note) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const password = String(passwordInput.value || "");
+    const currentPassword = String(currentPasswordInput?.value || "");
+
+    if (password.length < 8) {
+      note.textContent = "Password must be at least 8 characters.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    const button = form.querySelector("button");
+    const originalText = button?.textContent || "Save password";
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Saving...";
+    }
+
+    try {
+      await json(API.passwordSet, {
+        method: "POST",
+        body: JSON.stringify({
+          password,
+          current_password: currentPassword
+        })
+      });
+
+      passwordInput.value = "";
+      if (currentPasswordInput) currentPasswordInput.value = "";
+
+      note.textContent = "Password saved. Next time you can log in with your booking email and password.";
+      note.style.color = "var(--accent)";
+    } catch (err) {
+      note.textContent = err.message || "Could not save password.";
+      note.style.color = "var(--error)";
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+  });
+}
+function renderLogin(error = "") {
         logoutBtn.classList.add("hidden");
         heroSection?.classList.add("hidden");
         document.querySelector(".confirm-bar")?.classList.add("hidden");
@@ -1129,26 +1194,264 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
             <div class="login-card-clean">
               <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
               <div class="panel-kicker">Member dashboard</div>
-              <h2>Log in to your Monaco dashboard</h2>
-              <p>Use the Google account connected to your booking.</p>
+              <h2>Log in with your dashboard password</h2>
+              <p>Use the exact email you paid with and the password you created for your Monaco dashboard.</p>
 
               ${error ? `<div class="state error login-error">${esc(error)}</div>` : ""}
+
+              <form class="login-form" id="passwordLoginForm">
+                <label for="passwordLoginEmail">Email used at checkout</label>
+                <input id="passwordLoginEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
+
+                <label for="passwordLoginPassword">Password</label>
+                <input id="passwordLoginPassword" type="password" autocomplete="current-password" placeholder="Your dashboard password" required />
+
+                <button class="secondary-btn" type="submit">Log in with your password</button>
+                <p class="small-note" id="passwordLoginNote">Use this only if you have already created your dashboard password.</p>
+              </form>
+
+              <div class="login-divider">or</div>
 
               <a class="btn google-btn login-google-btn" href="${googleStartUrl()}">
                 ${googleIcon()}
                 Continue with Google
               </a>
 
-              <p class="small-note">Profile, referrals, curriculum, and WhatsApp access.</p>
+              <p class="small-note">First time here? Use the password setup link we sent you, or continue with Google using the same email you paid with.</p>
             </div>
           </div>
         `;
+
+        bindPasswordLoginForm();
+      }
+
+      function renderSetPasswordScreen(options = {}) {
+        logoutBtn.classList.add("hidden");
+        heroSection?.classList.add("hidden");
+        document.querySelector(".confirm-bar")?.classList.add("hidden");
+
+        const token = String(options.token || "");
+        const email = String(options.email || "").trim().toLowerCase();
+        const sessionMode = Boolean(options.sessionMode);
+        const message = options.message || "Create your dashboard password. Your login email must be the exact email used for your paid booking.";
+
+        app.innerHTML = `
+          <div class="login-wrap">
+            <div class="login-card-clean">
+              <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+              <div class="panel-kicker">Member dashboard</div>
+              <h2>Set your dashboard password</h2>
+              <p>${esc(message)}</p>
+
+              <form class="login-form" id="setupPasswordForm">
+                ${sessionMode ? `
+                  <label for="setupPasswordEmail">Email used at checkout</label>
+                  <input id="setupPasswordEmail" type="email" autocomplete="username" value="${esc(email)}" placeholder="your-booking-email@example.com" required />
+                ` : ""}
+
+                <label for="setupPasswordNew">New password</label>
+                <input id="setupPasswordNew" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+
+                <label for="setupPasswordConfirm">Confirm password</label>
+                <input id="setupPasswordConfirm" type="password" autocomplete="new-password" placeholder="Type it again" required />
+
+                <button class="secondary-btn" type="submit">Set password and continue</button>
+                <p class="small-note" id="setupPasswordNote">This password is only for your Monaco dashboard. Keep it somewhere safe.</p>
+              </form>
+
+              ${token ? `<p class="small-note">This setup link is secure, expires automatically, and can only be used once.</p>` : ""}
+            </div>
+          </div>
+        `;
+
+        bindSetupPasswordForm({ token, sessionMode });
+      }
+
+      function bindSetupPasswordForm(options = {}) {
+        const form = $("setupPasswordForm");
+        const emailInput = $("setupPasswordEmail");
+        const passwordInput = $("setupPasswordNew");
+        const confirmInput = $("setupPasswordConfirm");
+        const note = $("setupPasswordNote");
+
+        if (!form || !passwordInput || !confirmInput || !note) return;
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const password = String(passwordInput.value || "");
+          const confirm = String(confirmInput.value || "");
+          const email = String(emailInput?.value || "").trim().toLowerCase();
+
+          if (password.length < 8) {
+            note.textContent = "Password must be at least 8 characters.";
+            note.style.color = "var(--error)";
+            return;
+          }
+
+          if (password !== confirm) {
+            note.textContent = "Passwords do not match.";
+            note.style.color = "var(--error)";
+            return;
+          }
+
+          const button = form.querySelector("button");
+          const originalText = button?.textContent || "Create password and continue";
+
+          if (button) {
+            button.disabled = true;
+            button.textContent = "Saving...";
+          }
+
+          try {
+            const response = options.token
+              ? await json(API.passwordSetWithToken, {
+                  method: "POST",
+                  body: JSON.stringify({
+                    token: options.token,
+                    password
+                  })
+                })
+              : await json(API.passwordSet, {
+                  method: "POST",
+                  body: JSON.stringify({
+                    email,
+                    password
+                  })
+                });
+
+            if (response?.dashboard) {
+              history.replaceState({}, "", "/thankyou-referral-dashboard.html");
+              render(normalise(response));
+              return;
+            }
+
+            const me = await loadMe();
+            history.replaceState({}, "", "/thankyou-referral-dashboard.html");
+            render(normalise(me));
+          } catch (err) {
+            note.textContent = err.message || "Could not save your password.";
+            note.style.color = "var(--error)";
+          } finally {
+            if (button) {
+              button.disabled = false;
+              button.textContent = originalText;
+            }
+          }
+        });
+      }
+
+      function bindPasswordLoginForm() {
+        const form = $("passwordLoginForm");
+        const emailInput = $("passwordLoginEmail");
+        const passwordInput = $("passwordLoginPassword");
+        const note = $("passwordLoginNote");
+
+        if (!form || !emailInput || !passwordInput || !note) return;
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const email = String(emailInput.value || "").trim();
+          const password = String(passwordInput.value || "");
+
+          if (!email || !password) {
+            note.textContent = "Enter the email you used at checkout and your password.";
+            note.style.color = "var(--error)";
+            return;
+          }
+
+          const button = form.querySelector("button");
+          const originalText = button?.textContent || "Continue with your email";
+
+          if (button) {
+            button.disabled = true;
+            button.textContent = "Checking password...";
+          }
+
+          note.textContent = "Checking your booking email and password...";
+          note.style.color = "";
+
+          try {
+            const response = await json(API.passwordLogin, {
+              method: "POST",
+              body: JSON.stringify({ email, password })
+            });
+
+            if (response?.dashboard) {
+              render(normalise(response));
+              return;
+            }
+
+            const me = await loadMe();
+            render(normalise(me));
+          } catch (err) {
+            if (err?.data?.code === "PASSWORD_NOT_SET" && err.data.can_set_password_now) {
+              renderSetPasswordScreen({
+                email: err.data.email || email,
+                sessionMode: true,
+                message: "No password exists yet for this paid email. Create your dashboard password now."
+              });
+              return;
+            }
+
+            note.textContent = err.message || "Could not log in with that email and password.";
+            note.style.color = "var(--error)";
+          } finally {
+            if (button) {
+              button.disabled = false;
+              button.textContent = originalText;
+            }
+          }
+        });
+      }
+
+
+function bindEmailLoginForm() {
+        const form = $("emailLoginForm");
+        const input = $("bookingEmailLogin");
+        const note = $("emailLoginNote");
+
+        if (!form || !input || !note) return;
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const email = String(input.value || "").trim().toLowerCase();
+
+          if (!email) {
+            note.textContent = "Enter the email you used when signing up for the course.";
+            return;
+          }
+
+          note.textContent = "Checking that booking email...";
+
+          try {
+            const result = await json(API.login, {
+              method: "POST",
+              body: JSON.stringify({ email })
+            });
+
+            note.innerHTML = `Login link ready. <a href="${esc(result.login_url)}">Open your dashboard</a>.`;
+          } catch (err) {
+            note.textContent = err.message || "No booking was found for that email.";
+          }
+        });
       }
 
 async function boot() {
         try {
+          const setupPasswordToken = params.get("set_password_token");
           const token = params.get("token");
           const googleError = params.get("error");
+
+          if (setupPasswordToken) {
+            renderSetPasswordScreen({
+              token: setupPasswordToken,
+              message: "Use this secure setup link to create or reset your Monaco dashboard password. Your login email must match the email used for your paid booking."
+            });
+            return;
+          }
 
           if (googleError) {
             renderLogin(googleError);

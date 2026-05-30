@@ -40,8 +40,24 @@ const ADMIN_API_KEY = String(process.env.ADMIN_API_KEY || "").trim();
 const TICKET_PRICE_CENTS = Number(process.env.TICKET_PRICE_CENTS || 260000);
 const MAX_REFERRALS = Number(process.env.MAX_REFERRALS || 2);
 const CURRENCY = String(process.env.CURRENCY || "EUR").toUpperCase();
-
+const PASSWORD_MIN_LENGTH = Number(process.env.PASSWORD_MIN_LENGTH || 8);
+const PASSWORD_HASH_ITERATIONS = Number(process.env.PASSWORD_HASH_ITERATIONS || 210000);
+const PASSWORD_HASH_KEYLEN = 64;
+const PASSWORD_HASH_DIGEST = "sha512";
 const DATA_FILE = path.join("/tmp", "referrals.json");
+const PASSWORD_SETUP_TOKEN_TTL_MS = Number(
+  process.env.PASSWORD_SETUP_TOKEN_TTL_MS || 1000 * 60 * 60 * 24 * 7
+);
+// Optional Supabase mirror.
+// This keeps the existing referrals.json flow working,
+// but also copies the whole store into Supabase.
+const SUPABASE_URL = String(process.env.SUPABASE_URL || "").trim();
+const SUPABASE_SERVICE_ROLE_KEY = String(process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
+const SUPABASE_STORE_TABLE = String(process.env.SUPABASE_STORE_TABLE || "monaco_json_store").trim();
+const SUPABASE_STORE_KEY = String(process.env.SUPABASE_STORE_KEY || "referrals").trim();
+
+let supabaseClient = null;
+let supabaseWriteTimer = null;
 
 app.use(cookieParser());
 
@@ -55,7 +71,20 @@ app.use(
 
 app.use(express.static(path.join(__dirname, "public")));
 
-ensureStore();
+const storeReady = ensureStore();
+
+
+// Do not serve referral/admin requests until optional Supabase hydrate has finished.
+app.use(async (_req, res, next) => {
+  try {
+    await storeReady;
+    next();
+  } catch (error) {
+    console.error("Store initialisation failed:", error);
+    res.status(500).json({ error: "Store initialisation failed." });
+  }
+});
+
 
 app.get("/", (_req, res) => {
   res.redirect("/monaco.html");
@@ -360,7 +389,256 @@ app.post("/api/referrals/login", (req, res) => {
     login_url: `${APP_URL}/thankyou-referral-dashboard.html?token=${token}`
   });
 });
+app.post("/api/referrals/password-login", (req, res) => {
+  const email = cleanEmail(req.body?.email);
+  const password = String(req.body?.password || "");
 
+  if (!email) {
+    return res.status(400).json({
+      error: "Enter the email you used to book the Monaco Content Retreat."
+    });
+  }
+
+  if (!password) {
+    return res.status(400).json({ error: "Enter your password." });
+  }
+
+  const store = readStore();
+  const customer = store.customers[email];
+
+  if (!customer) {
+    return res.status(404).json({
+      error: "No paid Monaco booking was found for this email. Use the exact email you used at checkout."
+    });
+  }
+
+  if (!isPaidCustomer(store, email)) {
+    return res.status(403).json({
+      error: "This email is not connected to a paid Monaco booking yet."
+    });
+  }
+
+  if (!customer.password_hash) {
+    const sessionCustomerEmail = sessionEmail(req);
+
+    return res.status(409).json({
+      code: "PASSWORD_NOT_SET",
+      requires_password_setup: true,
+      can_set_password_now: sessionCustomerEmail === email,
+      email,
+      error: sessionCustomerEmail === email
+        ? "No password has been set yet. Create your dashboard password now."
+        : "No dashboard password has been created for this paid email yet. Use your password setup link, or continue with Google using the same email you paid with."
+    });
+  }
+
+  if (!verifyPassword(password, customer.password_hash)) {
+    return res.status(401).json({ error: "Incorrect email or password." });
+  }
+
+  customer.last_password_login_at = now();
+  customer.updated_at = now();
+  store.customers[email] = customer;
+  writeStore(store);
+
+  setSessionCookie(res, email);
+
+  res.json({
+    ok: true,
+    dashboard: {
+      ...buildDashboard(store, email),
+      google_connected: Object.values(store.google_accounts || {}).some(
+        (row) => cleanEmail(row.customer_email) === email
+      )
+    }
+  });
+});
+
+app.post("/api/referrals/password-set", (req, res) => {
+  const sessionCustomerEmail = sessionEmail(req);
+  const email = cleanEmail(req.body?.email || sessionCustomerEmail);
+  const password = String(req.body?.password || "");
+  const currentPassword = String(req.body?.current_password || "");
+
+  if (!sessionCustomerEmail) {
+    return res.status(401).json({
+      error: "Please use your checkout session, Google login, or a secure password setup link first."
+    });
+  }
+
+  if (!email || email !== sessionCustomerEmail) {
+    return res.status(403).json({
+      error: "You can only set a password for the email currently logged in."
+    });
+  }
+
+  const result = setCustomerPassword(readStore(), {
+    email,
+    password,
+    currentPassword,
+    requireCurrentPasswordIfAlreadySet: true
+  });
+
+  if (!result.ok) {
+    return res.status(result.status || 400).json({ error: result.error });
+  }
+
+  setSessionCookie(res, email);
+
+  res.json({
+    ok: true,
+    dashboard: {
+      ...buildDashboard(result.store, email),
+      google_connected: Object.values(result.store.google_accounts || {}).some(
+        (row) => cleanEmail(row.customer_email) === email
+      )
+    }
+  });
+});
+
+app.post("/api/referrals/password-set-with-token", (req, res) => {
+  const token = cleanText(req.body?.token || req.body?.setup_token, 120);
+  const password = String(req.body?.password || "");
+
+  if (!token) {
+    return res.status(400).json({ error: "Missing password setup token." });
+  }
+
+  const store = readStore();
+  const row = store.password_tokens[token];
+
+  if (!row || row.expires_at < Date.now()) {
+    if (row) {
+      delete store.password_tokens[token];
+      writeStore(store);
+    }
+
+    return res.status(401).json({
+      error: "This password setup link has expired. Please request a new one."
+    });
+  }
+
+  const email = cleanEmail(row.email);
+
+  if (!email) {
+    delete store.password_tokens[token];
+    writeStore(store);
+    return res.status(400).json({
+      error: "This password setup link is invalid or has already been used."
+    });
+  }
+
+  const result = setCustomerPassword(store, {
+    email,
+    password,
+    currentPassword: "",
+    requireCurrentPasswordIfAlreadySet: false
+  });
+
+  if (!result.ok) {
+    return res.status(result.status || 400).json({ error: result.error });
+  }
+
+  delete result.store.password_tokens[token];
+  writeStore(result.store);
+
+  setSessionCookie(res, email);
+
+  res.json({
+    ok: true,
+    dashboard: {
+      ...buildDashboard(result.store, email),
+      google_connected: Object.values(result.store.google_accounts || {}).some(
+        (row) => cleanEmail(row.customer_email) === email
+      )
+    }
+  });
+});
+
+app.post("/api/admin/referrals/password-setup-link", requireAdmin, (req, res) => {
+  const email = cleanEmail(req.body?.email || req.query.email);
+
+  if (!email) {
+    return res.status(400).json({ error: "Enter a valid customer email." });
+  }
+
+  const store = readStore();
+  const customer = store.customers[email];
+
+  if (!customer) {
+    return res.status(404).json({ error: "No customer was found for this email." });
+  }
+
+  if (!isPaidCustomer(store, email)) {
+    return res.status(403).json({
+      error: "This email is not connected to a paid Monaco booking yet."
+    });
+  }
+
+  const token = createPasswordSetupToken(store, email);
+  writeStore(store);
+
+  res.json({
+    ok: true,
+    email,
+    setup_url: passwordSetupUrl(token),
+    expires_in_hours: Math.round(PASSWORD_SETUP_TOKEN_TTL_MS / (1000 * 60 * 60))
+  });
+});
+
+app.post("/api/referrals/password-set", (req, res) => {
+  const sessionCustomerEmail = sessionEmail(req);
+  const email = cleanEmail(req.body?.email || sessionCustomerEmail);
+  const password = String(req.body?.password || "");
+  const currentPassword = String(req.body?.current_password || "");
+
+  if (!sessionCustomerEmail) {
+    return res.status(401).json({
+      error: "Please log in with Google or your dashboard login link first, then set your password."
+    });
+  }
+
+  if (!email || email !== sessionCustomerEmail) {
+    return res.status(403).json({
+      error: "You can only set a password for the email currently logged in."
+    });
+  }
+
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    return res.status(400).json({
+      error: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`
+    });
+  }
+
+  const store = readStore();
+  const customer = store.customers[email];
+
+  if (!customer) {
+    return res.status(404).json({ error: "No Monaco booking was found for this email." });
+  }
+
+  if (!isPaidCustomer(store, email)) {
+    return res.status(403).json({
+      error: "This email is not connected to a paid Monaco booking yet."
+    });
+  }
+
+  if (customer.password_hash && !verifyPassword(currentPassword, customer.password_hash)) {
+    return res.status(401).json({
+      error: "Enter your current password before changing it."
+    });
+  }
+
+  customer.password_hash = hashPassword(password);
+  customer.password_set_at = customer.password_set_at || now();
+  customer.password_updated_at = now();
+  customer.updated_at = now();
+
+  store.customers[email] = customer;
+  writeStore(store);
+
+  res.json({ ok: true });
+});
 app.post("/api/referrals/session", (req, res) => {
   const token = cleanText(req.body?.token, 100);
 
@@ -1016,16 +1294,21 @@ async function whopFetch(endpoint, options = {}) {
   return data;
 }
 
-function ensureStore() {
+async function ensureStore() {
   fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
 
-  if (!fs.existsSync(DATA_FILE)) {
-    writeStore(emptyStore());
-    return;
+  const localStore = fs.existsSync(DATA_FILE) ? readStore() : emptyStore();
+  let finalStore = normaliseStore(localStore);
+
+  const remoteStore = await readStoreFromSupabase();
+
+  if (remoteStore) {
+    // Merge keeps anything already in Supabase and anything still in local JSON.
+    // Local values win on duplicate IDs/emails, which makes first migration safer.
+    finalStore = mergeStores(remoteStore, finalStore);
   }
 
-  const store = readStore();
-  writeStore(normaliseStore(store));
+  writeStore(finalStore);
 }
 
 function emptyStore() {
@@ -1034,6 +1317,7 @@ function emptyStore() {
     customers: {},
     referrals: {},
     login_tokens: {},
+    password_tokens: {},
     google_accounts: {}
   };
 }
@@ -1047,6 +1331,7 @@ function normaliseStore(store) {
     customers: store?.customers || {},
     referrals: store?.referrals || {},
     login_tokens: store?.login_tokens || {},
+    password_tokens: store?.password_tokens || {},
     google_accounts: store?.google_accounts || {}
   };
 }
@@ -1061,10 +1346,116 @@ function readStore() {
 }
 
 function writeStore(store) {
+  const normalised = normaliseStore(store);
+
   fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
-  fs.writeFileSync(DATA_FILE, `${JSON.stringify(normaliseStore(store), null, 2)}\n`);
+  fs.writeFileSync(DATA_FILE, `${JSON.stringify(normalised, null, 2)}\n`);
+
+  queueSupabaseWrite(normalised);
+}
+function mergeStores(baseStore, overrideStore) {
+  return normaliseStore({
+    ...emptyStore(),
+    ...(baseStore || {}),
+    ...(overrideStore || {}),
+    checkout_sessions: {
+      ...(baseStore?.checkout_sessions || {}),
+      ...(overrideStore?.checkout_sessions || {})
+    },
+    customers: {
+      ...(baseStore?.customers || {}),
+      ...(overrideStore?.customers || {})
+    },
+    referrals: {
+      ...(baseStore?.referrals || {}),
+      ...(overrideStore?.referrals || {})
+    },
+login_tokens: {
+  ...(baseStore?.login_tokens || {}),
+  ...(overrideStore?.login_tokens || {})
+},
+password_tokens: {
+  ...(baseStore?.password_tokens || {}),
+  ...(overrideStore?.password_tokens || {})
+},
+google_accounts: {
+  ...(baseStore?.google_accounts || {}),
+  ...(overrideStore?.google_accounts || {})
+}
+  });
 }
 
+function getSupabaseClient() {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
+  if (supabaseClient) return supabaseClient;
+
+  let createClient;
+
+  try {
+    ({ createClient } = require("@supabase/supabase-js"));
+  } catch (error) {
+    console.warn("Supabase env vars are set, but @supabase/supabase-js is not installed. Using local referrals.json only.");
+    return null;
+  }
+
+  supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
+
+  return supabaseClient;
+}
+
+async function readStoreFromSupabase() {
+  const client = getSupabaseClient();
+  if (!client) return null;
+
+  const { data, error } = await client
+    .from(SUPABASE_STORE_TABLE)
+    .select("store")
+    .eq("store_key", SUPABASE_STORE_KEY)
+    .maybeSingle();
+
+  if (error) {
+    console.warn("Could not read referral store from Supabase. Local JSON fallback will be used:", error.message);
+    return null;
+  }
+
+  return data?.store ? normaliseStore(data.store) : null;
+}
+
+function queueSupabaseWrite(store) {
+  if (!getSupabaseClient()) return;
+
+  const snapshot = normaliseStore(store);
+
+  clearTimeout(supabaseWriteTimer);
+  supabaseWriteTimer = setTimeout(() => {
+    writeStoreToSupabase(snapshot).catch((error) => {
+      console.error("Could not mirror referral store to Supabase:", error);
+    });
+  }, 100);
+}
+
+async function writeStoreToSupabase(store) {
+  const client = getSupabaseClient();
+  if (!client) return;
+
+  const { error } = await client
+    .from(SUPABASE_STORE_TABLE)
+    .upsert(
+      {
+        store_key: SUPABASE_STORE_KEY,
+        store: normaliseStore(store),
+        updated_at: now()
+      },
+      { onConflict: "store_key" }
+    );
+
+  if (error) throw new Error(error.message || "Supabase write failed.");
+}
 function requireAdmin(req, res, next) {
   if (!ADMIN_API_KEY) {
     return res.status(500).json({ error: "ADMIN_API_KEY is not set." });
@@ -1667,5 +2058,148 @@ async function sendPaidCustomerToAirtable({ payment, session, customer, metadata
     });
   } catch (error) {
     console.error("Failed to send paid customer to Airtable:", error);
+  }
+}
+function createPasswordSetupToken(store, email) {
+  const clean = cleanEmail(email);
+
+  if (!clean) {
+    throw new Error("A valid customer email is required.");
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+
+  store.password_tokens[token] = {
+    email: clean,
+    created_at: now(),
+    expires_at: Date.now() + PASSWORD_SETUP_TOKEN_TTL_MS
+  };
+
+  return token;
+}
+
+function passwordSetupUrl(token) {
+  return `${APP_URL}/thankyou-referral-dashboard.html?set_password_token=${encodeURIComponent(token)}`;
+}
+
+function setCustomerPassword(store, options = {}) {
+  const email = cleanEmail(options.email);
+  const password = String(options.password || "");
+  const currentPassword = String(options.currentPassword || "");
+  const requireCurrentPasswordIfAlreadySet = options.requireCurrentPasswordIfAlreadySet !== false;
+
+  if (!email) {
+    return { ok: false, status: 400, error: "Enter a valid email." };
+  }
+
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    return {
+      ok: false,
+      status: 400,
+      error: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`
+    };
+  }
+
+  const customer = store.customers?.[email];
+
+  if (!customer) {
+    return { ok: false, status: 404, error: "No Monaco booking was found for this email." };
+  }
+
+  if (!isPaidCustomer(store, email)) {
+    return {
+      ok: false,
+      status: 403,
+      error: "This email is not connected to a paid Monaco booking yet."
+    };
+  }
+
+  if (
+    requireCurrentPasswordIfAlreadySet &&
+    customer.password_hash &&
+    !verifyPassword(currentPassword, customer.password_hash)
+  ) {
+    return {
+      ok: false,
+      status: 401,
+      error: "Enter your current password before changing it."
+    };
+  }
+
+  customer.password_hash = hashPassword(password);
+  customer.password_set_at = customer.password_set_at || now();
+  customer.password_updated_at = now();
+  customer.updated_at = now();
+
+  store.customers[email] = customer;
+  writeStore(store);
+
+  return { ok: true, store, customer };
+}
+function isPaidCustomer(store, email) {
+  const clean = cleanEmail(email);
+  const customer = store.customers?.[clean];
+
+  if (!customer) return false;
+
+  if (customer.status === "paid") return true;
+
+  const session = store.checkout_sessions?.[customer.checkout_session_id];
+
+  return session?.payment_status === "paid" || session?.status === "paid";
+}
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+
+  const hash = crypto
+    .pbkdf2Sync(
+      String(password),
+      salt,
+      PASSWORD_HASH_ITERATIONS,
+      PASSWORD_HASH_KEYLEN,
+      PASSWORD_HASH_DIGEST
+    )
+    .toString("hex");
+
+  return [
+    "pbkdf2",
+    PASSWORD_HASH_DIGEST,
+    PASSWORD_HASH_ITERATIONS,
+    salt,
+    hash
+  ].join("$");
+}
+
+function verifyPassword(password, storedHash) {
+  const parts = String(storedHash || "").split("$");
+
+  if (parts.length !== 5) return false;
+
+  const [method, digest, iterationsRaw, salt, expectedHash] = parts;
+
+  if (method !== "pbkdf2") return false;
+
+  const iterations = Number(iterationsRaw);
+
+  if (!iterations || !salt || !expectedHash) return false;
+
+  const actualHash = crypto
+    .pbkdf2Sync(
+      String(password),
+      salt,
+      iterations,
+      Buffer.from(expectedHash, "hex").length,
+      digest
+    )
+    .toString("hex");
+
+  try {
+    return crypto.timingSafeEqual(
+      Buffer.from(actualHash, "hex"),
+      Buffer.from(expectedHash, "hex")
+    );
+  } catch {
+    return false;
   }
 }
