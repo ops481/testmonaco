@@ -958,6 +958,7 @@ function sendLeadToAirtable(payload) {
         checkout.setAttribute("data-whop-checkout-prefill-email", payload.email);
         checkout.setAttribute("data-whop-checkout-hide-email", "true");
         checkout.setAttribute("data-whop-checkout-disable-email", "true");
+        checkout.setAttribute("data-whop-checkout-theme-accent-color", "gold");
         mount.appendChild(checkout);
 
         $("whopShell").classList.add("is-ready");
