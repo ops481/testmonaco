@@ -425,12 +425,10 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
       const WHATSAPP_SUPPORT_NUMBER = "";
 
       /*
-        Referral invitation Google Apps Script webhook.
-        1) Deploy your Apps Script as a Web app.
-        2) Set access to "Anyone" or "Anyone with the link".
-        3) Paste the /exec URL below.
+        Referral invitations now go through the backend first.
+        The backend saves the invite in Supabase, then optionally calls Google Apps Script.
       */
-      const REFERRAL_INVITE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkkRFnb_sCXBC_irLMkiiCG8SmeWY1YgY9S3QBfevVWUZtpgwldNJLh_vKGeW_d8_UjQ/exec";
+      const REFERRAL_INVITE_SCRIPT_URL = "";
 
       const INTL_TEL_INPUT_UTILS_URL = "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/utils.js";
       let invitePhoneInput = null;
@@ -445,7 +443,8 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
   passwordLogin: "/api/referrals/password-login",
   passwordSet: "/api/referrals/password-set",
   passwordSetWithToken: "/api/referrals/password-set-with-token",
-  passwordSetupToken: "/api/referrals/password-setup-token"
+  passwordSetupToken: "/api/referrals/password-setup-token",
+  inviteFriend: "/api/referrals/invite-friend"
 };
       const MAX_ATTEMPTS = 10;
       const RETRY_DELAY_MS = 1200;
@@ -793,7 +792,6 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
           : rawContactValue;
         const friendInstagram = normaliseInstagramHandle(instagramInput?.value || "");
         const note = String(noteInput?.value || "").trim();
-        const webhookUrl = String(window.__MONACO_REFERRAL_INVITE_SCRIPT_URL || REFERRAL_INVITE_SCRIPT_URL || "").trim();
 
         function setMessage(text, type = "success") {
           if (!msg) return;
@@ -816,57 +814,24 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
           return;
         }
 
-        if (!webhookUrl || webhookUrl === "PASTE_YOUR_GOOGLE_SCRIPT_EXEC_URL_HERE") {
-          setMessage("Paste your Google Apps Script /exec URL into REFERRAL_INVITE_SCRIPT_URL first.", "error");
-          return;
-        }
+        const friendEmail = contactType === "email" ? contactValue : "";
+        const friendPhone = contactType === "phone" ? contactValue : "";
 
         btn.disabled = true;
         btn.textContent = "Sending...";
         setMessage("");
         success?.classList.remove("is-visible");
 
-const friendEmail = contactType === "email" ? contactValue : "";
-
-const friendPhoneE164 = contactType === "phone"
-  ? contactValue
-  : "";
-
-const friendPhoneDigits = contactType === "phone"
-  ? contactValue.replace(/\D/g, "")
-  : "";
-        const contactMethod = contactType === "phone" ? "WhatsApp" : "Email";
-
-       const payload = new URLSearchParams({
-  event: "monaco_referral_invitation",
-  invited_by_name: d.name || "",
-  invited_by_email: d.email || "",
-  invited_by_company: d.company || "",
-  friend_name: friendName,
-  friend_email: friendEmail,
-
-  friend_phone: friendPhoneDigits,
-  friend_phone_digits: friendPhoneDigits,
-  friend_phone_e164: friendPhoneE164,
-
-  friend_insta: friendInstagram,
-  friend_instagram: friendInstagram,
-  contact_method: contactMethod,
-  friend_contact_type: contactType,
-  friend_contact_value: contactType === "phone" ? friendPhoneDigits : contactValue,
-  referral_link: d.referral_link,
-  note,
-  message: `${friendName}, ${d.name || "Someone"} has invited you to the Monaco Content Retreat. Use their referral link here: ${d.referral_link}`,
-  sent_at: new Date().toISOString()
-});
         try {
-          await fetch(webhookUrl, {
+          await json(API.inviteFriend, {
             method: "POST",
-            mode: "no-cors",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-            },
-            body: payload.toString()
+            body: JSON.stringify({
+              friend_name: friendName,
+              friend_email: friendEmail,
+              friend_phone: friendPhone,
+              friend_instagram: friendInstagram,
+              note
+            })
           });
 
           if (nameInput) nameInput.value = "";
@@ -886,6 +851,7 @@ const friendPhoneDigits = contactType === "phone"
             `;
             success.classList.add("is-visible");
           }
+
           setMessage("");
 
           setTimeout(() => {

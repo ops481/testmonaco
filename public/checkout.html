@@ -748,7 +748,7 @@
     var REFERRAL_STORAGE_KEY = "monaco_referral_code";
     var VISITOR_ID_STORAGE_KEY = "monaco_checkout_visitor_id";
 
-    var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwcpfC1t8g8cE0tR-Ou4rdXv6RGDD9gCNrSAvc-j8EA2dX2Dw37TXlzaZpFtviny7uN/exec";
+    var CHECKOUT_LEAD_URL = "/api/referrals/checkout-lead";
 
     var preparing = false;
     var preparedSignature = "";
@@ -891,7 +891,7 @@ function canCaptureLeadProgress(payload) {
 }
 
 function sendLeadToAirtable(payload, checkoutStatus) {
-  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf("PASTE_") === 0) return;
+  if (!CHECKOUT_LEAD_URL) return;
   if (!canCaptureLeadProgress(payload)) return;
 
   var leadPayload = Object.assign(
@@ -909,25 +909,26 @@ function sendLeadToAirtable(payload, checkoutStatus) {
   var body = JSON.stringify(leadPayload);
 
   try {
-    // sendBeacon is reliable for fire-and-forget lead capture.
     if (navigator.sendBeacon) {
-      var blob = new Blob([body], { type: "text/plain;charset=UTF-8" });
-      var queued = navigator.sendBeacon(GOOGLE_SCRIPT_URL, blob);
+      var blob = new Blob([body], { type: "application/json;charset=UTF-8" });
+      var queued = navigator.sendBeacon(CHECKOUT_LEAD_URL, blob);
       if (queued) return;
     }
 
-    // Fallback for browsers that do not queue sendBeacon.
-    fetch(GOOGLE_SCRIPT_URL, {
+    fetch(CHECKOUT_LEAD_URL, {
       method: "POST",
-      mode: "no-cors",
       keepalive: true,
+      credentials: "include",
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"
+        "Accept": "application/json",
+        "Content-Type": "application/json"
       },
       body: body
+    }).catch(function(error) {
+      console.warn("Could not send checkout lead to backend:", error);
     });
   } catch (error) {
-    console.warn("Could not send checkout lead to Airtable:", error);
+    console.warn("Could not send checkout lead to backend:", error);
   }
 }
 

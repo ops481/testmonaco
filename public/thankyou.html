@@ -616,7 +616,7 @@ function showPasswordSetupMode(message) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ email: email, password: password })
+          body: JSON.stringify({ email: email, password: password, checkout_session_id: checkoutId })
         });
 
         var data = await response.json().catch(function(){ return {}; });
@@ -699,7 +699,7 @@ function showPasswordSetupMode(message) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ email: email, password: password })
+          body: JSON.stringify({ email: email, password: password, checkout_session_id: checkoutId })
         });
 
         var data = await response.json().catch(function(){ return {}; });
