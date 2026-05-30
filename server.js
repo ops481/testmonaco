@@ -390,11 +390,17 @@ app.get("/api/referrals/complete-checkout", async (req, res) => {
 app.post("/api/whop/webhook", async (req, res) => {
   console.log("WHOP WEBHOOK HIT");
 
-  try {
-    const rawBody = req.rawBody || JSON.stringify(req.body || {});
-    const event = req.body || {};
+  const rawBody = req.rawBody || JSON.stringify(req.body || {});
+  const event = req.body || {};
 
-    const eventType = String(
+  let eventType = "";
+  let objectPath = "event";
+  let object = event;
+  let signatureValid = false;
+  let successfulPaymentDetected = false;
+
+  try {
+    eventType = String(
       event.type ||
         event.event ||
         event.name ||
@@ -403,47 +409,53 @@ app.post("/api/whop/webhook", async (req, res) => {
     ).toLowerCase();
 
     const possibleObjects = {
-      event_data_object: event.data && event.data.object ? event.data.object : null,
-      event_data: event.data || null,
-      event_object: event.object || null,
-      event_payload: event.payload || null,
-      event_resource: event.resource || null,
-      event
+      "event.data.object": event.data && event.data.object ? event.data.object : null,
+      "event.data": event.data || null,
+      "event.object": event.object || null,
+      "event.payload": event.payload || null,
+      "event.resource": event.resource || null,
+      "event": event
     };
 
-    let objectPath = "event";
-    let object = event;
-
-    if (possibleObjects.event_data_object) {
+    if (possibleObjects["event.data.object"]) {
       objectPath = "event.data.object";
-      object = possibleObjects.event_data_object;
-    } else if (possibleObjects.event_data) {
+      object = possibleObjects["event.data.object"];
+    } else if (possibleObjects["event.data"]) {
       objectPath = "event.data";
-      object = possibleObjects.event_data;
-    } else if (possibleObjects.event_object) {
+      object = possibleObjects["event.data"];
+    } else if (possibleObjects["event.object"]) {
       objectPath = "event.object";
-      object = possibleObjects.event_object;
-    } else if (possibleObjects.event_payload) {
+      object = possibleObjects["event.object"];
+    } else if (possibleObjects["event.payload"]) {
       objectPath = "event.payload";
-      object = possibleObjects.event_payload;
-    } else if (possibleObjects.event_resource) {
+      object = possibleObjects["event.payload"];
+    } else if (possibleObjects["event.resource"]) {
       objectPath = "event.resource";
-      object = possibleObjects.event_resource;
+      object = possibleObjects["event.resource"];
     }
 
-    const signatureValid = WHOP_WEBHOOK_SECRET ? verifyWhopWebhook(req) : true;
+    signatureValid = WHOP_WEBHOOK_SECRET ? verifyWhopWebhook(req) : true;
+    successfulPaymentDetected = isSuccessfulWhopPayment(eventType, object);
+
+    await saveWhopWebhookDebug({
+      eventType,
+      objectPath,
+      signatureValid,
+      successfulPaymentDetected,
+      selectedSummary: summarizeWebhookObject(object),
+      payload: sanitizeWebhookForLog(event),
+      error: ""
+    });
 
     console.log("WHOP WEBHOOK SUMMARY:", {
       event_type: eventType,
       object_path: objectPath,
       signature_required: Boolean(WHOP_WEBHOOK_SECRET),
       signature_valid: signatureValid,
-      body_length: rawBody.length,
-      body_sha256: sha256(rawBody),
+      successful_payment_detected: successfulPaymentDetected,
+      selected_summary: summarizeWebhookObject(object),
       top_level_keys: Object.keys(event || {}),
-      object_keys: object && typeof object === "object" ? Object.keys(object) : [],
-      selected_object_summary: summarizeWebhookObject(object),
-      successful_payment_detected: isSuccessfulWhopPayment(eventType, object)
+      object_keys: object && typeof object === "object" ? Object.keys(object) : []
     });
 
     if (WHOP_WEBHOOK_SECRET && !signatureValid) {
@@ -455,7 +467,7 @@ app.post("/api/whop/webhook", async (req, res) => {
       return res.status(401).json({ error: "Invalid webhook signature." });
     }
 
-    if (isSuccessfulWhopPayment(eventType, object)) {
+    if (successfulPaymentDetected) {
       console.log("WHOP WEBHOOK ACCEPTED AS PAID:", {
         event_type: eventType,
         object_path: objectPath,
@@ -480,6 +492,16 @@ app.post("/api/whop/webhook", async (req, res) => {
       hint: error.hint,
       stack: error.stack
     });
+
+    await saveWhopWebhookDebug({
+      eventType,
+      objectPath,
+      signatureValid,
+      successfulPaymentDetected,
+      selectedSummary: summarizeWebhookObject(object),
+      payload: sanitizeWebhookForLog(event),
+      error: error.message || String(error)
+    }).catch(() => {});
 
     res.status(200).json({
       ok: false,
@@ -3182,4 +3204,185 @@ function summarizeWebhookObject(value) {
     metadata_keys: Object.keys(metadata || {}),
     keys: Object.keys(value || {})
   };
+}
+
+
+async function saveWhopWebhookDebug({
+  eventType,
+  objectPath,
+  signatureValid,
+  successfulPaymentDetected,
+  selectedSummary,
+  payload,
+  error
+}) {
+  try {
+    await db()
+      .from("monaco_webhook_debug")
+      .insert({
+        provider: "whop",
+        event_type: String(eventType || ""),
+        object_path: String(objectPath || ""),
+        signature_valid: Boolean(signatureValid),
+        successful_payment_detected: Boolean(successfulPaymentDetected),
+        selected_summary: selectedSummary || {},
+        payload: payload || {},
+        error: String(error || "")
+      });
+  } catch (debugError) {
+    console.error("Could not save webhook debug row:", debugError);
+  }
+}
+
+function summarizeWebhookObject(value) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const metadata =
+    value.metadata ||
+    value.checkout_metadata ||
+    value.custom_data ||
+    value.custom_fields ||
+    {};
+
+  return {
+    id:
+      value.id ||
+      value.payment_id ||
+      value.paymentId ||
+      value.pay_id ||
+      value.checkout_id ||
+      value.checkoutId ||
+      "",
+
+    type:
+      value.type ||
+      value.event ||
+      value.name ||
+      "",
+
+    status:
+      value.status ||
+      value.payment_status ||
+      value.paymentStatus ||
+      value.substatus ||
+      value.state ||
+      value.checkout_status ||
+      value.checkoutStatus ||
+      "",
+
+    paid_at:
+      value.paid_at ||
+      value.paidAt ||
+      value.completed_at ||
+      value.completedAt ||
+      "",
+
+    created_at:
+      value.created_at ||
+      value.createdAt ||
+      value.timestamp ||
+      "",
+
+    checkout_configuration_id:
+      value.checkout_configuration_id ||
+      value.checkoutConfigurationId ||
+      value.checkout_config_id ||
+      value.checkoutConfigId ||
+      metadata.checkout_configuration_id ||
+      metadata.checkoutConfigurationId ||
+      "",
+
+    checkout_session_id:
+      value.checkout_session_id ||
+      value.checkoutSessionId ||
+      value.session_id ||
+      value.sessionId ||
+      metadata.checkout_session_id ||
+      metadata.checkoutSessionId ||
+      metadata.session_id ||
+      metadata.sessionId ||
+      "",
+
+    local_session_id:
+      metadata.local_session_id ||
+      metadata.localSessionId ||
+      value.local_session_id ||
+      value.localSessionId ||
+      "",
+
+    email:
+      metadata.email ||
+      value.email ||
+      value.customer?.email ||
+      value.user?.email ||
+      value.member?.email ||
+      value.buyer?.email ||
+      findEmailInObject(value) ||
+      "",
+
+    name:
+      metadata.full_name ||
+      metadata.fullName ||
+      value.name ||
+      value.customer?.name ||
+      value.user?.name ||
+      value.member?.name ||
+      "",
+
+    amount:
+      value.total ||
+      value.amount ||
+      value.amount_total ||
+      value.final_amount ||
+      value.price ||
+      "",
+
+    currency:
+      value.currency ||
+      "",
+
+    metadata_keys: Object.keys(metadata || {}),
+    keys: Object.keys(value || {})
+  };
+}
+
+function sanitizeWebhookForLog(value, depth = 0) {
+  if (depth > 8) return "[Max depth reached]";
+  if (value === null || value === undefined) return value;
+
+  if (typeof value !== "object") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.slice(0, 50).map((item) => sanitizeWebhookForLog(item, depth + 1));
+  }
+
+  const output = {};
+
+  Object.keys(value).forEach((key) => {
+    const lower = key.toLowerCase();
+    const item = value[key];
+
+    if (
+      lower.includes("secret") ||
+      lower.includes("token") ||
+      lower.includes("authorization") ||
+      lower.includes("signature") ||
+      lower.includes("api_key") ||
+      lower.includes("apikey") ||
+      lower.includes("password") ||
+      lower.includes("card") ||
+      lower.includes("cvc")
+    ) {
+      output[key] = "[REDACTED]";
+      return;
+    }
+
+    output[key] = sanitizeWebhookForLog(item, depth + 1);
+  });
+
+  return output;
 }
