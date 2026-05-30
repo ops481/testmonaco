@@ -1402,43 +1402,513 @@ async function findCheckoutSessionForPayment(payment) {
 }
 
 async function syncPaidWhopPaymentForSession(session) {
-  if (!WHOP_API_KEY || !session) return null;
+  if (!WHOP_API_KEY || !session?.id) return null;
 
-  const idsToTry = [
-    session.id,
-    session.local_session_id,
-    session.whop_plan_id
-  ].filter(Boolean);
+  const sessionId = cleanText(session.id, 200);
+  const localSessionId = cleanText(session.local_session_id, 200);
+  const sessionEmail = cleanEmail(session.email);
 
-  const endpoints = [];
+  const endpointPlans = [];
 
-  for (const id of idsToTry) {
-    endpoints.push(`/checkout_configurations/${encodeURIComponent(id)}`);
-    endpoints.push(`/checkout_sessions/${encodeURIComponent(id)}`);
-    endpoints.push(`/payments?checkout_configuration_id=${encodeURIComponent(id)}`);
-    endpoints.push(`/payments?checkout_session_id=${encodeURIComponent(id)}`);
+  /*
+    This is the old working strategy:
+    pull recent company payments, then match locally.
+    This is usually more reliable than asking Whop for one checkout ID.
+  */
+  if (WHOP_COMPANY_ID) {
+    const params = new URLSearchParams({
+      first: "50",
+      company_id: WHOP_COMPANY_ID,
+      direction: "desc",
+      order: "created_at"
+    });
+
+    endpointPlans.push({
+      label: "recent_company_payments_old_working_strategy",
+      endpoint: `/payments?${params.toString()}`,
+      trustPaymentList: true
+    });
+
+    const altParams = new URLSearchParams({
+      limit: "50",
+      company_id: WHOP_COMPANY_ID
+    });
+
+    endpointPlans.push({
+      label: "recent_company_payments_limit_strategy",
+      endpoint: `/payments?${altParams.toString()}`,
+      trustPaymentList: true
+    });
   }
 
-  endpoints.push(`/payments?email=${encodeURIComponent(session.email)}`);
+  /*
+    Keep the targeted lookups as fallback attempts.
+    Some Whop API versions support these. Some do not.
+  */
+  if (sessionId) {
+    endpointPlans.push({
+      label: "payments_by_checkout_configuration_id",
+      endpoint: `/payments?checkout_configuration_id=${encodeURIComponent(sessionId)}`,
+      trustPaymentList: false
+    });
 
-  for (const endpoint of endpoints) {
+    endpointPlans.push({
+      label: "payments_by_checkout_session_id",
+      endpoint: `/payments?checkout_session_id=${encodeURIComponent(sessionId)}`,
+      trustPaymentList: false
+    });
+
+    endpointPlans.push({
+      label: "checkout_configuration_lookup",
+      endpoint: `/checkout_configurations/${encodeURIComponent(sessionId)}`,
+      trustPaymentList: false
+    });
+
+    endpointPlans.push({
+      label: "checkout_session_lookup",
+      endpoint: `/checkout_sessions/${encodeURIComponent(sessionId)}`,
+      trustPaymentList: false
+    });
+  }
+
+  if (sessionEmail) {
+    endpointPlans.push({
+      label: "payments_by_email",
+      endpoint: `/payments?email=${encodeURIComponent(sessionEmail)}`,
+      trustPaymentList: true
+    });
+  }
+
+  console.log("WHOP PAYMENT SYNC START:", {
+    session_id: sessionId,
+    local_session_id: localSessionId,
+    email: sessionEmail,
+    endpoint_count: endpointPlans.length
+  });
+
+  for (const plan of endpointPlans) {
     try {
-      const result = await whopFetch(endpoint, { method: "GET" });
+      const result = await whopFetch(plan.endpoint, { method: "GET" });
       const candidates = extractPaymentCandidates(result);
 
-      for (const candidate of candidates) {
-        const eventType = String(candidate.type || candidate.event || "").toLowerCase();
+      console.log("WHOP PAYMENT SYNC ENDPOINT RESULT:", {
+        label: plan.label,
+        endpoint: plan.endpoint,
+        candidate_count: candidates.length,
+        first_five_candidates: candidates.slice(0, 5).map((payment) => whopPaymentDebugSummary(payment))
+      });
 
-        if (isSuccessfulWhopPayment(eventType, candidate)) {
-          return handlePaymentSucceeded(candidate);
-        }
+      const paidPayment = candidates.find((payment) => {
+        const matched = whopPaymentMatchesCheckoutSession(payment, session);
+        const paid = whopPaymentLooksPaid(payment, plan.trustPaymentList);
+
+        return matched && paid;
+      });
+
+      if (!paidPayment) {
+        continue;
       }
+
+      console.log("WHOP PAYMENT SYNC MATCHED PAID PAYMENT:", {
+        label: plan.label,
+        session_id: sessionId,
+        local_session_id: localSessionId,
+        email: sessionEmail,
+        payment: whopPaymentDebugSummary(paidPayment)
+      });
+
+      /*
+        Important:
+        Merge the local Supabase checkout session into payment.metadata.
+        That guarantees handlePaymentSucceeded has the email, name, phone,
+        referral code, source URL, and local_session_id even if Whop's payment
+        object is sparse.
+      */
+      return handlePaymentSucceeded({
+        ...paidPayment,
+
+        checkout_configuration_id:
+          paidPayment.checkout_configuration_id ||
+          paidPayment.checkoutConfigurationId ||
+          paidPayment.checkout_config_id ||
+          paidPayment.checkoutConfigId ||
+          sessionId,
+
+        checkout_session_id:
+          paidPayment.checkout_session_id ||
+          paidPayment.checkoutSessionId ||
+          sessionId,
+
+        metadata: {
+          ...(session || {}),
+          ...(paidPayment.metadata || {}),
+
+          local_session_id:
+            paidPayment.metadata?.local_session_id ||
+            localSessionId,
+
+          email:
+            paidPayment.metadata?.email ||
+            paidPayment.customer?.email ||
+            paidPayment.user?.email ||
+            paidPayment.member?.email ||
+            paidPayment.buyer?.email ||
+            paidPayment.email ||
+            session.email,
+
+          full_name:
+            paidPayment.metadata?.full_name ||
+            paidPayment.metadata?.fullName ||
+            paidPayment.user?.name ||
+            paidPayment.customer?.name ||
+            paidPayment.member?.name ||
+            session.full_name,
+
+          phone:
+            paidPayment.metadata?.phone ||
+            session.phone,
+
+          company:
+            paidPayment.metadata?.company ||
+            session.company,
+
+          instagram:
+            paidPayment.metadata?.instagram ||
+            session.instagram,
+
+          podia_email:
+            paidPayment.metadata?.podia_email ||
+            session.podia_email ||
+            session.email,
+
+          referred_by:
+            paidPayment.metadata?.referred_by ||
+            session.referred_by,
+
+          referral_code:
+            paidPayment.metadata?.referral_code ||
+            paidPayment.metadata?.referred_by ||
+            session.referral_code ||
+            session.referred_by,
+
+          source_url:
+            paidPayment.metadata?.source_url ||
+            session.source_url
+        }
+      });
     } catch (error) {
-      console.warn("Whop sync attempt failed:", endpoint, error.message);
+      console.warn("Whop sync attempt failed:", {
+        label: plan.label,
+        endpoint: plan.endpoint,
+        error: error.message || String(error)
+      });
     }
   }
 
+  console.warn("WHOP PAYMENT SYNC DID NOT FIND PAID PAYMENT:", {
+    session_id: sessionId,
+    local_session_id: localSessionId,
+    email: sessionEmail
+  });
+
   return null;
+}
+
+function extractPaymentCandidates(value) {
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    return value.flatMap(extractPaymentCandidates);
+  }
+
+  if (typeof value !== "object") {
+    return [];
+  }
+
+  const rows = [];
+
+  /*
+    The previous version only kept objects that already looked successful.
+    That can accidentally discard Whop payment objects with unusual status names.
+    So here we keep anything that looks like a payment-ish object, then filter later.
+  */
+  if (looksLikeWhopPaymentObject(value)) {
+    rows.push(value);
+  }
+
+  for (const key of [
+    "data",
+    "payments",
+    "results",
+    "items",
+    "records",
+    "object",
+    "payment",
+    "checkout",
+    "checkout_session",
+    "checkout_configuration"
+  ]) {
+    if (Array.isArray(value[key])) {
+      rows.push(...value[key].flatMap(extractPaymentCandidates));
+    } else if (value[key] && typeof value[key] === "object") {
+      rows.push(...extractPaymentCandidates(value[key]));
+    }
+  }
+
+  /*
+    De-dupe by payment ID if possible.
+  */
+  const seen = new Set();
+
+  return rows.filter((row) => {
+    const id = cleanText(
+      row.id ||
+        row.payment_id ||
+        row.paymentId ||
+        row.pay_id ||
+        JSON.stringify(whopPaymentDebugSummary(row)),
+      500
+    );
+
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
+function looksLikeWhopPaymentObject(value) {
+  if (!value || typeof value !== "object") return false;
+
+  return Boolean(
+    value.id ||
+      value.payment_id ||
+      value.paymentId ||
+      value.pay_id ||
+      value.status ||
+      value.substatus ||
+      value.payment_status ||
+      value.paymentStatus ||
+      value.paid_at ||
+      value.amount ||
+      value.total ||
+      value.final_amount ||
+      value.amount_total ||
+      value.checkout_configuration_id ||
+      value.checkoutConfigurationId ||
+      value.checkout_session_id ||
+      value.checkoutSessionId ||
+      value.customer?.email ||
+      value.user?.email ||
+      value.member?.email ||
+      value.buyer?.email ||
+      value.metadata?.email ||
+      value.metadata?.local_session_id
+  );
+}
+
+function whopPaymentMatchesCheckoutSession(payment, session) {
+  const metadata = payment.metadata || {};
+
+  const sessionId = cleanText(session.id, 200);
+  const localSessionId = cleanText(session.local_session_id, 200);
+  const sessionEmail = cleanEmail(session.email);
+
+  const possibleCheckoutIds = [
+    payment.checkout_configuration_id,
+    payment.checkoutConfigurationId,
+    payment.checkout_config_id,
+    payment.checkoutConfigId,
+    payment.checkout_session_id,
+    payment.checkoutSessionId,
+    payment.session_id,
+    payment.sessionId,
+    payment.checkout_configuration?.id,
+    payment.checkoutConfiguration?.id,
+    payment.checkout_session?.id,
+    payment.checkoutSession?.id,
+    metadata.checkout_configuration_id,
+    metadata.checkoutConfigurationId,
+    metadata.checkout_config_id,
+    metadata.checkoutConfigId,
+    metadata.checkout_session_id,
+    metadata.checkoutSessionId,
+    metadata.session_id,
+    metadata.sessionId
+  ]
+    .map((value) => cleanText(value, 200))
+    .filter(Boolean);
+
+  const possibleLocalSessionIds = [
+    metadata.local_session_id,
+    metadata.localSessionId,
+    payment.local_session_id,
+    payment.localSessionId
+  ]
+    .map((value) => cleanText(value, 200))
+    .filter(Boolean);
+
+  const possibleEmails = [
+    metadata.email,
+    payment.customer?.email,
+    payment.user?.email,
+    payment.member?.email,
+    payment.buyer?.email,
+    payment.email,
+    findEmailInObject(payment)
+  ]
+    .map(cleanEmail)
+    .filter(Boolean);
+
+  const matchedByCheckoutId =
+    Boolean(sessionId) &&
+    possibleCheckoutIds.includes(sessionId);
+
+  const matchedByLocalSessionId =
+    Boolean(localSessionId) &&
+    possibleLocalSessionIds.includes(localSessionId);
+
+  const matchedByEmail =
+    Boolean(sessionEmail) &&
+    possibleEmails.includes(sessionEmail);
+
+  return matchedByCheckoutId || matchedByLocalSessionId || matchedByEmail;
+}
+
+function whopPaymentLooksPaid(payment, trustPaymentList) {
+  if (!payment || typeof payment !== "object") return false;
+
+  /*
+    Normal happy path.
+  */
+  if (isSuccessfulWhopPayment("", payment)) {
+    return true;
+  }
+
+  const status = cleanText(
+    payment.status ||
+      payment.payment_status ||
+      payment.paymentStatus ||
+      payment.substatus ||
+      payment.state ||
+      "",
+    80
+  ).toLowerCase();
+
+  /*
+    If Whop explicitly says it is not paid, do not mark paid.
+  */
+  const clearlyNotPaidStatuses = [
+    "pending",
+    "processing",
+    "open",
+    "created",
+    "incomplete",
+    "failed",
+    "failure",
+    "canceled",
+    "cancelled",
+    "refunded",
+    "refund",
+    "chargeback",
+    "disputed",
+    "requires_payment_method",
+    "requires_action"
+  ];
+
+  if (clearlyNotPaidStatuses.includes(status)) {
+    return false;
+  }
+
+  /*
+    Compatibility with your old working server:
+    Your old code queried /payments and then treated the matching row as successful.
+    In some Whop responses, the returned payment row may not expose status in the
+    exact field our generic success detector expects.
+  */
+  if (trustPaymentList) {
+    const hasPaymentId = Boolean(
+      payment.id ||
+        payment.payment_id ||
+        payment.paymentId ||
+        payment.pay_id
+    );
+
+    const hasMoney = Boolean(
+      payment.total ||
+        payment.amount ||
+        payment.amount_total ||
+        payment.final_amount ||
+        payment.price
+    );
+
+    return hasPaymentId && hasMoney;
+  }
+
+  return false;
+}
+
+function whopPaymentDebugSummary(payment) {
+  const metadata = payment?.metadata || {};
+
+  return {
+    id:
+      payment?.id ||
+      payment?.payment_id ||
+      payment?.paymentId ||
+      payment?.pay_id ||
+      "",
+
+    status:
+      payment?.status ||
+      payment?.payment_status ||
+      payment?.paymentStatus ||
+      payment?.substatus ||
+      payment?.state ||
+      "",
+
+    paid_at: payment?.paid_at || "",
+
+    checkout_configuration_id:
+      payment?.checkout_configuration_id ||
+      payment?.checkoutConfigurationId ||
+      payment?.checkout_config_id ||
+      payment?.checkoutConfigId ||
+      metadata.checkout_configuration_id ||
+      metadata.checkoutConfigurationId ||
+      "",
+
+    checkout_session_id:
+      payment?.checkout_session_id ||
+      payment?.checkoutSessionId ||
+      metadata.checkout_session_id ||
+      metadata.checkoutSessionId ||
+      "",
+
+    local_session_id:
+      metadata.local_session_id ||
+      payment?.local_session_id ||
+      payment?.localSessionId ||
+      "",
+
+    email:
+      metadata.email ||
+      payment?.customer?.email ||
+      payment?.user?.email ||
+      payment?.member?.email ||
+      payment?.buyer?.email ||
+      payment?.email ||
+      "",
+
+    total:
+      payment?.total ||
+      payment?.amount ||
+      payment?.amount_total ||
+      payment?.final_amount ||
+      payment?.price ||
+      "",
+
+    metadata_keys: Object.keys(metadata)
+  };
 }
 
 function extractPaymentCandidates(value) {
