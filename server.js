@@ -8,49 +8,101 @@ const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 
-const PORT = Number(process.env.PORT || 3000);
-const APP_URL = trimTrailingSlash(process.env.APP_URL || `http://localhost:${PORT}`);
+/*
+  Environment values copied from Notion/Docs/ChatGPT can contain:
+  - leading bullet characters: •
+  - zero-width spaces
+  - smart whitespace
+  Those can break fetch headers with:
+  "Cannot convert argument to a ByteString..."
+*/
+function cleanEnv(value) {
+  return String(value || "")
+    .trim()
+    .replace(/^[\s\u2022\u2023\u25E6\u2043\u2219•]+/g, "")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .trim();
+}
 
-const SUPABASE_URL = String(process.env.SUPABASE_URL || "").trim();
-const SUPABASE_SERVICE_ROLE_KEY = String(process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
+function cleanEnvUrl(value) {
+  const cleaned = cleanEnv(value);
 
-const WHOP_API_KEY = String(process.env.WHOP_API_KEY || "").trim();
-const WHOP_COMPANY_ID = String(process.env.WHOP_COMPANY_ID || "").trim();
-const WHOP_ENVIRONMENT = String(process.env.WHOP_ENVIRONMENT || "sandbox").trim();
-const WHOP_API_BASE = trimTrailingSlash(
-  process.env.WHOP_API_BASE ||
-    (WHOP_ENVIRONMENT === "sandbox"
-      ? "https://sandbox-api.whop.com/api/v1"
-      : "https://api.whop.com/api/v1")
-);
-const WHOP_WEBHOOK_SECRET = String(process.env.WHOP_WEBHOOK_SECRET || "").trim();
+  if (!cleaned) return "";
 
-const GOOGLE_SCRIPT_URL = String(process.env.GOOGLE_SCRIPT_URL || "").trim();
-const GOOGLE_CLIENT_ID = String(process.env.GOOGLE_CLIENT_ID || "").trim();
-const GOOGLE_CLIENT_SECRET = String(process.env.GOOGLE_CLIENT_SECRET || "").trim();
-const GOOGLE_REDIRECT_URI = String(
-  process.env.GOOGLE_REDIRECT_URI || `${APP_URL}/auth/google/callback`
-).trim();
+  try {
+    const url = new URL(cleaned);
 
-const ADMIN_API_KEY = String(process.env.ADMIN_API_KEY || "").trim();
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return "";
+    }
 
-const WHATSAPP_GROUP_INVITE_URL = String(process.env.WHATSAPP_GROUP_INVITE_URL || "").trim();
-const WHATSAPP_SUPPORT_NUMBER = String(process.env.WHATSAPP_SUPPORT_NUMBER || "").replace(/\D/g, "");
+    return url.toString().replace(/\/+$/, "");
+  } catch {
+    return "";
+  }
+}
 
-const TICKET_PRICE_CENTS = Number(process.env.TICKET_PRICE_CENTS || 260000);
-const MAX_REFERRALS = Number(process.env.MAX_REFERRALS || 2);
-const CURRENCY = String(process.env.CURRENCY || "EUR").toUpperCase();
+function cleanEnvNumber(value, fallback) {
+  const cleaned = cleanEnv(value);
+  const number = Number(cleaned);
 
-const PASSWORD_MIN_LENGTH = Number(process.env.PASSWORD_MIN_LENGTH || 8);
-const PASSWORD_HASH_ITERATIONS = Number(process.env.PASSWORD_HASH_ITERATIONS || 210000);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+const PORT = cleanEnvNumber(process.env.PORT, 3000);
+
+const APP_URL =
+  cleanEnvUrl(process.env.APP_URL) ||
+  `http://localhost:${PORT}`;
+
+const SUPABASE_URL = cleanEnvUrl(process.env.SUPABASE_URL);
+const SUPABASE_SERVICE_ROLE_KEY = cleanEnv(process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+const WHOP_API_KEY = cleanEnv(process.env.WHOP_API_KEY);
+const WHOP_COMPANY_ID = cleanEnv(process.env.WHOP_COMPANY_ID);
+const WHOP_ENVIRONMENT = cleanEnv(process.env.WHOP_ENVIRONMENT || "sandbox").toLowerCase();
+
+const WHOP_API_BASE =
+  cleanEnvUrl(process.env.WHOP_API_BASE) ||
+  (WHOP_ENVIRONMENT === "sandbox"
+    ? "https://sandbox-api.whop.com/api/v1"
+    : "https://api.whop.com/api/v1");
+
+const WHOP_WEBHOOK_SECRET = cleanEnv(process.env.WHOP_WEBHOOK_SECRET);
+
+const GOOGLE_SCRIPT_URL = cleanEnvUrl(process.env.GOOGLE_SCRIPT_URL);
+const GOOGLE_CLIENT_ID = cleanEnv(process.env.GOOGLE_CLIENT_ID);
+const GOOGLE_CLIENT_SECRET = cleanEnv(process.env.GOOGLE_CLIENT_SECRET);
+
+const GOOGLE_REDIRECT_URI =
+  cleanEnvUrl(process.env.GOOGLE_REDIRECT_URI) ||
+  `${APP_URL}/auth/google/callback`;
+
+const ADMIN_API_KEY = cleanEnv(process.env.ADMIN_API_KEY);
+
+const WHATSAPP_GROUP_INVITE_URL = cleanEnvUrl(process.env.WHATSAPP_GROUP_INVITE_URL);
+const WHATSAPP_SUPPORT_NUMBER = cleanEnv(process.env.WHATSAPP_SUPPORT_NUMBER).replace(/\D/g, "");
+
+const TICKET_PRICE_CENTS = cleanEnvNumber(process.env.TICKET_PRICE_CENTS, 260000);
+const MAX_REFERRALS = cleanEnvNumber(process.env.MAX_REFERRALS, 2);
+const CURRENCY = cleanEnv(process.env.CURRENCY || "EUR").toUpperCase() || "EUR";
+
+const PASSWORD_MIN_LENGTH = cleanEnvNumber(process.env.PASSWORD_MIN_LENGTH, 8);
+const PASSWORD_HASH_ITERATIONS = cleanEnvNumber(process.env.PASSWORD_HASH_ITERATIONS, 210000);
 const PASSWORD_HASH_KEYLEN = 64;
 const PASSWORD_HASH_DIGEST = "sha512";
-const PASSWORD_SETUP_TOKEN_TTL_MS = Number(
-  process.env.PASSWORD_SETUP_TOKEN_TTL_MS || 1000 * 60 * 60 * 24 * 7
+
+const PASSWORD_SETUP_TOKEN_TTL_MS = cleanEnvNumber(
+  process.env.PASSWORD_SETUP_TOKEN_TTL_MS,
+  1000 * 60 * 60 * 24 * 7
 );
 
 const SESSION_COOKIE = "monaco_session";
-const SESSION_TTL_MS = Number(process.env.SESSION_TTL_MS || 1000 * 60 * 60 * 24 * 30);
+
+const SESSION_TTL_MS = cleanEnvNumber(
+  process.env.SESSION_TTL_MS,
+  1000 * 60 * 60 * 24 * 30
+);
 
 const GOOGLE_STATE_COOKIE = "monaco_google_state";
 const GOOGLE_CHECKOUT_COOKIE = "monaco_google_checkout_session";
