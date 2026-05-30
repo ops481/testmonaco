@@ -388,62 +388,99 @@ app.get("/api/referrals/complete-checkout", async (req, res) => {
 });
 
 app.post("/api/whop/webhook", async (req, res) => {
+  console.log("WHOP WEBHOOK HIT");
+
   try {
-    if (WHOP_WEBHOOK_SECRET && !verifyWhopWebhook(req)) {
+    const rawBody = req.rawBody || JSON.stringify(req.body || {});
+    const event = req.body || {};
+
+    const eventType = String(
+      event.type ||
+        event.event ||
+        event.name ||
+        event.event_type ||
+        ""
+    ).toLowerCase();
+
+    const possibleObjects = {
+      event_data_object: event.data && event.data.object ? event.data.object : null,
+      event_data: event.data || null,
+      event_object: event.object || null,
+      event_payload: event.payload || null,
+      event_resource: event.resource || null,
+      event
+    };
+
+    let objectPath = "event";
+    let object = event;
+
+    if (possibleObjects.event_data_object) {
+      objectPath = "event.data.object";
+      object = possibleObjects.event_data_object;
+    } else if (possibleObjects.event_data) {
+      objectPath = "event.data";
+      object = possibleObjects.event_data;
+    } else if (possibleObjects.event_object) {
+      objectPath = "event.object";
+      object = possibleObjects.event_object;
+    } else if (possibleObjects.event_payload) {
+      objectPath = "event.payload";
+      object = possibleObjects.event_payload;
+    } else if (possibleObjects.event_resource) {
+      objectPath = "event.resource";
+      object = possibleObjects.event_resource;
+    }
+
+    const signatureValid = WHOP_WEBHOOK_SECRET ? verifyWhopWebhook(req) : true;
+
+    console.log("WHOP WEBHOOK SUMMARY:", {
+      event_type: eventType,
+      object_path: objectPath,
+      signature_required: Boolean(WHOP_WEBHOOK_SECRET),
+      signature_valid: signatureValid,
+      body_length: rawBody.length,
+      body_sha256: sha256(rawBody),
+      top_level_keys: Object.keys(event || {}),
+      object_keys: object && typeof object === "object" ? Object.keys(object) : [],
+      selected_object_summary: summarizeWebhookObject(object),
+      successful_payment_detected: isSuccessfulWhopPayment(eventType, object)
+    });
+
+    if (WHOP_WEBHOOK_SECRET && !signatureValid) {
+      console.warn("WHOP WEBHOOK REJECTED: invalid signature", {
+        event_type: eventType,
+        body_sha256: sha256(rawBody)
+      });
+
       return res.status(401).json({ error: "Invalid webhook signature." });
     }
 
-    const event = req.body || {};
-    const eventType = String(event.type || event.event || event.name || "").toLowerCase();
-    const object = event.data?.object || event.data || event.object || event;
-logWebhookDebug("WHOP WEBHOOK DEBUG: received", {
-        request: {
-          method: req.method,
-          path: req.path,
-          content_type: req.get("content-type") || "",
-          user_agent: req.get("user-agent") || "",
-          body_length: rawBody.length,
-          body_sha256: sha256(rawBody),
-          has_x_whop_signature: Boolean(req.get("x-whop-signature")),
-          has_whop_signature: Boolean(req.get("whop-signature")),
-          has_x_signature: Boolean(req.get("x-signature")),
-          signature_valid: signatureValid
-        },
-        event_detection: {
-          event_type: eventType,
-          top_level_keys: Object.keys(event || {}),
-          object_path_used: objectPath,
-          object_keys: object && typeof object === "object" ? Object.keys(object) : [],
-          possible_object_summaries: {
-            "event.data.object": summarizeWebhookObject(possibleObjects["event.data.object"]),
-            "event.data": summarizeWebhookObject(possibleObjects["event.data"]),
-            "event.object": summarizeWebhookObject(possibleObjects["event.object"]),
-            "event": summarizeWebhookObject(possibleObjects["event"])
-          },
-          selected_object_summary: summarizeWebhookObject(object),
-          is_successful_payment: isSuccessfulWhopPayment(eventType, object)
-        },
-        sanitized_event: sanitizeWebhookForLog(event)
-      });
     if (isSuccessfulWhopPayment(eventType, object)) {
+      console.log("WHOP WEBHOOK ACCEPTED AS PAID:", {
+        event_type: eventType,
+        object_path: objectPath,
+        summary: summarizeWebhookObject(object)
+      });
+
       await handlePaymentSucceeded(object);
     } else {
-      console.log("Ignored Whop webhook:", {
-        eventType,
-        status: object.status,
-        payment_status: object.payment_status,
-        substatus: object.substatus
+      console.warn("WHOP WEBHOOK IGNORED: not detected as successful payment", {
+        event_type: eventType,
+        object_path: objectPath,
+        summary: summarizeWebhookObject(object)
       });
     }
 
     res.json({ ok: true });
   } catch (error) {
-    console.error("webhook failed:", error);
+    console.error("webhook failed:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      stack: error.stack
+    });
 
-    /*
-      Return 200 so Whop does not endlessly retry a permanently malformed event.
-      We still log the error and include ok:false for diagnostics.
-    */
     res.status(200).json({
       ok: false,
       error: error.message || "Webhook error."
@@ -3033,13 +3070,17 @@ function logWebhookDebug(label, payload) {
 
   console.log(`${label} END`);
 }
-
 function summarizeWebhookObject(value) {
   if (!value || typeof value !== "object") {
     return null;
   }
 
-  const metadata = value.metadata || value.checkout_metadata || value.custom_data || value.custom_fields || {};
+  const metadata =
+    value.metadata ||
+    value.checkout_metadata ||
+    value.custom_data ||
+    value.custom_fields ||
+    {};
 
   return {
     id:
@@ -3141,44 +3182,4 @@ function summarizeWebhookObject(value) {
     metadata_keys: Object.keys(metadata || {}),
     keys: Object.keys(value || {})
   };
-}
-
-function sanitizeWebhookForLog(value, depth = 0) {
-  if (depth > 8) return "[Max depth reached]";
-
-  if (value === null || value === undefined) return value;
-
-  if (typeof value !== "object") {
-    return value;
-  }
-
-  if (Array.isArray(value)) {
-    return value.slice(0, 20).map((item) => sanitizeWebhookForLog(item, depth + 1));
-  }
-
-  const output = {};
-
-  Object.keys(value).forEach((key) => {
-    const lower = key.toLowerCase();
-    const item = value[key];
-
-    if (
-      lower.includes("secret") ||
-      lower.includes("token") ||
-      lower.includes("authorization") ||
-      lower.includes("signature") ||
-      lower.includes("api_key") ||
-      lower.includes("apikey") ||
-      lower.includes("password") ||
-      lower.includes("card") ||
-      lower.includes("cvc")
-    ) {
-      output[key] = "[REDACTED]";
-      return;
-    }
-
-    output[key] = sanitizeWebhookForLog(item, depth + 1);
-  });
-
-  return output;
 }
