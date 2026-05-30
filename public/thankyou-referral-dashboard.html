@@ -1128,26 +1128,28 @@ const friendPhoneDigits = contactType === "phone"
                   </div>
                 </div>
 
-                <div class="panel">
-                  <div class="panel-head">
-                    <div>
-                      <div class="panel-kicker">Password login</div>
-                      <h2>${d.password_set ? "Change your dashboard password" : "Set your dashboard password"}</h2>
-                      <p>${d.password_set ? "Use this only if you want to change the password you already use to log in." : "Create this once so you can log in later with your checkout email and password."}</p>
-                    </div>
-                  </div>
+                ${d.google_connected ? "" : `
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-kicker">Password login</div>
+        <h2>${d.password_set ? "Change your dashboard password" : "Set your dashboard password"}</h2>
+        <p>${d.password_set ? "Use this only if you want to change the password you already use to log in." : "Create this once so you can log in later with your checkout email and password."}</p>
+      </div>
+    </div>
 
-                  <form class="login-form" id="setPasswordForm">
-                    <label for="newDashboardPassword">New password</label>
-                    <input id="newDashboardPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+    <form class="login-form" id="setPasswordForm">
+      <label for="newDashboardPassword">New password</label>
+      <input id="newDashboardPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
 
-                    <label for="currentDashboardPassword">Current password, only if changing it later</label>
-                    <input id="currentDashboardPassword" type="password" autocomplete="current-password" placeholder="Leave blank if setting it for the first time" />
+      <label for="currentDashboardPassword">Current password, only if changing it later</label>
+      <input id="currentDashboardPassword" type="password" autocomplete="current-password" placeholder="Leave blank if setting it for the first time" />
 
-                    <button class="secondary-btn" type="submit">${d.password_set ? "Update password" : "Save password"}</button>
-                    <p class="small-note" id="setPasswordNote">Your login email is always your paid booking email.</p>
-                  </form>
-                </div>
+      <button class="secondary-btn" type="submit">${d.password_set ? "Update password" : "Save password"}</button>
+      <p class="small-note" id="setPasswordNote">Your login email is always your paid booking email.</p>
+    </form>
+  </div>
+`}
               </section>
 
               <section class="dashboard-page" id="page-community">
