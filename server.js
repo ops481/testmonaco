@@ -495,7 +495,47 @@ app.post("/api/referrals/password-set", (req, res) => {
     }
   });
 });
+app.get("/api/referrals/password-setup-token", (req, res) => {
+  const token = cleanText(req.query?.token || req.body?.token || "", 120);
 
+  if (!token) {
+    return res.status(400).json({ error: "Missing password setup token." });
+  }
+
+  const store = readStore();
+  const row = store.password_tokens[token];
+
+  if (!row || row.expires_at < Date.now()) {
+    if (row) {
+      delete store.password_tokens[token];
+      writeStore(store);
+    }
+
+    return res.status(401).json({
+      error: "This password setup link has expired. Please request a new one."
+    });
+  }
+
+  const email = cleanEmail(row.email);
+
+  if (!email || !store.customers[email]) {
+    return res.status(400).json({
+      error: "This password setup link is invalid or has already been used."
+    });
+  }
+
+  if (!isPaidCustomer(store, email)) {
+    return res.status(403).json({
+      error: "This setup link is not connected to a paid Monaco booking."
+    });
+  }
+
+  res.json({
+    ok: true,
+    email,
+    expires_at: row.expires_at
+  });
+});
 app.post("/api/referrals/password-set-with-token", (req, res) => {
   const token = cleanText(req.body?.token || req.body?.setup_token, 120);
   const password = String(req.body?.password || "");

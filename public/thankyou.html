@@ -328,23 +328,33 @@
     <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
     <div class="panel-kicker">Member dashboard</div>
     <h2 id="dashboardLoginModalTitle">Log in to your Monaco dashboard</h2>
-    <p id="dashboardLoginModalText">Use your dashboard password with the exact email you paid with.</p>
+    <p id="dashboardLoginModalText">Continue with Google, or use your booking email and dashboard password.</p>
 
-    <div class="login-divider" id="emailLoginDivider">password login</div>
+    <a class="btn google-btn login-google-btn" id="modalGoogleLoginBtn" href="/auth/google/start">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.223 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+        <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+      </svg>
+      Continue with Google
+    </a>
+
+    <div class="login-divider" id="emailLoginDivider">or</div>
 
     <form class="email-login-form" id="thankyouEmailLoginForm">
-      <label for="thankyouLoginEmail">Email used at checkout</label>
+      <label for="thankyouLoginEmail">Username / email used at checkout</label>
       <input id="thankyouLoginEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
 
       <label for="thankyouLoginPassword">Password</label>
       <input id="thankyouLoginPassword" type="password" autocomplete="current-password" placeholder="Your dashboard password" required />
 
-      <button class="btn email-btn" id="thankyouEmailLoginSubmit" type="submit">Log in with your password</button>
+      <button class="btn email-btn" id="thankyouEmailLoginSubmit" type="submit">Log in with username and password</button>
       <p class="email-login-note" id="thankyouEmailLoginNote">Use this only if you have already created your dashboard password.</p>
     </form>
 
     <form class="email-login-form password-setup-form is-hidden" id="thankyouPasswordSetupForm">
-      <label for="thankyouSetupEmail">Email used at checkout</label>
+      <label for="thankyouSetupEmail">Username / email used at checkout</label>
       <input id="thankyouSetupEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
 
       <label for="thankyouSetupPassword">Create password</label>
@@ -354,10 +364,8 @@
       <input id="thankyouSetupPasswordConfirm" type="password" autocomplete="new-password" placeholder="Type it again" required />
 
       <button class="btn email-btn" id="thankyouPasswordSetupSubmit" type="submit">Create password and continue</button>
-      <p class="email-login-note" id="thankyouPasswordSetupNote">Use the same email you used at checkout. This becomes your login email.</p>
+      <p class="email-login-note" id="thankyouPasswordSetupNote">Your username is the same email used for your paid Monaco booking.</p>
     </form>
-
-    <p class="small-note" id="googleFallbackNote">Prefer Google? <a id="modalGoogleLoginBtn" href="/auth/google/start" style="text-decoration:underline;font-weight:800;">Continue with Google</a></p>
   </div>
 </div>
 
@@ -492,32 +500,44 @@
     if (googleBtn) googleBtn.href = loginUrl;
     if (modalGoogleBtn) modalGoogleBtn.href = loginUrl;
 
-    function showEmailLoginMode() {
-      if (modalTitle) modalTitle.textContent = 'Log in to your Monaco dashboard';
-      if (modalText) modalText.textContent = 'Use your dashboard password with the exact email you paid with.';
-      emailLoginDivider?.classList.remove('is-hidden');
-      emailLoginForm?.classList.remove('is-hidden');
-      passwordSetupForm?.classList.add('is-hidden');
-      if (emailLoginNote) {
-        emailLoginNote.textContent = 'Use this only if you have already created your dashboard password.';
-        emailLoginNote.style.color = '';
-      }
-    }
+function showEmailLoginMode() {
+  if (modalTitle) modalTitle.textContent = 'Log in to your Monaco dashboard';
+  if (modalText) modalText.textContent = 'Continue with Google, or use your booking email and dashboard password.';
+  emailLoginDivider?.classList.remove('is-hidden');
+  emailLoginForm?.classList.remove('is-hidden');
+  passwordSetupForm?.classList.add('is-hidden');
 
-    function showPasswordSetupMode(message) {
-      if (modalTitle) modalTitle.textContent = 'Set your dashboard password';
-      if (modalText) modalText.textContent = message || 'You have paid. Create your password now so you can come back later with this email.';
-      emailLoginDivider?.classList.add('is-hidden');
-      emailLoginForm?.classList.add('is-hidden');
-      passwordSetupForm?.classList.remove('is-hidden');
-      setBookingEmail(bookingEmail);
-      if (setupPasswordNote) {
-        setupPasswordNote.textContent = 'Use the same email you used at checkout. This becomes your login email.';
-        setupPasswordNote.style.color = '';
-      }
-      setTimeout(function(){ setupPasswordInput?.focus(); }, 80);
-    }
+  setBookingEmail(bookingEmail);
 
+  if (emailLoginNote) {
+    emailLoginNote.textContent = 'Your username is the email you used for your paid booking.';
+    emailLoginNote.style.color = '';
+  }
+}
+
+function showPasswordSetupMode(message) {
+  if (modalTitle) modalTitle.textContent = 'Set your dashboard password';
+  if (modalText) {
+    modalText.textContent =
+      message ||
+      'Use this secure setup link to create or reset your Monaco dashboard password. Your login email must match the email used for your paid booking.';
+  }
+
+  emailLoginDivider?.classList.remove('is-hidden');
+  emailLoginForm?.classList.add('is-hidden');
+  passwordSetupForm?.classList.remove('is-hidden');
+
+  setBookingEmail(bookingEmail);
+
+  if (setupPasswordNote) {
+    setupPasswordNote.textContent = 'Your username is the same email used for your paid Monaco booking.';
+    setupPasswordNote.style.color = '';
+  }
+
+  setTimeout(function(){
+    setupPasswordInput?.focus();
+  }, 80);
+}
     function openDashboardLoginModal(event) {
       if (event) event.preventDefault();
       setBookingEmail(bookingEmail);

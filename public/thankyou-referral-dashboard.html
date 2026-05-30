@@ -435,18 +435,18 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
       const INTL_TEL_INPUT_UTILS_URL = "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/utils.js";
       let invitePhoneInput = null;
 
-      const API = {
-        complete: "/api/referrals/complete-checkout",
-        me: "/api/referrals/me",
-        session: "/api/referrals/session",
-        login: "/api/referrals/login",
-        logout: "/api/referrals/logout",
-        googleStart: "/auth/google/start",
-        passwordLogin: "/api/referrals/password-login",
-        passwordSet: "/api/referrals/password-set",
-        passwordSetWithToken: "/api/referrals/password-set-with-token"
-      };
-
+  const API = {
+  complete: "/api/referrals/complete-checkout",
+  me: "/api/referrals/me",
+  session: "/api/referrals/session",
+  login: "/api/referrals/login",
+  logout: "/api/referrals/logout",
+  googleStart: "/auth/google/start",
+  passwordLogin: "/api/referrals/password-login",
+  passwordSet: "/api/referrals/password-set",
+  passwordSetWithToken: "/api/referrals/password-set-with-token",
+  passwordSetupToken: "/api/referrals/password-setup-token"
+};
       const MAX_ATTEMPTS = 10;
       const RETRY_DELAY_MS = 1200;
 
@@ -1307,227 +1307,276 @@ function bindSetPasswordForm() {
     }
   });
 }
+
 function renderLogin(error = "") {
-        logoutBtn.classList.add("hidden");
-        heroSection?.classList.add("hidden");
-        document.querySelector(".confirm-bar")?.classList.add("hidden");
+  logoutBtn.classList.add("hidden");
+  heroSection?.classList.add("hidden");
+  document.querySelector(".confirm-bar")?.classList.add("hidden");
 
-        app.innerHTML = `
-          <div class="login-wrap">
-            <div class="login-card-clean">
-              <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
-              <div class="panel-kicker">Member dashboard</div>
-              <h2>Log in with your dashboard password</h2>
-              <p>Use the exact email you paid with and the password you created for your Monaco dashboard.</p>
+  app.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card-clean">
+        <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+        <div class="panel-kicker">Member dashboard</div>
+        <h2>Log in to your Monaco dashboard</h2>
+        <p>Use Google, or log in with the exact email you paid with and your dashboard password.</p>
 
-              ${error ? `<div class="state error login-error">${esc(error)}</div>` : ""}
+        ${error ? `<div class="state error login-error">${esc(error)}</div>` : ""}
 
-              <form class="login-form" id="passwordLoginForm">
-                <label for="passwordLoginEmail">Email used at checkout</label>
-                <input id="passwordLoginEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
+        <a class="btn google-btn login-google-btn" href="${googleStartUrl()}">
+          ${googleIcon()}
+          Continue with Google
+        </a>
 
-                <label for="passwordLoginPassword">Password</label>
-                <input id="passwordLoginPassword" type="password" autocomplete="current-password" placeholder="Your dashboard password" required />
+        <div class="login-divider">or</div>
 
-                <button class="secondary-btn" type="submit">Log in with your password</button>
-                <p class="small-note" id="passwordLoginNote">Use this only if you have already created your dashboard password.</p>
-              </form>
+        <form class="login-form" id="passwordLoginForm">
+          <label for="passwordLoginEmail">Username / email used at checkout</label>
+          <input
+            id="passwordLoginEmail"
+            type="email"
+            autocomplete="username"
+            placeholder="your-booking-email@example.com"
+            required
+          />
 
-              <div class="login-divider">or</div>
+          <label for="passwordLoginPassword">Password</label>
+          <input
+            id="passwordLoginPassword"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Your dashboard password"
+            required
+          />
 
-              <a class="btn google-btn login-google-btn" href="${googleStartUrl()}">
-                ${googleIcon()}
-                Continue with Google
-              </a>
+          <button class="secondary-btn" type="submit">Log in with username and password</button>
+          <p class="small-note" id="passwordLoginNote">Your username is the same email used for your paid Monaco booking.</p>
+        </form>
 
-              <p class="small-note">First time here? Use the password setup link we sent you, or continue with Google using the same email you paid with.</p>
-            </div>
-          </div>
-        `;
+        <p class="small-note">First time here? Use your secure setup link to create or reset your Monaco dashboard password.</p>
+      </div>
+    </div>
+  `;
 
-        bindPasswordLoginForm();
+  bindPasswordLoginForm();
+}
+
+function renderSetPasswordScreen(options = {}) {
+  logoutBtn.classList.add("hidden");
+  heroSection?.classList.add("hidden");
+  document.querySelector(".confirm-bar")?.classList.add("hidden");
+
+  const token = String(options.token || "");
+  const email = String(options.email || "").trim().toLowerCase();
+  const sessionMode = Boolean(options.sessionMode);
+  const message =
+    options.message ||
+    "Use this secure setup link to create or reset your Monaco dashboard password. Your login email must match the email used for your paid booking.";
+
+  app.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card-clean">
+        <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+        <div class="panel-kicker">Member dashboard</div>
+        <h2>Set your dashboard password</h2>
+        <p>${esc(message)}</p>
+
+        <a class="btn google-btn login-google-btn" href="${googleStartUrl()}">
+          ${googleIcon()}
+          Continue with Google
+        </a>
+
+        <div class="login-divider">or</div>
+
+        <form class="login-form" id="setupPasswordForm">
+          <label for="setupPasswordEmail">Username / email used at checkout</label>
+          <input
+            id="setupPasswordEmail"
+            type="email"
+            autocomplete="username"
+            value="${esc(email)}"
+            placeholder="your-booking-email@example.com"
+            ${token ? "readonly" : ""}
+            required
+          />
+
+          <label for="setupPasswordNew">Create password</label>
+          <input
+            id="setupPasswordNew"
+            type="password"
+            autocomplete="new-password"
+            placeholder="At least 8 characters"
+            required
+          />
+
+          <label for="setupPasswordConfirm">Confirm password</label>
+          <input
+            id="setupPasswordConfirm"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Type it again"
+            required
+          />
+
+          <button class="secondary-btn" type="submit">Set password and continue</button>
+          <p class="small-note" id="setupPasswordNote">This password is only for your Monaco dashboard. Keep it somewhere safe.</p>
+        </form>
+
+        ${token ? `<p class="small-note">This setup link is secure, expires automatically, and can only be used once.</p>` : ""}
+      </div>
+    </div>
+  `;
+
+  bindSetupPasswordForm({ token, sessionMode });
+}
+
+function bindSetupPasswordForm(options = {}) {
+  const form = $("setupPasswordForm");
+  const emailInput = $("setupPasswordEmail");
+  const passwordInput = $("setupPasswordNew");
+  const confirmInput = $("setupPasswordConfirm");
+  const note = $("setupPasswordNote");
+
+  if (!form || !emailInput || !passwordInput || !confirmInput || !note) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const password = String(passwordInput.value || "");
+    const confirm = String(confirmInput.value || "");
+    const email = String(emailInput.value || "").trim().toLowerCase();
+
+    if (!email) {
+      note.textContent = "Your login email is required. Use the exact email from your paid booking.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    if (password.length < 8) {
+      note.textContent = "Password must be at least 8 characters.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    if (password !== confirm) {
+      note.textContent = "Passwords do not match.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    const button = form.querySelector("button");
+    const originalText = button?.textContent || "Set password and continue";
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Saving...";
+    }
+
+    note.textContent = "Creating your dashboard password...";
+    note.style.color = "";
+
+    try {
+      const response = options.token
+        ? await json(API.passwordSetWithToken, {
+            method: "POST",
+            body: JSON.stringify({
+              token: options.token,
+              password
+            })
+          })
+        : await json(API.passwordSet, {
+            method: "POST",
+            body: JSON.stringify({
+              email,
+              password
+            })
+          });
+
+      if (response?.dashboard) {
+        history.replaceState({}, "", "/thankyou-referral-dashboard.html");
+        render(normalise(response));
+        return;
       }
 
-      function renderSetPasswordScreen(options = {}) {
-        logoutBtn.classList.add("hidden");
-        heroSection?.classList.add("hidden");
-        document.querySelector(".confirm-bar")?.classList.add("hidden");
+      const me = await loadMe();
+      history.replaceState({}, "", "/thankyou-referral-dashboard.html");
+      render(normalise(me));
+    } catch (err) {
+      note.textContent = err.message || "Could not save your password.";
+      note.style.color = "var(--error)";
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+  });
+}
 
-        const token = String(options.token || "");
-        const email = String(options.email || "").trim().toLowerCase();
-        const sessionMode = Boolean(options.sessionMode);
-        const message = options.message || "Create your dashboard password. Your login email must be the exact email used for your paid booking.";
+function bindPasswordLoginForm() {
+  const form = $("passwordLoginForm");
+  const emailInput = $("passwordLoginEmail");
+  const passwordInput = $("passwordLoginPassword");
+  const note = $("passwordLoginNote");
 
-        app.innerHTML = `
-          <div class="login-wrap">
-            <div class="login-card-clean">
-              <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
-              <div class="panel-kicker">Member dashboard</div>
-              <h2>Set your dashboard password</h2>
-              <p>${esc(message)}</p>
+  if (!form || !emailInput || !passwordInput || !note) return;
 
-              <form class="login-form" id="setupPasswordForm">
-                ${sessionMode ? `
-                  <label for="setupPasswordEmail">Email used at checkout</label>
-                  <input id="setupPasswordEmail" type="email" autocomplete="username" value="${esc(email)}" placeholder="your-booking-email@example.com" required />
-                ` : ""}
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-                <label for="setupPasswordNew">New password</label>
-                <input id="setupPasswordNew" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+    const email = String(emailInput.value || "").trim().toLowerCase();
+    const password = String(passwordInput.value || "");
 
-                <label for="setupPasswordConfirm">Confirm password</label>
-                <input id="setupPasswordConfirm" type="password" autocomplete="new-password" placeholder="Type it again" required />
+    if (!email || !password) {
+      note.textContent = "Enter the email you used at checkout and your password.";
+      note.style.color = "var(--error)";
+      return;
+    }
 
-                <button class="secondary-btn" type="submit">Set password and continue</button>
-                <p class="small-note" id="setupPasswordNote">This password is only for your Monaco dashboard. Keep it somewhere safe.</p>
-              </form>
+    const button = form.querySelector("button");
+    const originalText = button?.textContent || "Log in with username and password";
 
-              ${token ? `<p class="small-note">This setup link is secure, expires automatically, and can only be used once.</p>` : ""}
-            </div>
-          </div>
-        `;
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Checking password...";
+    }
 
-        bindSetupPasswordForm({ token, sessionMode });
+    note.textContent = "Checking your booking email and password...";
+    note.style.color = "";
+
+    try {
+      const response = await json(API.passwordLogin, {
+        method: "POST",
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response?.dashboard) {
+        render(normalise(response));
+        return;
       }
 
-      function bindSetupPasswordForm(options = {}) {
-        const form = $("setupPasswordForm");
-        const emailInput = $("setupPasswordEmail");
-        const passwordInput = $("setupPasswordNew");
-        const confirmInput = $("setupPasswordConfirm");
-        const note = $("setupPasswordNote");
-
-        if (!form || !passwordInput || !confirmInput || !note) return;
-
-        form.addEventListener("submit", async (event) => {
-          event.preventDefault();
-
-          const password = String(passwordInput.value || "");
-          const confirm = String(confirmInput.value || "");
-          const email = String(emailInput?.value || "").trim().toLowerCase();
-
-          if (password.length < 8) {
-            note.textContent = "Password must be at least 8 characters.";
-            note.style.color = "var(--error)";
-            return;
-          }
-
-          if (password !== confirm) {
-            note.textContent = "Passwords do not match.";
-            note.style.color = "var(--error)";
-            return;
-          }
-
-          const button = form.querySelector("button");
-          const originalText = button?.textContent || "Create password and continue";
-
-          if (button) {
-            button.disabled = true;
-            button.textContent = "Saving...";
-          }
-
-          try {
-            const response = options.token
-              ? await json(API.passwordSetWithToken, {
-                  method: "POST",
-                  body: JSON.stringify({
-                    token: options.token,
-                    password
-                  })
-                })
-              : await json(API.passwordSet, {
-                  method: "POST",
-                  body: JSON.stringify({
-                    email,
-                    password
-                  })
-                });
-
-            if (response?.dashboard) {
-              history.replaceState({}, "", "/thankyou-referral-dashboard.html");
-              render(normalise(response));
-              return;
-            }
-
-            const me = await loadMe();
-            history.replaceState({}, "", "/thankyou-referral-dashboard.html");
-            render(normalise(me));
-          } catch (err) {
-            note.textContent = err.message || "Could not save your password.";
-            note.style.color = "var(--error)";
-          } finally {
-            if (button) {
-              button.disabled = false;
-              button.textContent = originalText;
-            }
-          }
+      const me = await loadMe();
+      render(normalise(me));
+    } catch (err) {
+      if (err?.data?.code === "PASSWORD_NOT_SET" && err.data.can_set_password_now) {
+        renderSetPasswordScreen({
+          email: err.data.email || email,
+          sessionMode: true,
+          message: "No password exists yet for this paid email. Create your dashboard password now."
         });
+        return;
       }
 
-      function bindPasswordLoginForm() {
-        const form = $("passwordLoginForm");
-        const emailInput = $("passwordLoginEmail");
-        const passwordInput = $("passwordLoginPassword");
-        const note = $("passwordLoginNote");
-
-        if (!form || !emailInput || !passwordInput || !note) return;
-
-        form.addEventListener("submit", async (event) => {
-          event.preventDefault();
-
-          const email = String(emailInput.value || "").trim();
-          const password = String(passwordInput.value || "");
-
-          if (!email || !password) {
-            note.textContent = "Enter the email you used at checkout and your password.";
-            note.style.color = "var(--error)";
-            return;
-          }
-
-          const button = form.querySelector("button");
-          const originalText = button?.textContent || "Continue with your email";
-
-          if (button) {
-            button.disabled = true;
-            button.textContent = "Checking password...";
-          }
-
-          note.textContent = "Checking your booking email and password...";
-          note.style.color = "";
-
-          try {
-            const response = await json(API.passwordLogin, {
-              method: "POST",
-              body: JSON.stringify({ email, password })
-            });
-
-            if (response?.dashboard) {
-              render(normalise(response));
-              return;
-            }
-
-            const me = await loadMe();
-            render(normalise(me));
-          } catch (err) {
-            if (err?.data?.code === "PASSWORD_NOT_SET" && err.data.can_set_password_now) {
-              renderSetPasswordScreen({
-                email: err.data.email || email,
-                sessionMode: true,
-                message: "No password exists yet for this paid email. Create your dashboard password now."
-              });
-              return;
-            }
-
-            note.textContent = err.message || "Could not log in with that email and password.";
-            note.style.color = "var(--error)";
-          } finally {
-            if (button) {
-              button.disabled = false;
-              button.textContent = originalText;
-            }
-          }
-        });
+      note.textContent = err.message || "Could not log in with that email and password.";
+      note.style.color = "var(--error)";
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
       }
+    }
+  });
+}
 
 
 function bindEmailLoginForm() {
@@ -1569,12 +1618,25 @@ async function boot() {
           const googleError = params.get("error");
 
           if (setupPasswordToken) {
-            renderSetPasswordScreen({
-              token: setupPasswordToken,
-              message: "Use this secure setup link to create or reset your Monaco dashboard password. Your login email must match the email used for your paid booking."
-            });
-            return;
-          }
+  try {
+    const tokenInfo = await json(
+      `${API.passwordSetupToken}?token=${encodeURIComponent(setupPasswordToken)}`,
+      {
+        method: "GET"
+      }
+    );
+
+    renderSetPasswordScreen({
+      token: setupPasswordToken,
+      email: tokenInfo.email || "",
+      message: "Use this secure setup link to create or reset your Monaco dashboard password. Your login email must match the email used for your paid booking."
+    });
+  } catch (err) {
+    renderLogin(err.message || "This password setup link is invalid or expired.");
+  }
+
+  return;
+}
 
           if (googleError) {
             renderLogin(googleError);
