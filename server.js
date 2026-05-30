@@ -556,89 +556,68 @@ app.post("/api/referrals/password-set-with-token", (req, res) => {
 });
 
 app.post("/api/admin/referrals/password-setup-link", requireAdmin, (req, res) => {
-  const email = cleanEmail(req.body?.email || req.query.email);
+  try {
+    const email = cleanEmail(req.body?.email || req.query.email);
+    const fullName = cleanText(
+      req.body?.full_name || req.body?.fullName || req.body?.name || "Founder",
+      120
+    );
 
-  if (!email) {
-    return res.status(400).json({ error: "Enter a valid customer email." });
-  }
+    const whopPaymentId = cleanText(
+      req.body?.whop_payment_id || req.body?.payment_id || "",
+      160
+    );
 
-  const store = readStore();
-  const customer = store.customers[email];
+    const whopMemberId = cleanText(
+      req.body?.whop_member_id || req.body?.member_id || "",
+      160
+    );
 
-  if (!customer) {
-    return res.status(404).json({ error: "No customer was found for this email." });
-  }
+    if (!email) {
+      return res.status(400).json({ error: "Enter a valid customer email." });
+    }
 
-  if (!isPaidCustomer(store, email)) {
-    return res.status(403).json({
-      error: "This email is not connected to a paid Monaco booking yet."
+    const store = readStore();
+
+    // Create the customer if missing, or update them if already present.
+    const customer = upsertCustomer(store, {
+      email,
+      name: fullName,
+      whop_payment_id: whopPaymentId,
+      status: "paid",
+      paid_at: now(),
+      currency: CURRENCY,
+      ticket_price_cents: TICKET_PRICE_CENTS
+    });
+
+    // Optional: store the Whop member ID too.
+    if (whopMemberId) {
+      customer.whop_member_id = whopMemberId;
+      customer.updated_at = now();
+      store.customers[email] = customer;
+    }
+
+    const token = createPasswordSetupToken(store, email);
+
+    writeStore(store);
+
+    res.json({
+      ok: true,
+      email,
+      setup_url: passwordSetupUrl(token),
+      expires_in_hours: Math.round(PASSWORD_SETUP_TOKEN_TTL_MS / (1000 * 60 * 60))
+    });
+  } catch (error) {
+    console.error("password-setup-link failed:", error);
+
+    res.status(500).json({
+      ok: false,
+      error: error.message || "Could not create password setup link."
     });
   }
-
-  const token = createPasswordSetupToken(store, email);
-  writeStore(store);
-
-  res.json({
-    ok: true,
-    email,
-    setup_url: passwordSetupUrl(token),
-    expires_in_hours: Math.round(PASSWORD_SETUP_TOKEN_TTL_MS / (1000 * 60 * 60))
-  });
 });
 
-app.post("/api/referrals/password-set", (req, res) => {
-  const sessionCustomerEmail = sessionEmail(req);
-  const email = cleanEmail(req.body?.email || sessionCustomerEmail);
-  const password = String(req.body?.password || "");
-  const currentPassword = String(req.body?.current_password || "");
 
-  if (!sessionCustomerEmail) {
-    return res.status(401).json({
-      error: "Please log in with Google or your dashboard login link first, then set your password."
-    });
-  }
-
-  if (!email || email !== sessionCustomerEmail) {
-    return res.status(403).json({
-      error: "You can only set a password for the email currently logged in."
-    });
-  }
-
-  if (password.length < PASSWORD_MIN_LENGTH) {
-    return res.status(400).json({
-      error: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`
-    });
-  }
-
-  const store = readStore();
-  const customer = store.customers[email];
-
-  if (!customer) {
-    return res.status(404).json({ error: "No Monaco booking was found for this email." });
-  }
-
-  if (!isPaidCustomer(store, email)) {
-    return res.status(403).json({
-      error: "This email is not connected to a paid Monaco booking yet."
-    });
-  }
-
-  if (customer.password_hash && !verifyPassword(currentPassword, customer.password_hash)) {
-    return res.status(401).json({
-      error: "Enter your current password before changing it."
-    });
-  }
-
-  customer.password_hash = hashPassword(password);
-  customer.password_set_at = customer.password_set_at || now();
-  customer.password_updated_at = now();
-  customer.updated_at = now();
-
-  store.customers[email] = customer;
-  writeStore(store);
-
-  res.json({ ok: true });
-});
 app.post("/api/referrals/session", (req, res) => {
   const token = cleanText(req.body?.token, 100);
 
