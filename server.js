@@ -396,7 +396,35 @@ app.post("/api/whop/webhook", async (req, res) => {
     const event = req.body || {};
     const eventType = String(event.type || event.event || event.name || "").toLowerCase();
     const object = event.data?.object || event.data || event.object || event;
-
+logWebhookDebug("WHOP WEBHOOK DEBUG: received", {
+        request: {
+          method: req.method,
+          path: req.path,
+          content_type: req.get("content-type") || "",
+          user_agent: req.get("user-agent") || "",
+          body_length: rawBody.length,
+          body_sha256: sha256(rawBody),
+          has_x_whop_signature: Boolean(req.get("x-whop-signature")),
+          has_whop_signature: Boolean(req.get("whop-signature")),
+          has_x_signature: Boolean(req.get("x-signature")),
+          signature_valid: signatureValid
+        },
+        event_detection: {
+          event_type: eventType,
+          top_level_keys: Object.keys(event || {}),
+          object_path_used: objectPath,
+          object_keys: object && typeof object === "object" ? Object.keys(object) : [],
+          possible_object_summaries: {
+            "event.data.object": summarizeWebhookObject(possibleObjects["event.data.object"]),
+            "event.data": summarizeWebhookObject(possibleObjects["event.data"]),
+            "event.object": summarizeWebhookObject(possibleObjects["event.object"]),
+            "event": summarizeWebhookObject(possibleObjects["event"])
+          },
+          selected_object_summary: summarizeWebhookObject(object),
+          is_successful_payment: isSuccessfulWhopPayment(eventType, object)
+        },
+        sanitized_event: sanitizeWebhookForLog(event)
+      });
     if (isSuccessfulWhopPayment(eventType, object)) {
       await handlePaymentSucceeded(object);
     } else {
@@ -2985,3 +3013,172 @@ app.listen(PORT, () => {
   console.log(`Monaco app listening on port ${PORT}`);
   console.log(`Storage: Supabase only`);
 });
+
+
+
+function logWebhookDebug(label, payload) {
+  const text = JSON.stringify(payload, null, 2);
+
+  /*
+    Vercel logs can truncate long lines.
+    Split into chunks so you can copy the full webhook shape.
+  */
+  const chunkSize = 7000;
+
+  console.log(`${label} BEGIN`);
+
+  for (let i = 0; i < text.length; i += chunkSize) {
+    console.log(`${label} CHUNK ${Math.floor(i / chunkSize) + 1}: ${text.slice(i, i + chunkSize)}`);
+  }
+
+  console.log(`${label} END`);
+}
+
+function summarizeWebhookObject(value) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const metadata = value.metadata || value.checkout_metadata || value.custom_data || value.custom_fields || {};
+
+  return {
+    id:
+      value.id ||
+      value.payment_id ||
+      value.paymentId ||
+      value.pay_id ||
+      value.checkout_id ||
+      value.checkoutId ||
+      "",
+
+    type:
+      value.type ||
+      value.event ||
+      value.name ||
+      "",
+
+    status:
+      value.status ||
+      value.payment_status ||
+      value.paymentStatus ||
+      value.substatus ||
+      value.state ||
+      value.checkout_status ||
+      value.checkoutStatus ||
+      "",
+
+    paid_at:
+      value.paid_at ||
+      value.paidAt ||
+      value.completed_at ||
+      value.completedAt ||
+      "",
+
+    created_at:
+      value.created_at ||
+      value.createdAt ||
+      value.timestamp ||
+      "",
+
+    checkout_configuration_id:
+      value.checkout_configuration_id ||
+      value.checkoutConfigurationId ||
+      value.checkout_config_id ||
+      value.checkoutConfigId ||
+      metadata.checkout_configuration_id ||
+      metadata.checkoutConfigurationId ||
+      "",
+
+    checkout_session_id:
+      value.checkout_session_id ||
+      value.checkoutSessionId ||
+      value.session_id ||
+      value.sessionId ||
+      metadata.checkout_session_id ||
+      metadata.checkoutSessionId ||
+      metadata.session_id ||
+      metadata.sessionId ||
+      "",
+
+    local_session_id:
+      metadata.local_session_id ||
+      metadata.localSessionId ||
+      value.local_session_id ||
+      value.localSessionId ||
+      "",
+
+    email:
+      metadata.email ||
+      value.email ||
+      value.customer?.email ||
+      value.user?.email ||
+      value.member?.email ||
+      value.buyer?.email ||
+      findEmailInObject(value) ||
+      "",
+
+    name:
+      metadata.full_name ||
+      metadata.fullName ||
+      value.name ||
+      value.customer?.name ||
+      value.user?.name ||
+      value.member?.name ||
+      "",
+
+    amount:
+      value.total ||
+      value.amount ||
+      value.amount_total ||
+      value.final_amount ||
+      value.price ||
+      "",
+
+    currency:
+      value.currency ||
+      "",
+
+    metadata_keys: Object.keys(metadata || {}),
+    keys: Object.keys(value || {})
+  };
+}
+
+function sanitizeWebhookForLog(value, depth = 0) {
+  if (depth > 8) return "[Max depth reached]";
+
+  if (value === null || value === undefined) return value;
+
+  if (typeof value !== "object") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.slice(0, 20).map((item) => sanitizeWebhookForLog(item, depth + 1));
+  }
+
+  const output = {};
+
+  Object.keys(value).forEach((key) => {
+    const lower = key.toLowerCase();
+    const item = value[key];
+
+    if (
+      lower.includes("secret") ||
+      lower.includes("token") ||
+      lower.includes("authorization") ||
+      lower.includes("signature") ||
+      lower.includes("api_key") ||
+      lower.includes("apikey") ||
+      lower.includes("password") ||
+      lower.includes("card") ||
+      lower.includes("cvc")
+    ) {
+      output[key] = "[REDACTED]";
+      return;
+    }
+
+    output[key] = sanitizeWebhookForLog(item, depth + 1);
+  });
+
+  return output;
+}
