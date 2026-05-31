@@ -444,10 +444,7 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
             <div class="hub-badge">
               <span class="hub-label">Confirmed pass</span>
               <span class="hub-title">Monaco 2026</span>
-              <div class="hub-meta">
-                <span>Official Member</span>
-                <span>Referral active</span>
-              </div>
+           
             </div>
           </aside>
         </div>
@@ -704,7 +701,7 @@ async function loadMe() {
           referral_code: referralCode,
           referral_link: referralLink,
 
-          max_referrals: Number(d.max_referrals ?? d.maxReferrals ?? 2),
+          max_referrals: 2,
           paid_referrals: Number(d.paid_referrals ?? d.paidReferrals ?? 0),
 
           referrals: Array.isArray(d.referrals) ? d.referrals : []
