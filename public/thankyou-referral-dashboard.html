@@ -575,9 +575,23 @@ function googleStartUrlForCheckoutLinkingOnly() {
         return data;
       }
 
-      async function loadMe() {
-        return json(API.me);
-      }
+     function memberEmailFromUrl() {
+  return String(
+    params.get("member_email") ||
+      params.get("email") ||
+      ""
+  ).trim().toLowerCase();
+}
+
+async function loadMe() {
+  const email = memberEmailFromUrl();
+
+  if (email) {
+    return json(`${API.me}?email=${encodeURIComponent(email)}`);
+  }
+
+  return json(API.me);
+}
 
       function normalise(data) {
         const d = data.dashboard || data.customer || data;
@@ -845,12 +859,13 @@ function googleStartUrlForCheckoutLinkingOnly() {
           await json(API.inviteFriend, {
             method: "POST",
             body: JSON.stringify({
-              friend_name: friendName,
-              friend_email: friendEmail,
-              friend_phone: friendPhone,
-              friend_instagram: friendInstagram,
-              note
-            })
+  referrer_email: d.email || memberEmailFromUrl(),
+  friend_name: friendName,
+  friend_email: friendEmail,
+  friend_phone: friendPhone,
+  friend_instagram: friendInstagram,
+  note
+})
           });
 
           if (nameInput) nameInput.value = "";
@@ -1239,9 +1254,9 @@ function googleStartUrlForCheckoutLinkingOnly() {
           });
         });
 
-        bindSetPasswordForm();
+        bindSetPasswordForm(d);
       }
-function bindSetPasswordForm() {
+function bindSetPasswordForm(d = {}) {
   const form = $("setPasswordForm");
   const passwordInput = $("newDashboardPassword");
   const currentPasswordInput = $("currentDashboardPassword");
@@ -1273,9 +1288,10 @@ function bindSetPasswordForm() {
       await json(API.passwordSet, {
         method: "POST",
         body: JSON.stringify({
-          password,
-          current_password: currentPassword
-        })
+  email: d.email || memberEmailFromUrl(),
+  password,
+  current_password: currentPassword
+})
       });
 
       passwordInput.value = "";
