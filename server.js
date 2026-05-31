@@ -2637,30 +2637,102 @@ async function createServerSession(res, email) {
 }
 
 async function sessionEmail(req) {
-  const token = String(req.cookies?.[SESSION_COOKIE] || "");
+  const tokens = getSessionCookieTokens(req);
 
-  if (!token) return "";
+  if (!tokens.length) {
+    console.warn("SESSION LOOKUP: no session cookie received", {
+      cookie_header_present: Boolean(req.get("cookie")),
+      cookie_names: Object.keys(req.cookies || {})
+    });
+
+    return "";
+  }
+
+  const tokenHashes = tokens.map((token) => sha256(token));
 
   const { data, error } = await db()
     .from("monaco_sessions")
-    .select("customer_email, expires_at, revoked_at")
-    .eq("token_hash", sha256(token))
-    .maybeSingle();
+    .select("customer_email, expires_at, revoked_at, token_hash")
+    .in("token_hash", tokenHashes)
+    .order("created_at", { ascending: false })
+    .limit(20);
 
-  if (error || !data || data.revoked_at) return "";
+  if (error) {
+    console.warn("SESSION LOOKUP: Supabase error", {
+      message: error.message,
+      code: error.code
+    });
 
-  if (new Date(data.expires_at).getTime() <= Date.now()) {
+    return "";
+  }
+
+  const nowMs = Date.now();
+
+  const validSession = (data || []).find((row) => {
+    if (!row) return false;
+    if (row.revoked_at) return false;
+    if (!row.expires_at) return false;
+    return new Date(row.expires_at).getTime() > nowMs;
+  });
+
+  if (!validSession) {
+    console.warn("SESSION LOOKUP: no matching valid session", {
+      received_cookie_count: tokens.length,
+      received_cookie_names: Object.keys(req.cookies || {}),
+      matching_rows: (data || []).length,
+      rows: (data || []).map((row) => ({
+        customer_email: row.customer_email,
+        expires_at: row.expires_at,
+        revoked: Boolean(row.revoked_at)
+      }))
+    });
+
     return "";
   }
 
   db()
     .from("monaco_sessions")
     .update({ last_seen_at: now() })
-    .eq("token_hash", sha256(token))
+    .eq("token_hash", validSession.token_hash)
     .then(() => {})
     .catch(() => {});
 
-  return cleanEmail(data.customer_email);
+  return cleanEmail(validSession.customer_email);
+}
+
+function getSessionCookieTokens(req) {
+  const tokens = [];
+
+  for (const name of ["monaco_session_v2", "monaco_session"]) {
+    const value = String(req.cookies?.[name] || "").trim();
+    if (value) tokens.push(value);
+  }
+
+  /*
+    cookie-parser only gives one value per cookie name.
+    Browsers can send duplicate cookie names when old cookies exist with
+    different paths/domains, so parse the raw Cookie header too.
+  */
+  const rawCookieHeader = String(req.get("cookie") || "");
+
+  rawCookieHeader.split(";").forEach((part) => {
+    const index = part.indexOf("=");
+    if (index === -1) return;
+
+    const name = part.slice(0, index).trim();
+    const value = part.slice(index + 1).trim();
+
+    if (name !== "monaco_session_v2" && name !== "monaco_session") return;
+    if (!value) return;
+
+    try {
+      tokens.push(decodeURIComponent(value));
+    } catch {
+      tokens.push(value);
+    }
+  });
+
+  return [...new Set(tokens.filter(Boolean))];
 }
 
 async function clearServerSession(req, res) {
