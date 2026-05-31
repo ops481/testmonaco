@@ -4,965 +4,346 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Monaco Members Dashboard · Grow Acquisition</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --bg: #f5f7f4;
-      --card: #ffffff;
-      --fg: #0e0e0e;
-      --muted: #4b4b4b;
-      --line: #e4e8e3;
-      --accent: #0e5732;
-      --accent-2: #174a32;
-      --gold: #ccb784;
-      --soft: #eef4ee;
-      --error: #8a1f1f;
-      --warn: #7a5a13;
-      --shadow: 0 18px 50px rgba(14,87,50,.08);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      overflow-x: hidden;
-    }
-
-    body {
-      font-family: "Inter", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-      color: var(--fg);
-      background:
-        radial-gradient(circle at top left, rgba(204,183,132,.18), transparent 30%),
-        var(--bg);
-      line-height: 1.55;
-      letter-spacing: .012em;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    .container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .confirm-bar {
-      background: var(--accent);
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .confirm-bar .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      padding-top: 8px;
-      padding-bottom: 8px;
-      font-size: 14px;
-      text-align: center;
-    }
-
-    .cb-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 0 4px rgba(204,183,132,.22);
-    }
-
-    .top {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(245,247,244,.92);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(14px);
-    }
-
-    .top-row {
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 14px 24px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .logo {
-      height: 26px;
-      width: auto;
-    }
-
-    .brand-divider {
-      width: 1px;
-      height: 22px;
-      background: var(--line);
-    }
-
-    .brand-title {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .btn,
-    button {
-      border: 0;
-      cursor: pointer;
-    }
-
-    .btn,
-    .ghost-btn,
-    .secondary-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      border-radius: 999px;
-      font-weight: 850;
-      white-space: nowrap;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
-    }
-
-    .btn {
-      background: var(--accent);
-      color: #fff;
-      padding: 14px 22px;
-      box-shadow: 0 6px 16px rgba(14,87,50,.18);
-    }
-
-    .btn:hover {
-      background: var(--accent-2);
-      transform: translateY(-1px);
-      box-shadow: 0 12px 24px rgba(14,87,50,.24);
-    }
-
-    .secondary-btn,
-    .ghost-btn {
-      background: #fff;
-      color: var(--accent);
-      border: 1.5px solid rgba(14,87,50,.20);
-      padding: 11px 16px;
-      box-shadow: none;
-    }
-
-    .ghost-btn {
-      font-size: 13px;
-      padding: 8px 13px;
-    }
-
-    .secondary-btn:hover,
-    .ghost-btn:hover {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    button:disabled {
-      opacity: .64;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-
-    .google-btn {
-      width: 100%;
-      background: #fff;
-      color: #1f1f1f;
-      border: 1px solid #dadce0;
-      box-shadow: 0 8px 20px rgba(0,0,0,.05);
-    }
-
-    .google-btn:hover {
-      background: #fff;
-      color: #1f1f1f;
-    }
-
-    .google-mark {
-      width: 20px;
-      height: 20px;
-      flex: 0 0 auto;
-    }
-
-    .hero {
-      padding: 42px 0 22px;
-    }
-
-    .hero-card {
-      position: relative;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: stretch;
-      gap: 0;
-      min-height: 210px;
-      border-radius: 24px;
-      color: #fff;
-      background:
-        radial-gradient(circle at 18% 12%, rgba(204,183,132,.32), transparent 30%),
-        linear-gradient(135deg, #143d2a 0%, #0e5732 48%, #092417 100%);
-      box-shadow: 0 22px 56px rgba(14,87,50,.18);
-    }
-
-    .hero-card::before {
-      content: "";
-      position: absolute;
-      inset: 14px;
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 18px;
-      pointer-events: none;
-    }
-
-    .hero-copy {
-      position: relative;
-      z-index: 1;
-      padding: clamp(28px, 4.5vw, 46px);
-      align-self: center;
-    }
-
-    .eyebrow,
-    .panel-kicker {
-      color: var(--accent);
-      font-size: 12px;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      font-weight: 900;
-    }
-
-    .hero-card .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-      color: #e9d8a5;
-    }
-
-    .hero-card .eyebrow::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--gold);
-      box-shadow: 0 0 0 4px rgba(204,183,132,.18);
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin: 0;
-    }
-
-    h1 {
-      font-size: clamp(34px, 5vw, 58px);
-      line-height: .98;
-      letter-spacing: -.045em;
-      font-weight: 760;
-    }
-
-    h2 {
-      font-size: clamp(25px, 3vw, 34px);
-      line-height: 1.08;
-      letter-spacing: -.03em;
-      font-weight: 760;
-    }
-
-    h3 {
-      font-size: 18px;
-      line-height: 1.15;
-      letter-spacing: -.01em;
-      font-weight: 800;
-    }
-
-    .lead {
-      max-width: 560px;
-      margin-top: 12px;
-      color: rgba(255,255,255,.76);
-      font-size: 16px;
-      font-weight: 550;
-    }
-
-    .hero-accent {
-      position: relative;
-      z-index: 1;
-      width: min(34vw, 330px);
-      min-width: 260px;
-      display: grid;
-      place-items: center;
-      padding: 28px;
-      border-left: 2px dotted rgba(255,255,255,.25);
-      background: #272e26;
-    }
-
-    .hub-badge {
-      width: 100%;
-      border-radius: 20px;
-      padding: 18px;
-      background: #272e26;
-      color: #fff;
-      box-shadow: 0 20px 46px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08);
-    }
-
-    .hub-label {
-      display: block;
-      color: var(--gold);
-      font-size: 11px;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      font-weight: 900;
-    }
-
-    .hub-title {
-      display: block;
-      margin-top: 6px;
-      font-size: 28px;
-      line-height: 1;
-      letter-spacing: -.04em;
-      font-weight: 900;
-      color: #fff;
-    }
-
-    .hub-meta {
-      display: grid;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .hub-meta span,
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      padding: 7px 11px;
-      background: rgba(204,183,132,.18);
-      color: #6e581c;
-      font-size: 12px;
-      font-weight: 850;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-    }
-
-    .hub-meta span {
-      color: rgba(255,255,255,.78);
-      border: 1px solid rgba(255,255,255,.12);
-    }
-
-    .hub-meta span:first-child {
-      background: var(--gold);
-      color: #241d0c;
-      border-color: transparent;
-    }
-
-    .section {
-      padding: 0 0 64px;
-    }
-
-    .state {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 24px;
-      color: var(--muted);
-      box-shadow: var(--shadow);
-      font-weight: 650;
-    }
-
-    .state.error {
-      color: var(--error);
-      background: #fff7f7;
-      border-color: rgba(138,31,31,.18);
-    }
-
-    .state.warn {
-      color: var(--warn);
-      background: rgba(204,183,132,.14);
-      border-color: rgba(204,183,132,.42);
-    }
-
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: clamp(22px, 3.5vw, 32px);
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-    }
-
-    .panel-head {
-      display: flex;
-      align-items: start;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .panel-head p,
-    .panel p {
-      color: var(--muted);
-      font-weight: 550;
-    }
-
-    .small-note {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 550;
-    }
-
-    .input,
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fbfcfb;
-      color: var(--fg);
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    .input::placeholder,
-    input::placeholder,
-    textarea::placeholder {
-      color: #a8ada6;
-    }
-
-    .input:focus,
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(14,87,50,.12);
-      background: #fff;
-    }
-
-    .auth-wrap {
-      max-width: 980px;
-      margin: 0 auto;
-    }
-
-    .auth-card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: var(--shadow);
-      padding: clamp(24px, 4vw, 38px);
-    }
-
-    .auth-title {
-      max-width: 720px;
-      margin: 0 auto 24px;
-      text-align: center;
-    }
-
-    .auth-title .panel-kicker {
-      margin-bottom: 8px;
-    }
-
-    .auth-title p {
-      margin-top: 12px;
-      color: var(--muted);
-      font-weight: 550;
-    }
-
-    .auth-google {
-      max-width: 440px;
-      margin: 0 auto 24px;
-    }
-
-    .auth-divider {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin: 20px 0 24px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      font-weight: 850;
-    }
-
-    .auth-divider::before,
-    .auth-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--line);
-    }
-
-    .auth-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      align-items: stretch;
-    }
-
-    .auth-option {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 20px;
-      background: #fbfcfb;
-    }
-
-    .auth-option.featured {
-      background:
-        radial-gradient(circle at top right, rgba(204,183,132,.28), transparent 34%),
-        #fff;
-      border-color: rgba(14,87,50,.18);
-    }
-
-    .auth-option h3 {
-      margin-bottom: 7px;
-    }
-
-    .auth-option p {
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 550;
-      margin-bottom: 15px;
-    }
-
-    .form-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    .form-message {
-      display: block;
-      min-height: 18px;
-      margin-top: 12px;
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 750;
-    }
-
-    .form-message.error {
-      color: var(--error);
-    }
-
-    .app-shell {
-      display: grid;
-      grid-template-columns: 235px 1fr;
-      gap: 24px;
-      align-items: start;
-    }
-
-    .sidebar {
-      position: sticky;
-      top: 82px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 10px;
-      box-shadow: var(--shadow);
-    }
-
-    .sidebar-title {
-      padding: 10px 11px 12px;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 8px;
-    }
-
-    .sidebar-title strong {
-      display: block;
-      font-size: 14px;
-      font-weight: 850;
-    }
-
-    .sidebar-title span {
-      display: block;
-      margin-top: 1px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 650;
-    }
-
-    .dashboard-nav {
-      display: grid;
-      gap: 4px;
-    }
-
-    .dash-tab {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 11px;
-      border-radius: 12px;
-      background: transparent;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 800;
-      text-align: left;
-    }
-
-    .dash-tab:hover {
-      background: #f7f8f5;
-      color: var(--accent);
-    }
-
-    .dash-tab.is-active {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .dash-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 8px;
-      display: inline-grid;
-      place-items: center;
-      background: rgba(14,87,50,.08);
-      color: var(--accent);
-      font-size: 13px;
-    }
-
-    .dash-tab.is-active .dash-icon {
-      background: rgba(255,255,255,.16);
-      color: #fff;
-    }
-
-    .main-panel {
-      min-width: 0;
-    }
-
-    .dashboard-page {
-      display: none;
-    }
-
-    .dashboard-page.is-active {
-      display: block;
-      animation: fadeUp .2s ease-out;
-    }
-
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(5px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .stat-card {
-      border-top: 1px solid var(--line);
-      padding-top: 14px;
-    }
-
-    .stat-card strong {
-      display: block;
-      font-size: 30px;
-      line-height: 1;
-      letter-spacing: -.04em;
-      margin-bottom: 5px;
-    }
-
-    .stat-card span {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .profile-grid,
-    .referral-meta,
-    .community-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 12px;
-    }
-
-    .info-box {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #fbfcfb;
-      padding: 16px;
-    }
-
-    .info-box span {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .info-box strong {
-      display: block;
-      font-size: 15px;
-      word-break: break-word;
-    }
-
-    .link-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .notice {
-      margin: 16px 0;
-      padding: 14px 16px;
-      border-radius: 14px;
-      background: rgba(204,183,132,.18);
-      border: 1px solid rgba(204,183,132,.46);
-      color: #6e581c;
-    }
-
-    .notice p {
-      color: #6e581c;
-      font-weight: 750;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      border-top: 1px solid var(--line);
-      margin-top: 16px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 620px;
-    }
-
-    th,
-    td {
-      padding: 13px 10px;
-      border-bottom: 1px solid var(--line);
-      text-align: left;
-      font-size: 14px;
-    }
-
-    th {
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      font-weight: 900;
-    }
-
-    td {
-      color: var(--fg);
-      font-weight: 600;
-    }
-
-    .status {
-      display: inline-flex;
-      border-radius: 999px;
-      padding: 5px 9px;
-      background: rgba(14,87,50,.08);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 850;
-      text-transform: capitalize;
-    }
-
-    .status-pending,
-    .status-processing {
-      background: rgba(204,183,132,.22);
-      color: #6e581c;
-    }
-
-    .status-failed,
-    .status-cancelled {
-      background: rgba(138,31,31,.08);
-      color: var(--error);
-    }
-
-    .invite-form {
-      display: grid;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .row2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .course-frame {
-      margin-top: 16px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      overflow: hidden;
-      background: #fff;
-    }
-
-    .course-frame iframe {
-      width: 100%;
-      height: 720px;
-      border: 0;
-      display: block;
-    }
-
-    footer {
-      padding: 34px 0 42px;
-      border-top: 1px solid var(--line);
-    }
-
-    .footer-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    @media (max-width: 900px) {
-      .hero-card {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-accent {
-        width: auto;
-        min-width: 0;
-        display: block;
-        border-left: 0;
-        border-top: 2px dotted rgba(255,255,255,.25);
-        padding: 0 clamp(28px, 4.5vw, 46px) clamp(28px, 4.5vw, 46px);
-        background: transparent;
-      }
-
-      .hub-badge {
-        max-width: 360px;
-      }
-
-      .auth-grid,
-      .app-shell {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: static;
-      }
-
-      .dashboard-nav {
-        grid-template-columns: repeat(4, 1fr);
-      }
-
-      .dash-tab {
-        justify-content: center;
-      }
-
-      .sidebar-title {
-        display: none;
-      }
-    }
-
-    @media (max-width: 680px) {
-      .container,
-      .top-row {
-        padding-left: 18px;
-        padding-right: 18px;
-      }
-
-      .brand-title,
-      .brand-divider {
-        display: none;
-      }
-
-      .hero {
-        padding-top: 30px;
-      }
-
-      .hero-card,
-      .panel,
-      .auth-card {
-        border-radius: 16px;
-      }
-
-      .stats-grid,
-      .profile-grid,
-      .referral-meta,
-      .community-grid,
-      .row2,
-      .link-row {
-        grid-template-columns: 1fr;
-      }
-
-      .dashboard-nav {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .dash-tab {
-        justify-content: flex-start;
-      }
-
-      .btn,
-      .secondary-btn {
-        width: 100%;
-      }
-
-      .footer-row {
-        display: grid;
-        justify-items: start;
-      }
-
-      .course-frame iframe {
-        height: 620px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/css/intlTelInput.css" />
+<style>
+:root {
+  --bg: #f5f7f4;
+  --card: #ffffff;
+  --fg: #0e0e0e;
+  --muted: #4b4b4b;
+  --line: #e4e8e3;
+  --accent: #0e5732;
+  --accent-2: #174a32;
+  --gold: #ccb784;
+  --sand: #e8e2d2;
+  --soft: #eef4ee;
+  --error: #8a1f1f;
+  --shadow: 0 18px 50px rgba(14,87,50,.06);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+body {
+  font-family: "Inter", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.55;
+  letter-spacing: .012em;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+button, input, select, textarea { font: inherit; }
+.container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+.hidden { display: none !important; }
+
+/* top */
+.confirm-bar { background: var(--accent); color: #fff; font-weight: 600; }
+.confirm-bar .container { display: flex; justify-content: center; align-items: center; gap: 10px; padding-top: 7px; padding-bottom: 7px; font-size: 14px; text-align: center; }
+.cb-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(204,183,132,.22); }
+.top { position: sticky; top: 0; z-index: 50; background: rgba(245,247,244,.92); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
+.top-row { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; }
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.logo { height: 26px; width: auto; }
+.brand-divider { width: 1px; height: 22px; background: var(--line); }
+.brand-title { color: var(--muted); font-size: 13px; font-weight: 700; white-space: nowrap; }
+.top-links { display: flex; align-items: center; gap: 10px; }
+
+/* buttons */
+.btn, button { border: 0; cursor: pointer; }
+.btn, .ghost-btn, .secondary-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  border-radius: 999px; font-weight: 800; white-space: nowrap; transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+}
+.btn { background: var(--accent); color: #fff; padding: 14px 22px; box-shadow: 0 6px 16px rgba(14,87,50,.18); }
+.btn:hover { background: var(--accent-2); transform: translateY(-1px); box-shadow: 0 12px 24px rgba(14,87,50,.24); }
+.ghost-btn, .secondary-btn { background: #fff; color: var(--accent); border: 1.5px solid rgba(14,87,50,.20); padding: 11px 16px; box-shadow: none; }
+.ghost-btn { font-size: 13px; padding: 8px 13px; }
+.secondary-btn:hover, .ghost-btn:hover { background: var(--accent); color: #fff; }
+button:disabled { opacity: .64; cursor: not-allowed; transform: none !important; }
+.google-btn { width: 100%; max-width: 420px; margin: 0 auto; background: #fff; color: #1f1f1f; border: 1px solid #dadce0; box-shadow: 0 8px 20px rgba(0,0,0,.05); }
+.google-btn:hover { background: #fff; color: #1f1f1f; }
+.google-mark { width: 20px; height: 20px; flex: 0 0 auto; }
+
+/* hero */
+.hero { padding: 42px 0 22px; }
+.hero-card {
+  position: relative; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; gap: 0;
+  min-height: 210px; border-radius: 24px; color: #fff;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(204,183,132,.32), transparent 30%),
+    linear-gradient(135deg, #143d2a 0%, #0e5732 48%, #092417 100%);
+  box-shadow: 0 22px 56px rgba(14,87,50,.18);
+}
+.hero-card::before {
+  content: ""; position: absolute; inset: 14px; border: 1px solid rgba(255,255,255,.16);
+  border-radius: 18px; pointer-events: none;
+}
+.hero-card::after {
+  content: ""; position: absolute; right: -80px; top: -120px; width: 270px; height: 270px;
+  border-radius: 50%; background: rgba(204,183,132,.22); pointer-events: none;
+}
+.hero-copy { position: relative; z-index: 1; padding: clamp(28px, 4.5vw, 46px); align-self: center; }
+.eyebrow, .panel-kicker { color: var(--accent); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; font-weight: 800; }
+.hero-card .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #e9d8a5;
+}
+.hero-card .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(204,183,132,.18); }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(34px, 5vw, 58px); line-height: .98; letter-spacing: -.045em; font-weight: 750; }
+h2 { font-size: clamp(25px, 3vw, 34px); line-height: 1.08; letter-spacing: -.03em; font-weight: 700; }
+h3 { font-size: 18px; line-height: 1.15; letter-spacing: -.01em; font-weight: 750; }
+.lead { max-width: 560px; margin-top: 12px; color: rgba(255,255,255,.72); font-size: 16px; font-weight: 500; }
+.hero-accent {
+  position: relative; z-index: 1; width: min(34vw, 330px); min-width: 260px;
+  display: grid; place-items: center; padding: 28px;
+  border-left: 2px dotted rgba(255,255,255,.25);
+  background: #272e26;
+}
+.hero-accent::before, .hero-accent::after {
+  content: ""; position: absolute; left: -13px; width: 26px; height: 26px; border-radius: 50%; background: var(--bg);
+}
+.hero-accent::before { top: -13px; }
+.hero-accent::after { bottom: -13px; }
+.hub-badge {
+  width: 100%; border-radius: 20px; padding: 18px;
+  background: #272e26; color: #fff;
+  box-shadow: 0 20px 46px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.08);
+}
+.hub-label { display: block; color: var(--gold); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; font-weight: 850; }
+.hub-title { display: block; margin-top: 6px; font-size: 28px; line-height: 1; letter-spacing: -.04em; font-weight: 850; color: #fff; }
+.hub-meta { display: grid; gap: 8px; margin-top: 16px; }
+.hub-meta span, .pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; padding: 7px 11px; background: rgba(204,183,132,.18); color: #6e581c;
+  font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+}
+.hub-meta span { color: rgba(255,255,255,.78); border: 1px solid rgba(255,255,255,.12); }
+.hub-meta span:first-child { background: var(--gold); color: #241d0c; border-color: transparent; }
+
+/* layout */
+.section { padding: 0 0 64px; }
+.card { background: transparent; border: 0; padding: 0; box-shadow: none; }
+.app-shell { display: grid; grid-template-columns: 235px 1fr; gap: 24px; align-items: start; }
+.sidebar { position: sticky; top: 82px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 10px; box-shadow: var(--shadow); }
+.sidebar-title { padding: 10px 11px 12px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.sidebar-title strong { display: block; font-size: 14px; font-weight: 800; }
+.sidebar-title span { display: block; margin-top: 1px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.dashboard-nav { display: grid; gap: 4px; }
+.dash-tab { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 11px; border-radius: 12px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 750; text-align: left; }
+.dash-tab:hover { background: #f7f8f5; color: var(--accent); }
+.dash-tab.is-active { background: var(--accent); color: #fff; }
+.dash-icon { width: 24px; height: 24px; border-radius: 8px; display: inline-grid; place-items: center; background: rgba(14,87,50,.08); color: var(--accent); font-size: 13px; }
+.dash-tab.is-active .dash-icon { background: rgba(255,255,255,.16); color: #fff; }
+.main-panel { min-width: 0; }
+.dashboard-page { display: none; }
+.dashboard-page.is-active { display: block; animation: fadeUp .2s ease-out; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: clamp(22px, 3.5vw, 32px); box-shadow: var(--shadow); margin-bottom: 16px; }
+.panel-head { display: flex; align-items: start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.panel-head p, .panel p, .card p { color: var(--muted); font-weight: 500; }
+.panel-kicker { margin-bottom: 6px; }
+.small-note { margin-top: 14px; color: var(--muted); font-size: 13px; font-weight: 500; }
+
+/* content */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+.stat-card { border-top: 1px solid var(--line); padding-top: 14px; }
+.stat-card strong { display: block; font-size: 30px; line-height: 1; letter-spacing: -.04em; margin-bottom: 5px; }
+.stat-card span { color: var(--muted); font-size: 13px; font-weight: 650; }
+.link-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 16px; }
+.input, input, select, textarea { width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfb; color: var(--fg); }
+.input::placeholder, input::placeholder { color: #a8ada6; }
+.input:focus, input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,87,50,.12); background: #fff; }
+.inline-actions, .invite-actions, .community-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.compact-note { padding: 14px 0 0; margin-top: 16px; border-top: 1px solid var(--line); }
+.profile-card {
+  position: relative; overflow: hidden; border-radius: 18px; padding: 22px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(204,183,132,.30), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f4f7f2 100%);
+  border: 1px solid rgba(14,87,50,.14);
+}
+.profile-card::after {
+  content: ""; position: absolute; right: -46px; bottom: -70px; width: 170px; height: 170px; border-radius: 50%;
+  background: rgba(14,87,50,.07); pointer-events: none;
+}
+.profile-card-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; align-items: start; }
+.profile-icon {
+  width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-size: 25px; box-shadow: 0 12px 26px rgba(14,87,50,.20);
+}
+.profile-card h3 { margin-bottom: 6px; }
+.profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+.profile-field { border-top: 1px solid var(--line); padding-top: 11px; }
+.profile-field span { display: block; color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+.profile-field strong { display: block; margin-top: 2px; font-size: 14px; word-break: break-word; }
+.profile-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.profile-card .small-note { margin-top: 12px; }
+.placeholder-box { background: transparent; border: 0; border-radius: 0; padding: 0; }
+.notice { margin: 16px 0; padding: 14px 16px; border-radius: 14px; background: rgba(204,183,132,.18); border: 1px solid rgba(204,183,132,.46); color: #6e581c; }
+.notice p { color: #6e581c; font-weight: 700; }
+.course-frame { margin-top: 16px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: #fff; }
+.course-frame iframe { width: 100%; height: 720px; border: 0; display: block; }
+.table-wrap { overflow-x: auto; border-top: 1px solid var(--line); margin-top: 6px; }
+table { width: 100%; border-collapse: collapse; min-width: 620px; }
+th, td { padding: 13px 10px; border-bottom: 1px solid var(--line); text-align: left; font-size: 14px; }
+th { color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 800; }
+td { color: var(--fg); font-weight: 550; }
+.status { display: inline-flex; border-radius: 999px; padding: 5px 9px; background: rgba(14,87,50,.08); color: var(--accent); font-size: 12px; font-weight: 800; text-transform: capitalize; }
+.status-pending, .status-processing { background: rgba(204,183,132,.22); color: #6e581c; }
+.status-failed, .status-cancelled { background: rgba(138,31,31,.08); color: var(--error); }
+
+
+.referral-group {
+  display: grid; grid-template-columns: minmax(0, 1.18fr) .82fr; gap: 18px; align-items: stretch; margin-bottom: 18px;
+}
+.referral-card {
+  border: 1px solid var(--line); border-radius: 16px; background: #fbfcfb; padding: 18px;
+}
+.referral-card.feature {
+  background:
+    radial-gradient(circle at 96% 0%, rgba(204,183,132,.24), transparent 34%),
+    #fff;
+}
+.referral-card h3 { margin-bottom: 7px; }
+.referral-progress {
+  display: grid; align-content: space-between; gap: 14px; background: rgba(14,87,50,.055);
+  border-color: rgba(14,87,50,.18);
+}
+.progress-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.progress-top strong { font-size: 34px; letter-spacing: -.05em; line-height: 1; color: var(--accent); }
+.progress-top span { color: var(--muted); font-size: 13px; font-weight: 700; }
+.progress-track { height: 8px; border-radius: 999px; overflow: hidden; background: rgba(14,87,50,.12); }
+.progress-fill { height: 100%; border-radius: inherit; background: var(--accent); }
+.referral-meta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 14px; }
+.referral-meta span { display: block; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 800; }
+.referral-meta strong { display: block; margin-top: 2px; font-size: 15px; }
+.referral-activity-card {
+  position: relative; overflow: hidden; border-radius: 18px; padding: 22px; margin-top: 22px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(204,183,132,.30), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f4f7f2 100%);
+  border: 1px solid rgba(14,87,50,.14);
+}
+.referral-activity-card::after {
+  content: ""; position: absolute; right: -46px; bottom: -70px; width: 170px; height: 170px; border-radius: 50%;
+  background: rgba(14,87,50,.07); pointer-events: none;
+}
+.referral-activity-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; align-items: start; }
+.referral-activity-icon {
+  width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-size: 25px; box-shadow: 0 12px 26px rgba(14,87,50,.20);
+}
+.referral-table-head { display: flex; align-items: start; justify-content: space-between; gap: 14px; margin-bottom: 14px; }
+.referral-table-head h3 { margin-bottom: 6px; }
+.referral-table-head p { margin-top: 0; }
+.referral-activity-meta { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: 7px 11px; background: rgba(204,183,132,.18); color: #6e581c; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.referral-activity-card .table-wrap { position: relative; z-index: 1; margin-top: 0; border-top: 1px solid var(--line); }
+.whatsapp-card {
+  position: relative; overflow: hidden; border-radius: 18px; padding: 22px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(204,183,132,.30), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f4f7f2 100%);
+  border: 1px solid rgba(14,87,50,.14);
+}
+.whatsapp-card::after {
+  content: ""; position: absolute; right: -46px; bottom: -70px; width: 170px; height: 170px; border-radius: 50%;
+  background: rgba(14,87,50,.07); pointer-events: none;
+}
+.whatsapp-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 58px minmax(0,1fr); gap: 16px; align-items: start; }
+.whatsapp-icon {
+  width: 58px; height: 58px; border-radius: 18px; display: grid; place-items: center;
+  background: var(--accent); color: #fff; font-size: 26px; box-shadow: 0 12px 26px rgba(14,87,50,.20);
+}
+.whatsapp-card h3 { margin-bottom: 6px; }
+.whatsapp-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.whatsapp-card .small-note { margin-top: 12px; }
+.wa-meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+.wa-meta {
+  border-top: 1px solid var(--line); padding-top: 11px;
+}
+.wa-meta span { display: block; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 800; }
+.wa-meta strong { display: block; margin-top: 2px; font-size: 14px; word-break: break-word; }
+
+/* login */
+.login-wrap { min-height: calc(100dvh - 128px); display: grid; place-items: center; padding: clamp(18px, 4vw, 34px) 0; }
+.login-card-clean { width: min(100%, 480px); max-height: calc(100dvh - 96px); overflow-y: auto; text-align: center; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: clamp(24px, 4vw, 34px); box-shadow: var(--shadow); }
+.login-logo { height: 30px; width: auto; margin: 0 auto 22px; }
+.login-card-clean h2 { margin-bottom: 10px; font-size: clamp(25px, 4vw, 34px); }
+.login-card-clean p { color: var(--muted); font-weight: 500; }
+.login-google-btn { margin-top: 22px; }
+.login-error { margin-top: 16px; text-align: left; }
+.login-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0 14px; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.login-divider::before, .login-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.login-form { display: grid; gap: 9px; margin-top: 12px; text-align: left; }
+.login-form label { font-size: 13px; font-weight: 800; }
+.login-form .small-note { text-align: center; margin-top: 6px; }
+.login-helper-box { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: #fbfcfb; text-align: center; }
+.login-helper-box .secondary-btn { width: 100%; margin-top: 10px; }
+.login-helper-box .small-note { margin-top: 0; }
+.state { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; color: var(--accent); font-weight: 750; box-shadow: var(--shadow); }
+.state.error { color: var(--error); }
+.state.warn { color: #7a5a13; }
+
+/* modal */
+.modal-overlay { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 22px; background: rgba(14,14,14,.48); backdrop-filter: blur(8px); }
+.modal-overlay.is-open { display: flex; }
+.modal-card { width: min(100%, 720px); background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(22px, 4vw, 30px); position: relative; }
+.modal-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 999px; background: #f7f8f5; color: var(--fg); font-size: 22px; line-height: 1; }
+.invite-form { display: grid; gap: 12px; margin-top: 18px; }
+.contact-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; }
+.invite-message { display: block; color: var(--accent); font-size: 13px; font-weight: 700; }
+.invite-message.error { color: var(--error); }
+.modal-success {
+  display: none; align-items: flex-start; gap: 12px; padding: 15px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(14,87,50,.10), rgba(204,183,132,.18));
+  border: 1px solid rgba(14,87,50,.14); color: var(--accent); font-weight: 800;
+  box-shadow: 0 12px 30px rgba(14,87,50,.08);
+}
+.modal-success.is-visible { display: flex; }
+.success-icon { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 999px; display: grid; place-items: center; background: var(--accent); color: #fff; font-weight: 900; }
+.success-copy strong { display: block; color: var(--accent); font-size: 15px; line-height: 1.2; }
+.success-copy span { display: block; margin-top: 3px; color: var(--muted); font-size: 13px; font-weight: 650; }
+.iti { width: 100%; display: block; }
+.iti input, .iti input[type=tel] { width: 100%; min-height: 48px; padding-top: 13px; padding-bottom: 13px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfb; }
+.iti__selected-country { border-radius: 11px 0 0 11px; padding-left: 12px; background: linear-gradient(135deg, rgba(204,183,132,.22), rgba(14,87,50,.07)); }
+.iti__dropdown-content { border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 18px 50px rgba(14,87,50,.16); overflow: hidden; font-family: inherit; }
+
+footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
+.footer-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 13px; font-weight: 600; }
+
+@media (max-width: 900px) {
+  .hero-card { grid-template-columns: 1fr; }
+  .hero-card, .panel-head { display: block; }
+  .hero-accent { width: auto; min-width: 0; display: block; border-left: 0; border-top: 2px dotted rgba(255,255,255,.25); padding: 0 clamp(28px, 4.5vw, 46px) clamp(28px, 4.5vw, 46px); background: transparent; }
+  .hero-accent::before, .hero-accent::after { display: none; }
+  .hub-badge { max-width: 360px; }
+  .app-shell, .referral-group { grid-template-columns: 1fr; }
+  .sidebar { position: static; }
+  .dashboard-nav { grid-template-columns: repeat(4, 1fr); }
+  .dash-tab { justify-content: center; }
+  .sidebar-title { display: none; }
+}
+@media (max-width: 680px) {
+  .container, .top-row { padding-left: 18px; padding-right: 18px; }
+  .brand-title, .brand-divider { display: none; }
+  .hero { padding-top: 30px; }
+  .hero-card, .panel, .login-card-clean { border-radius: 16px; }
+  .stats-grid, .profile-grid, .link-row, .contact-row, .referral-meta, .wa-meta-grid, .whatsapp-grid, .profile-card-grid, .referral-activity-grid { grid-template-columns: 1fr; }
+  .dashboard-nav { grid-template-columns: 1fr 1fr; }
+  .dash-tab { justify-content: flex-start; }
+  .btn, .secondary-btn { width: 100%; }
+  .footer-row { display: grid; justify-items: start; }
+  .course-frame iframe { height: 620px; }
+  .referral-table-head { display: grid; gap: 10px; }
+  .referral-activity-meta { justify-self: start; }
+}
+</style>
 </head>
-
 <body>
   <div class="confirm-bar">
     <div class="container">
@@ -979,7 +360,9 @@
         <span class="brand-title">Monaco Content Retreat</span>
       </a>
 
-      <button class="ghost-btn hidden" id="logoutBtn" type="button">Log out</button>
+      <nav class="top-links">
+        <button class="ghost-btn hidden" id="logoutBtn" type="button">Log out</button>
+      </nav>
     </div>
   </header>
 
@@ -992,14 +375,13 @@
             <h1>Your Monaco hub</h1>
             <p class="lead">Everything you need before Monaco: referrals, curriculum, and community access.</p>
           </div>
-
           <aside class="hero-accent" aria-label="Booking summary">
             <div class="hub-badge">
               <span class="hub-label">Confirmed pass</span>
               <span class="hub-title">Monaco 2026</span>
               <div class="hub-meta">
                 <span>Member</span>
-                <span>Email matched</span>
+                <span>Referral active</span>
               </div>
             </div>
           </aside>
@@ -1009,7 +391,7 @@
 
     <section class="section">
       <div class="container">
-        <div id="app">
+        <div class="card" id="app">
           <div class="state">Loading dashboard...</div>
         </div>
       </div>
@@ -1020,33 +402,54 @@
     <div class="container">
       <div class="footer-row">
         <img src="ga-wordmark.png" alt="grow acquisition" style="height:30px;width:auto;" />
-        <div>Grow Acquisition. Copyright 2026. All rights reserved.</div>
+        <div class="copy">Grow Acquisition. Copyright 2026. All rights reserved.</div>
       </div>
     </div>
   </footer>
 
-  <script>
-    (function () {
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/intlTelInput.min.js"></script>
+  <script>    (function() {
       const app = document.getElementById("app");
       const logoutBtn = document.getElementById("logoutBtn");
+      const heroSection = document.getElementById("heroSection");
       const params = new URLSearchParams(location.search);
 
+      /*
+        IMPORTANT:
+        Replace this with your real WhatsApp group invite link.
+        Example: "https://chat.whatsapp.com/AbCdEfGhIjKlMnOpQrStUv"
+      */
       const WHATSAPP_GROUP_INVITE_URL = "https://chat.whatsapp.com/GeSjfsgJQDI8iEdoY5jLo0";
 
-      const API = {
-        complete: "/api/referrals/complete-checkout",
-        me: "/api/referrals/me",
-        login: "/api/referrals/login",
-        logout: "/api/referrals/logout",
-        googleStart: "/auth/google/start",
-        passwordLogin: "/api/referrals/password-login",
-        passwordSet: "/api/referrals/password-set",
-        passwordSetWithToken: "/api/referrals/password-set-with-token",
-        passwordSetupToken: "/api/referrals/password-setup-token",
-        passwordSetupRequest: "/api/referrals/password-setup-request",
-        inviteFriend: "/api/referrals/invite-friend"
-      };
+      /*
+        Optional fallback. Replace with your team WhatsApp number in international format,
+        with numbers only, no plus sign or spaces. Example: "447700900000"
+      */
+      const WHATSAPP_SUPPORT_NUMBER = "";
 
+      /*
+        Referral invitations now go through the backend first.
+        The backend saves the invite in Supabase, then optionally calls Google Apps Script.
+      */
+      const REFERRAL_INVITE_SCRIPT_URL = "";
+
+      const INTL_TEL_INPUT_UTILS_URL = "https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/utils.js";
+      let invitePhoneInput = null;
+
+  const API = {
+  complete: "/api/referrals/complete-checkout",
+  me: "/api/referrals/me",
+  session: "/api/referrals/session",
+  login: "/api/referrals/login",
+  logout: "/api/referrals/logout",
+  googleStart: "/auth/google/start",
+  passwordLogin: "/api/referrals/password-login",
+  passwordSet: "/api/referrals/password-set",
+  passwordSetWithToken: "/api/referrals/password-set-with-token",
+  passwordSetupToken: "/api/referrals/password-setup-token",
+  passwordSetupRequest: "/api/referrals/password-setup-request",
+  inviteFriend: "/api/referrals/invite-friend"
+};
       const MAX_ATTEMPTS = 10;
       const RETRY_DELAY_MS = 1200;
 
@@ -1054,31 +457,22 @@
         return document.getElementById(id);
       }
 
-      function esc(value) {
-        return String(value ?? "").replace(/[&<>"']/g, function (char) {
-          return {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-          }[char];
-        });
-      }
-
       function sleep(ms) {
-        return new Promise(function (resolve) {
-          setTimeout(resolve, ms);
-        });
+        return new Promise((resolve) => setTimeout(resolve, ms));
       }
 
-      function state(message, type) {
-        app.innerHTML = '<div class="state ' + (type === "error" ? "error" : type === "warn" ? "warn" : "") + '">' + esc(message) + "</div>";
+      function esc(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        }[char]));
       }
 
       function date(value) {
         if (!value) return "—";
-
         const d = new Date(value);
 
         return Number.isFinite(d.getTime())
@@ -1088,6 +482,10 @@
               day: "numeric"
             })
           : "—";
+      }
+
+      function state(message, type = "success") {
+        app.innerHTML = `<div class="state ${type === "error" ? "error" : type === "warn" ? "warn" : ""}">${esc(message)}</div>`;
       }
 
       function googleIcon() {
@@ -1101,115 +499,105 @@
         `;
       }
 
-      function sessionId() {
-        return (
-          params.get("checkout_session_id") ||
-          params.get("session_id") ||
-          params.get("checkout_configuration_id") ||
-          ""
-        );
-      }
+function sessionId() {
+  return (
+    params.get("checkout_session_id") ||
+    params.get("session_id") ||
+    params.get("checkout_configuration_id") ||
+    ""
+  );
+}
 
-      function memberEmailFromUrl() {
-        return String(
-          params.get("member_email") ||
-          params.get("email") ||
-          ""
-        ).trim().toLowerCase();
-      }
+function googleStartUrl() {
+  /*
+    Normal dashboard login should never depend on localStorage,
+    sessionStorage, checkout cookies, or the original checkout browser.
 
-      function setupTokenFromUrl() {
-        /*
-          This deliberately treats plain ?token= as a password setup token.
-          That prevents the old bug where a reset link was treated like an old
-          login/session token and instantly showed "expired".
-        */
-        return String(
-          params.get("set_password_token") ||
-          params.get("password_setup_token") ||
-          params.get("setup_token") ||
-          params.get("reset_token") ||
-          params.get("token") ||
-          ""
-        ).trim();
-      }
+    If a paid customer comes back later from a new browser, this sends them to:
+      /auth/google/start
 
-      function cleanUrlAfterPasswordSetup() {
-        const cleanUrl = location.origin + location.pathname;
-        history.replaceState({}, document.title, cleanUrl);
-      }
+    server.js then checks:
+      Google email === paid customer email in Supabase
+  */
+  return API.googleStart;
+}
 
-      function googleStartUrl() {
-        /*
-          Normal login only needs Google email to match a paid customer.
-          No checkout cookies or localStorage are needed here.
-        */
-        return API.googleStart;
-      }
+function googleStartUrlForCheckoutLinkingOnly() {
+  /*
+    Only use this on the immediate thank-you page flow, not normal login.
+    This lets someone link a different Google account right after checkout,
+    but it does not affect normal later logins.
+  */
+  const id = sessionId();
+  return id ? `${API.googleStart}?checkout_session_id=${encodeURIComponent(id)}` : API.googleStart;
+}
 
-      async function api(url, options) {
-        const opts = options || {};
-        const headers = Object.assign(
-          {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-          },
-          opts.headers || {}
-        );
-
-        const res = await fetch(url, Object.assign({}, opts, {
-          credentials: opts.credentials || "include",
+      async function json(url, options = {}) {
+        const res = await fetch(url, {
+          credentials: "include",
           cache: "no-store",
-          headers
-        }));
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          },
+          ...options
+        });
 
         const text = await res.text();
         let data = {};
 
         try {
           data = text ? JSON.parse(text) : {};
-        } catch (error) {
+        } catch {
           throw new Error("The server returned invalid JSON.");
         }
 
         if (!res.ok) {
-          const err = new Error(data.error || data.message || "Request failed.");
-          err.status = res.status;
-          err.data = data;
-          throw err;
+          const error = new Error(data.error || data.message || `Request failed (${res.status}).`);
+          error.status = res.status;
+          error.data = data;
+          throw error;
         }
 
         return data;
       }
 
-      async function completeCheckout(attempt) {
+      async function completeCheckout(attempt = 1) {
         const id = sessionId();
         if (!id) return null;
 
-        const currentAttempt = attempt || 1;
-        const data = await api(API.complete + "?checkout_session_id=" + encodeURIComponent(id));
+        const data = await json(`${API.complete}?checkout_session_id=${encodeURIComponent(id)}`);
 
-        if (data.status === "processing" && currentAttempt < MAX_ATTEMPTS) {
-          state("Finalising your dashboard" + ".".repeat((currentAttempt % 3) + 1));
+        if (data.status === "processing" && attempt < MAX_ATTEMPTS) {
+          state(`Finalising your dashboard${".".repeat((attempt % 3) + 1)}`);
           await sleep(RETRY_DELAY_MS);
-          return completeCheckout(currentAttempt + 1);
+          return completeCheckout(attempt + 1);
         }
 
         return data;
       }
 
-      async function loadMe() {
-        const email = memberEmailFromUrl();
+     function memberEmailFromUrl() {
+  return String(
+    params.get("member_email") ||
+      params.get("email") ||
+      ""
+  ).trim().toLowerCase();
+}
 
-        if (email) {
-          return api(API.me + "?email=" + encodeURIComponent(email));
-        }
+async function loadMe() {
+  const email = memberEmailFromUrl();
 
-        return api(API.me);
-      }
+  if (email) {
+    return json(`${API.me}?email=${encodeURIComponent(email)}`);
+  }
+
+  return json(API.me);
+}
 
       function normalise(data) {
-        const d = data.dashboard || data.customer || data || {};
+        const d = data.dashboard || data.customer || data;
 
         const referralCode =
           d.referral_code ||
@@ -1220,7 +608,7 @@
           d.referral_link ||
           d.referralLink ||
           (referralCode
-            ? location.origin + "/checkout.html?r=" + encodeURIComponent(referralCode)
+            ? `${location.origin}/checkout.html?r=${encodeURIComponent(referralCode)}`
             : "");
 
         return {
@@ -1228,423 +616,543 @@
           email: d.email || "",
           phone: d.phone || d.phone_number || d.phoneNumber || "",
           company: d.company || d.business || "",
+
           google_connected: Boolean(d.google_connected || d.googleConnected),
           password_set: Boolean(d.password_set || d.passwordSet),
           whatsapp: d.whatsapp || {},
+
           referral_code: referralCode,
           referral_link: referralLink,
+
           max_referrals: Number(d.max_referrals ?? d.maxReferrals ?? 2),
           paid_referrals: Number(d.paid_referrals ?? d.paidReferrals ?? 0),
+
           referrals: Array.isArray(d.referrals) ? d.referrals : []
         };
       }
 
       function statusClass(status) {
-        return "status status-" + String(status || "paid").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        return `status status-${String(status || "paid").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
       }
 
-      function renderLogin(message) {
-        logoutBtn.classList.add("hidden");
+      function configuredWhatsappGroupUrl() {
+        const backendUrl = String(window.__MONACO_WHATSAPP_GROUP_URL || "").trim();
+        const fileUrl = String(WHATSAPP_GROUP_INVITE_URL || "").trim();
 
-        const email = memberEmailFromUrl();
+        if (backendUrl) return backendUrl;
 
-        app.innerHTML = `
-          <div class="auth-wrap">
-            <div class="auth-card">
-              <div class="auth-title">
-                <div class="panel-kicker">Members access</div>
-                <h2>Log in with the email from your paid booking</h2>
-                <p>Google is easiest. Password login is only checked against your paid booking email.</p>
+        if (
+          fileUrl &&
+          !fileUrl.includes("YOUR_INVITE_CODE") &&
+          fileUrl.startsWith("https://chat.whatsapp.com/")
+        ) {
+          return fileUrl;
+        }
+
+        return "";
+      }
+
+      function whatsappSupportUrl(d) {
+        const backendUrl = String(d.whatsapp?.support_url || "").trim();
+        if (backendUrl) return backendUrl;
+
+        const number = String(WHATSAPP_SUPPORT_NUMBER || "").replace(/\D/g, "");
+        if (!number) return "";
+
+        const message = encodeURIComponent(
+          `Hi, I just joined the Monaco Content Retreat. My name is ${d.name || ""} and my booking email is ${d.email || ""}.`
+        );
+
+        return `https://wa.me/${number}?text=${message}`;
+      }
+
+      function openInviteModal() {
+        const modal = $("inviteModal");
+        const msg = $("inviteMessage");
+        const success = $("inviteSuccess");
+
+        if (msg) {
+          msg.textContent = "";
+          msg.classList.remove("error");
+        }
+
+        success?.classList.remove("is-visible");
+        modal?.classList.add("is-open");
+        setTimeout(() => $("inviteContactValue")?.focus(), 50);
+      }
+
+      function closeInviteModal() {
+        $("inviteModal")?.classList.remove("is-open");
+      }
+
+      function initInvitePhonePicker() {
+        const input = $("inviteContactValue");
+        if (!input || !window.intlTelInput || invitePhoneInput) return;
+
+        invitePhoneInput = window.intlTelInput(input, {
+          initialCountry: "gb",
+          separateDialCode: true,
+          nationalMode: true,
+          autoPlaceholder: "aggressive",
+          formatAsYouType: true,
+          utilsScript: INTL_TEL_INPUT_UTILS_URL
+        });
+      }
+
+      function destroyInvitePhonePicker() {
+        if (!invitePhoneInput) return;
+        invitePhoneInput.destroy();
+        invitePhoneInput = null;
+      }
+
+      function normaliseWhatsappNumber(rawValue) {
+        const raw = String(rawValue || "").trim();
+
+        if (!raw) {
+          return {
+            ok: false,
+            value: "",
+            message: "Add one contact detail first."
+          };
+        }
+
+        const selectedCountry = invitePhoneInput?.getSelectedCountryData?.() || {};
+        const dialCode = String(selectedCountry.dialCode || "").replace(/\D/g, "");
+        let digits = raw.replace(/[^\d+]/g, "");
+
+        if (digits.startsWith("+")) {
+          digits = `+${digits.slice(1).replace(/\D/g, "")}`;
+        } else {
+          let nationalDigits = digits.replace(/\D/g, "");
+
+          if (dialCode && nationalDigits.startsWith("0")) {
+            nationalDigits = nationalDigits.replace(/^0+/, "");
+          }
+
+          digits = dialCode ? `+${dialCode}${nationalDigits}` : `+${nationalDigits}`;
+        }
+
+        const e164 = `+${digits.replace(/\D/g, "")}`;
+
+        if (!/^\+[1-9]\d{7,14}$/.test(e164)) {
+          return {
+            ok: false,
+            value: e164,
+            message: "Add a valid WhatsApp phone number."
+          };
+        }
+
+        return {
+          ok: true,
+          value: e164,
+          message: ""
+        };
+      }
+
+      function resetInviteContactInputForType(type) {
+        const input = $("inviteContactValue");
+        if (!input) return;
+
+        input.value = "";
+
+        if (type === "phone") {
+          input.type = "tel";
+          input.placeholder = "7939 299 167";
+          input.inputMode = "tel";
+          input.autocomplete = "tel";
+          setTimeout(initInvitePhonePicker, 0);
+          return;
+        }
+
+        destroyInvitePhonePicker();
+        input.type = "email";
+        input.placeholder = "friend@example.com";
+        input.inputMode = "email";
+        input.autocomplete = "email";
+      }
+
+
+      function normaliseInstagramHandle(value) {
+        const trimmed = String(value || "").trim().replace(/\s+/g, "");
+        const handle = trimmed.replace(/^@+/, "");
+        return handle ? `@${handle}` : "";
+      }
+
+      function handleInstagramFocus(event) {
+        const input = event.target;
+        if (!String(input.value || "").trim()) {
+          input.value = "@";
+          requestAnimationFrame(() => input.setSelectionRange(input.value.length, input.value.length));
+        }
+      }
+
+      function handleInstagramInput(event) {
+        const input = event.target;
+        const rawValue = String(input.value || "").replace(/\s+/g, "");
+        const nextValue = rawValue ? `@${rawValue.replace(/^@+/, "")}` : "";
+        if (input.value !== nextValue) {
+          input.value = nextValue;
+        }
+      }
+
+      function handleInstagramBlur(event) {
+        const input = event.target;
+        if (String(input.value || "").trim() === "@") {
+          input.value = "";
+        }
+      }
+
+      function updateInviteContactPlaceholder() {
+        const type = String($("inviteContactType")?.value || "email");
+        resetInviteContactInputForType(type);
+      }
+
+      async function sendReferralInvitation(d) {
+        const nameInput = $("inviteFriendName");
+        const contactTypeInput = $("inviteContactType");
+        const contactInput = $("inviteContactValue");
+        const instagramInput = $("inviteInstagramHandle");
+        const noteInput = $("inviteNote");
+        const btn = $("sendInviteBtn");
+        const msg = $("inviteMessage");
+        const success = $("inviteSuccess");
+
+        const friendName = String(nameInput?.value || "").trim() || "Friend";
+        const contactType = String(contactTypeInput?.value || "email").trim();
+        const rawContactValue = String(contactInput?.value || "").trim();
+        const phoneResult = contactType === "phone"
+          ? normaliseWhatsappNumber(rawContactValue)
+          : null;
+        const contactValue = contactType === "phone"
+          ? phoneResult.value
+          : rawContactValue;
+        const friendInstagram = normaliseInstagramHandle(instagramInput?.value || "");
+        const note = String(noteInput?.value || "").trim();
+
+        function setMessage(text, type = "success") {
+          if (!msg) return;
+          msg.textContent = text;
+          msg.classList.toggle("error", type === "error");
+        }
+
+        if (!contactValue) {
+          setMessage("Add one contact detail first.", "error");
+          return;
+        }
+
+        if (contactType === "phone" && phoneResult && !phoneResult.ok) {
+          setMessage(phoneResult.message, "error");
+          return;
+        }
+
+        if (!d.referral_link) {
+          setMessage("Your referral link is not ready yet.", "error");
+          return;
+        }
+
+        const friendEmail = contactType === "email" ? contactValue : "";
+        const friendPhone = contactType === "phone" ? contactValue : "";
+
+        btn.disabled = true;
+        btn.textContent = "Sending...";
+        setMessage("");
+        success?.classList.remove("is-visible");
+
+        try {
+          await json(API.inviteFriend, {
+            method: "POST",
+            body: JSON.stringify({
+  referrer_email: d.email || memberEmailFromUrl(),
+  friend_name: friendName,
+  friend_email: friendEmail,
+  friend_phone: friendPhone,
+  friend_instagram: friendInstagram,
+  note
+})
+          });
+
+          if (nameInput) nameInput.value = "";
+          if (contactInput) contactInput.value = "";
+          if (instagramInput) instagramInput.value = "";
+          if (noteInput) noteInput.value = "";
+          if (contactTypeInput) contactTypeInput.value = "email";
+          updateInviteContactPlaceholder();
+
+          if (success) {
+            success.innerHTML = `
+              <span class="success-icon">✓</span>
+              <span class="success-copy">
+                <strong>Invitation sent to ${esc(friendName)}.</strong>
+                <span>We’ve logged their details and included your referral link.</span>
+              </span>
+            `;
+            success.classList.add("is-visible");
+          }
+
+          setMessage("");
+
+          setTimeout(() => {
+            closeInviteModal();
+            success?.classList.remove("is-visible");
+            setMessage("");
+          }, 2400);
+        } catch (err) {
+          setMessage(err.message || "Could not send the invitation.", "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Send invitation";
+        }
+      }
+
+
+      function whatsappCommunityHtml(d) {
+        const whatsapp = d.whatsapp || {};
+        const groupUrl = String(whatsapp.group_invite_url || "").trim() || configuredWhatsappGroupUrl();
+        const supportUrl = whatsappSupportUrl(d);
+        const primaryUrl = groupUrl || supportUrl;
+        const primaryLabel = groupUrl ? "Join WhatsApp" : "Message us";
+        const accessLabel = d.google_connected ? "Google connected" : "Email verified";
+
+        if (!primaryUrl) {
+          return `
+            <div class="whatsapp-card">
+              <div class="whatsapp-grid">
+                <div class="whatsapp-icon">✓</div>
+                <div>
+                  <h3>WhatsApp unlocked</h3>
+                  <p>Your booking email is verified. Add the real invite link to <strong>WHATSAPP_GROUP_INVITE_URL</strong>.</p>
+                  <div class="wa-meta-grid">
+                    <div class="wa-meta"><span>Phone on file</span><strong>${esc(whatsapp.customer_phone || d.phone || "—")}</strong></div>
+                    <div class="wa-meta"><span>Access</span><strong>${esc(accessLabel)}</strong></div>
+                  </div>
+                </div>
               </div>
-
-              <div class="auth-google">
-                <button class="btn google-btn" id="googleLoginBtn" type="button">
-                  ${googleIcon()}
-                  Continue with Google
-                </button>
-              </div>
-
-              <div class="auth-divider">or use password</div>
-
-              <div class="auth-grid">
-                <section class="auth-option featured">
-                  <h3>Already set a password?</h3>
-                  <p>Use your booking email and dashboard password.</p>
-
-                  <form class="form-grid" id="passwordLoginForm">
-                    <input id="loginEmail" type="email" placeholder="Booking email" autocomplete="email" value="${esc(email)}" required />
-                    <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password" required />
-                    <button class="btn" id="passwordLoginBtn" type="submit">Log in</button>
-                    <span class="form-message" id="loginMessage">${message ? esc(message) : ""}</span>
-                  </form>
-                </section>
-
-                <section class="auth-option">
-                  <h3>First time or forgot?</h3>
-                  <p>Send yourself a fresh set/reset password link. This does not rely on old browser cookies.</p>
-
-                  <form class="form-grid" id="passwordRequestForm">
-                    <input id="setupEmail" type="email" placeholder="Booking email" autocomplete="email" value="${esc(email)}" required />
-                    <button class="secondary-btn" id="passwordRequestBtn" type="submit">Send set/reset link</button>
-                    <span class="form-message" id="requestMessage"></span>
-                  </form>
-                </section>
-              </div>
-
-              <p class="small-note">Important: the email must match the email from Whop/payment. Security is intentionally simple here: paid booking email = dashboard access.</p>
             </div>
-          </div>
-        `;
-
-        $("googleLoginBtn").addEventListener("click", function () {
-          location.href = googleStartUrl();
-        });
-
-        $("passwordLoginForm").addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const btn = $("passwordLoginBtn");
-          const msg = $("loginMessage");
-          const emailValue = $("loginEmail").value.trim().toLowerCase();
-          const passwordValue = $("loginPassword").value;
-
-          msg.textContent = "";
-          msg.classList.remove("error");
-          btn.disabled = true;
-          btn.textContent = "Logging in...";
-
-          try {
-            await api(API.passwordLogin, {
-              method: "POST",
-              body: JSON.stringify({
-                email: emailValue,
-                password: passwordValue
-              })
-            });
-
-            await loadDashboard();
-          } catch (error) {
-            msg.textContent = error.message || "Could not log in. Check the booking email and password.";
-            msg.classList.add("error");
-          } finally {
-            btn.disabled = false;
-            btn.textContent = "Log in";
-          }
-        });
-
-        $("passwordRequestForm").addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const btn = $("passwordRequestBtn");
-          const msg = $("requestMessage");
-          const emailValue = $("setupEmail").value.trim().toLowerCase();
-
-          msg.textContent = "";
-          msg.classList.remove("error");
-          btn.disabled = true;
-          btn.textContent = "Sending...";
-
-          try {
-            await api(API.passwordSetupRequest, {
-              method: "POST",
-              credentials: "omit",
-              body: JSON.stringify({
-                email: emailValue
-              })
-            });
-
-            msg.textContent = "Check your email for a fresh set/reset password link.";
-          } catch (error) {
-            msg.textContent = error.message || "Could not send the set/reset link.";
-            msg.classList.add("error");
-          } finally {
-            btn.disabled = false;
-            btn.textContent = "Send set/reset link";
-          }
-        });
-      }
-
-      function renderPasswordSetupFromToken(token) {
-        logoutBtn.classList.add("hidden");
-
-        const email = memberEmailFromUrl();
-
-        app.innerHTML = `
-          <div class="auth-wrap">
-            <div class="auth-card">
-              <div class="auth-title">
-                <div class="panel-kicker">Set dashboard password</div>
-                <h2>Create or reset your password</h2>
-                <p>This page came from your email link. It will use the link token directly and ignore old browser cookies.</p>
-              </div>
-
-              <div class="auth-grid">
-                <section class="auth-option featured">
-                  <h3>Set password</h3>
-                  <p>Your username is your paid booking email.</p>
-
-                  <form class="form-grid" id="tokenPasswordForm">
-                    <input id="tokenEmail" type="email" placeholder="Booking email" autocomplete="email" value="${esc(email)}" required />
-                    <input id="tokenPassword" type="password" placeholder="New password" autocomplete="new-password" minlength="6" required />
-                    <input id="tokenPasswordConfirm" type="password" placeholder="Confirm password" autocomplete="new-password" minlength="6" required />
-                    <button class="btn" id="tokenPasswordBtn" type="submit">Save password</button>
-                    <span class="form-message" id="tokenPasswordMessage"></span>
-                  </form>
-                </section>
-
-                <section class="auth-option">
-                  <h3>Link showing expired?</h3>
-                  <p>Request a fresh link below. This is separate from login, so it is clearer what to do.</p>
-
-                  <form class="form-grid" id="backupRequestForm">
-                    <input id="backupSetupEmail" type="email" placeholder="Booking email" autocomplete="email" value="${esc(email)}" required />
-                    <button class="secondary-btn" id="backupRequestBtn" type="submit">Send fresh link</button>
-                    <span class="form-message" id="backupRequestMessage"></span>
-                  </form>
-                </section>
-              </div>
-            </div>
-          </div>
-        `;
-
-        $("tokenPasswordForm").addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const btn = $("tokenPasswordBtn");
-          const msg = $("tokenPasswordMessage");
-          const emailValue = $("tokenEmail").value.trim().toLowerCase();
-          const password = $("tokenPassword").value;
-          const confirm = $("tokenPasswordConfirm").value;
-
-          msg.textContent = "";
-          msg.classList.remove("error");
-
-          if (password !== confirm) {
-            msg.textContent = "Passwords do not match.";
-            msg.classList.add("error");
-            return;
-          }
-
-          btn.disabled = true;
-          btn.textContent = "Saving...";
-
-          try {
-            await api(API.passwordSetWithToken, {
-              method: "POST",
-              credentials: "omit",
-              body: JSON.stringify({
-                token: token,
-                email: emailValue,
-                password: password
-              })
-            });
-
-            cleanUrlAfterPasswordSetup();
-            renderLogin("Password saved. Log in with your booking email and new password.");
-          } catch (error) {
-            msg.textContent = error.message || "Could not save password. Request a fresh link.";
-            msg.classList.add("error");
-          } finally {
-            btn.disabled = false;
-            btn.textContent = "Save password";
-          }
-        });
-
-        $("backupRequestForm").addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const btn = $("backupRequestBtn");
-          const msg = $("backupRequestMessage");
-          const emailValue = $("backupSetupEmail").value.trim().toLowerCase();
-
-          msg.textContent = "";
-          msg.classList.remove("error");
-          btn.disabled = true;
-          btn.textContent = "Sending...";
-
-          try {
-            await api(API.passwordSetupRequest, {
-              method: "POST",
-              credentials: "omit",
-              body: JSON.stringify({
-                email: emailValue
-              })
-            });
-
-            msg.textContent = "Fresh link sent. Check your inbox.";
-          } catch (error) {
-            msg.textContent = error.message || "Could not send a fresh link.";
-            msg.classList.add("error");
-          } finally {
-            btn.disabled = false;
-            btn.textContent = "Send fresh link";
-          }
-        });
-      }
-
-      function referralsTable(d) {
-        const rows = d.referrals.length
-          ? d.referrals.map(function (r) {
-              const name = r.friend_name || r.friendName || r.name || "Friend";
-              const email = r.friend_email || r.friendEmail || r.email || "";
-              const status = r.status || r.invite_status || r.inviteStatus || r.payment_status || "pending";
-              const created = r.created_at || r.createdAt || r.invited_at || r.invitedAt || "";
-
-              return `
-                <tr>
-                  <td>${esc(name)}</td>
-                  <td>${esc(email || "—")}</td>
-                  <td><span class="${statusClass(status)}">${esc(status)}</span></td>
-                  <td>${date(created)}</td>
-                </tr>
-              `;
-            }).join("")
-          : `
-            <tr>
-              <td colspan="4">No referrals yet.</td>
-            </tr>
           `;
+        }
 
         return `
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Friend</th>
-                  <th>Email</th>
-                  <th>Status</th>
-                  <th>Invited</th>
-                </tr>
-              </thead>
-              <tbody>${rows}</tbody>
-            </table>
+          <div class="whatsapp-card">
+            <div class="whatsapp-grid">
+              <div class="whatsapp-icon">☏</div>
+              <div>
+                <h3>Private WhatsApp group</h3>
+                <p>Your access is matched to your paid booking email. Google is optional.</p>
+                <div class="whatsapp-actions">
+                  <a class="btn" href="${esc(primaryUrl)}" target="_blank" rel="noopener">${esc(primaryLabel)}</a>
+                  ${supportUrl && groupUrl ? `<a class="secondary-btn" href="${esc(supportUrl)}" target="_blank" rel="noopener">Need help?</a>` : ""}
+                </div>
+                <div class="wa-meta-grid">
+                  <div class="wa-meta"><span>Phone on file</span><strong>${esc(whatsapp.customer_phone || d.phone || "your checkout phone")}</strong></div>
+                  <div class="wa-meta"><span>Access</span><strong>${esc(accessLabel)}</strong></div>
+                </div>
+                <p class="small-note">Wrong account opening? Switch to your booking number in WhatsApp.</p>
+              </div>
+            </div>
           </div>
         `;
       }
 
-      function dashboardHtml(d) {
-        const remaining = Math.max(0, d.max_referrals - d.paid_referrals);
-        const progress = d.max_referrals ? Math.min(100, Math.round((d.paid_referrals / d.max_referrals) * 100)) : 0;
-        const whatsappUrl = String(d.whatsapp.group_invite_url || "").trim() || WHATSAPP_GROUP_INVITE_URL;
+      function render(d) {
+        heroSection?.classList.remove("hidden");
 
-        return `
+        const rows = d.referrals.length
+          ? d.referrals.map((r) => `
+              <tr>
+                <td>${esc(r.friend_name || r.name || "Friend")}</td>
+                <td>${esc(r.friend_email_masked || r.email_masked || r.email || "—")}</td>
+                <td><span class="${statusClass(r.friend_payment_status || r.payment_status || "paid")}">${esc(r.friend_payment_status || r.payment_status || "paid")}</span></td>
+                <td>${date(r.paid_at)}</td>
+              </tr>
+            `).join("")
+          : `<tr><td colspan="4">No paid referrals yet.</td></tr>`;
+
+        logoutBtn.classList.remove("hidden");
+
+        app.innerHTML = `
           <div class="app-shell">
             <aside class="sidebar">
               <div class="sidebar-title">
-                <strong>${esc(d.name)}</strong>
-                <span>${esc(d.email || "Member")}</span>
+                <strong>Dashboard</strong>
+                <span>Monaco Content Retreat</span>
               </div>
 
               <nav class="dashboard-nav">
-                <button class="dash-tab is-active" data-tab="overview" type="button"><span class="dash-icon">⌂</span>Overview</button>
-                <button class="dash-tab" data-tab="referrals" type="button"><span class="dash-icon">↗</span>Referrals</button>
-                <button class="dash-tab" data-tab="community" type="button"><span class="dash-icon">☏</span>Community</button>
-                <button class="dash-tab" data-tab="course" type="button"><span class="dash-icon">▶</span>Course</button>
+                <button class="dash-tab is-active" data-page="referrals" type="button"><span class="dash-icon">↗</span>Referrals</button>
+                <button class="dash-tab" data-page="profile" type="button"><span class="dash-icon">◉</span>Profile</button>
+                <button class="dash-tab" data-page="community" type="button"><span class="dash-icon">◎</span>Community</button>
+                <button class="dash-tab" data-page="curriculum" type="button"><span class="dash-icon">▣</span>Curriculum</button>
               </nav>
             </aside>
 
             <div class="main-panel">
-              <section class="dashboard-page is-active" id="page-overview">
-                <div class="panel">
-                  <div class="panel-head">
-                    <div>
-                      <div class="panel-kicker">Overview</div>
-                      <h2>Welcome, ${esc(d.name)}</h2>
-                      <p>Your access is matched to your paid booking email.</p>
-                    </div>
-                    <div class="pill">${d.google_connected ? "Google connected" : "Email verified"}</div>
-                  </div>
-
-                  <div class="stats-grid">
-                    <div class="stat-card">
-                      <strong>${esc(d.paid_referrals)}</strong>
-                      <span>Paid referrals</span>
-                    </div>
-                    <div class="stat-card">
-                      <strong>${esc(remaining)}</strong>
-                      <span>Remaining spots</span>
-                    </div>
-                    <div class="stat-card">
-                      <strong>${esc(progress)}%</strong>
-                      <span>Referral progress</span>
-                    </div>
-                  </div>
-
-                  <div class="profile-grid">
-                    <div class="info-box">
-                      <span>Booking email</span>
-                      <strong>${esc(d.email || "—")}</strong>
-                    </div>
-                    <div class="info-box">
-                      <span>Company</span>
-                      <strong>${esc(d.company || "—")}</strong>
-                    </div>
-                    <div class="info-box">
-                      <span>Phone</span>
-                      <strong>${esc(d.phone || "—")}</strong>
-                    </div>
-                    <div class="info-box">
-                      <span>Referral code</span>
-                      <strong>${esc(d.referral_code || "—")}</strong>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section class="dashboard-page" id="page-referrals">
+              <section class="dashboard-page is-active" id="page-referrals">
                 <div class="panel">
                   <div class="panel-head">
                     <div>
                       <div class="panel-kicker">Referrals</div>
-                      <h2>Invite friends</h2>
-                      <p>Share your referral link or send an invite directly.</p>
+                      <h2>Your referral link</h2>
+                      <p>Share your link. Paid referrals show below after verification.</p>
                     </div>
-                    <button class="btn" id="openInviteBtn" type="button">Invite a friend</button>
+                    <div class="pill">${d.paid_referrals}/${d.max_referrals} complete</div>
                   </div>
 
-                  <div class="link-row">
-                    <input class="input" id="referralLinkInput" readonly value="${esc(d.referral_link || "")}" />
-                    <button class="secondary-btn" id="copyReferralBtn" type="button">Copy</button>
-                  </div>
-                  <p class="small-note" id="copyMessage">Your friend must use this link or the same referral code at checkout.</p>
-
-                  <div class="referral-meta" style="margin-top:16px;">
-                    <div class="info-box">
-                      <span>Paid referrals</span>
-                      <strong>${esc(d.paid_referrals)} / ${esc(d.max_referrals)}</strong>
+                  <div class="referral-group">
+                    <div class="referral-card feature">
+                      <h3>Share this link</h3>
+                      <p>Send it directly, or use the invite flow below.</p>
+                      <div class="link-row">
+                        <input id="referralLinkInput" class="input" value="${esc(d.referral_link)}" readonly aria-label="Your referral link" />
+                        <button id="copyReferralBtn" class="btn" type="button">Copy link</button>
+                      </div>
+                      <div class="inline-actions compact-note">
+                        <button id="openInviteModalBtn" class="secondary-btn" type="button">Invite a friend</button>
+                        <p>Rewards are issued after payment verification.</p>
+                      </div>
                     </div>
-                    <div class="info-box">
-                      <span>Remaining</span>
-                      <strong>${esc(remaining)}</strong>
+
+                    <div class="referral-card referral-progress">
+                      <div>
+                        <div class="progress-top">
+                          <strong>${d.paid_referrals}/${d.max_referrals}</strong>
+                          <span>complete</span>
+                        </div>
+                        <div class="progress-track" aria-hidden="true">
+                          <div class="progress-fill" style="width:${Math.min(100, Math.max(0, (d.paid_referrals / Math.max(1, d.max_referrals)) * 100))}%"></div>
+                        </div>
+                      </div>
+                      <div class="referral-meta">
+                        <div><span>Remaining</span><strong>${Math.max(0, d.max_referrals - d.paid_referrals)}</strong></div>
+                        <div><span>Link</span><strong>${d.referral_code ? "Ready" : "Pending"}</strong></div>
+                      </div>
                     </div>
                   </div>
 
-                  ${referralsTable(d)}
+                  <div class="referral-activity-card">
+                    <div class="referral-activity-grid">
+                      <div class="referral-activity-icon">↗</div>
+                      <div>
+                        <div class="referral-table-head">
+                          <div>
+                            <h3>Referral activity</h3>
+                            <p>Paid referrals appear here once verified.</p>
+                          </div>
+                          <span class="referral-activity-meta">Verified only</span>
+                        </div>
 
-                  <div class="panel" style="margin-top:16px; box-shadow:none;">
-                    <div class="panel-kicker">Send invite</div>
-                    <h3>Invite a friend directly</h3>
-                    <p class="small-note">This saves them as a friend/referral and sends the invite through your backend.</p>
+                        <div class="table-wrap">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Friend</th>
+                                <th>Email</th>
+                                <th>Payment</th>
+                                <th>Paid date</th>
+                              </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal-overlay" id="inviteModal" aria-hidden="true">
+                  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="inviteModalTitle">
+                    <button class="modal-close" id="closeInviteModalBtn" type="button" aria-label="Close invitation popup">×</button>
+                    <div class="panel-kicker">Invitation</div>
+                    <h2 id="inviteModalTitle">Invite a friend</h2>
+                    <p>Add an email or WhatsApp number.</p>
 
                     <form class="invite-form" id="inviteFriendForm">
-                      <input id="inviteFriendName" type="text" placeholder="Friend's name" autocomplete="name" />
+                      <input id="inviteFriendName" class="input" type="text" placeholder="Friend's name" autocomplete="name" />
 
-                      <div class="row2">
-                        <select id="inviteContactType" aria-label="Contact type">
+                      <div class="contact-row">
+                        <select id="inviteContactType" class="input" aria-label="Contact type">
                           <option value="email">Email</option>
-                          <option value="phone">WhatsApp phone</option>
+                          <option value="phone">WhatsApp</option>
                         </select>
-                        <input id="inviteContactValue" type="email" placeholder="friend@example.com" required />
+                        <input id="inviteContactValue" class="input" type="email" placeholder="friend@example.com" required />
                       </div>
 
-                      <input id="inviteInstagramHandle" type="text" placeholder="@instagram_handle optional" autocomplete="off" />
-                      <textarea id="inviteNote" placeholder="Optional note"></textarea>
+                      <input id="inviteInstagramHandle" class="input" type="text" placeholder="@instagram_handle" autocomplete="off" inputmode="text" />
 
-                      <button class="btn" id="sendInviteBtn" type="submit">Send invitation</button>
-                      <span class="form-message" id="inviteMessage"></span>
+                      <input id="inviteNote" class="input" type="text" placeholder="Optional note" />
+
+                      <div class="invite-actions">
+                        <button id="sendInviteBtn" class="btn" type="submit">Send invitation</button>
+                        <button class="secondary-btn" id="cancelInviteBtn" type="button">Cancel</button>
+                      </div>
+
+                      <div id="inviteSuccess" class="modal-success" aria-live="polite">
+                        <span class="success-icon">✓</span>
+                        <span class="success-copy"><strong>Invitation sent.</strong><span>Your referral link has been shared.</span></span>
+                      </div>
+                      <span id="inviteMessage" class="invite-message" aria-live="polite"></span>
                     </form>
                   </div>
                 </div>
+              </section>
+
+              <section class="dashboard-page" id="page-profile">
+                <div class="panel">
+                  <div class="panel-head">
+                    <div>
+                      <div class="panel-kicker">Profile</div>
+                      <h2>Your details</h2>
+                    </div>
+                    <div class="pill">Active</div>
+                  </div>
+
+                  <div class="profile-card">
+                    <div class="profile-card-grid">
+                      <div class="profile-icon">◉</div>
+                      <div>
+                        <h3>${esc(d.name || "Monaco member")}</h3>
+                        <p>Your booking profile for Monaco access, referrals, curriculum, and community.</p>
+
+                        <div class="profile-grid">
+                          <div class="profile-field"><span>Email</span><strong>${esc(d.email || "—")}</strong></div>
+                          <div class="profile-field"><span>Phone</span><strong>${esc(d.phone || "—")}</strong></div>
+                          <div class="profile-field"><span>Company</span><strong>${esc(d.company || "—")}</strong></div>
+                          <div class="profile-field"><span>Google</span><strong>${d.google_connected ? "Connected" : "Optional"}</strong></div>
+                          <div class="profile-field"><span>Status</span><strong>Active</strong></div>
+                          <div class="profile-field"><span>Referral code</span><strong>${esc(d.referral_code || "Pending")}</strong></div>
+                        </div>
+
+                        <div class="profile-actions">
+                          ${d.google_connected ? "" : `<a class="secondary-btn" href="${googleStartUrl()}">Connect Google</a>`}
+                        </div>
+
+                        <p class="small-note">Need a change? Contact the Grow Acquisition team.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                ${d.google_connected ? "" : `
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <div class="panel-kicker">Password login</div>
+        <h2>${d.password_set ? "Change your dashboard password" : "Set your dashboard password"}</h2>
+        <p>${d.password_set ? "Use this only if you want to change the password you already use to log in." : "Create this once so you can log in later with your checkout email and password."}</p>
+      </div>
+    </div>
+
+    <form class="login-form" id="setPasswordForm">
+      <label for="newDashboardPassword">New password</label>
+      <input id="newDashboardPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+
+      <label for="currentDashboardPassword">Current password, only if changing it later</label>
+      <input id="currentDashboardPassword" type="password" autocomplete="current-password" placeholder="Leave blank if setting it for the first time" />
+
+      <button class="secondary-btn" type="submit">${d.password_set ? "Update password" : "Save password"}</button>
+      <p class="small-note" id="setPasswordNote">Your login email is always your paid booking email.</p>
+    </form>
+  </div>
+`}
               </section>
 
               <section class="dashboard-page" id="page-community">
@@ -1652,44 +1160,27 @@
                   <div class="panel-head">
                     <div>
                       <div class="panel-kicker">Community</div>
-                      <h2>WhatsApp group</h2>
-                      <p>Your booking email is verified. Join the private Monaco group below.</p>
+                      <h2>WhatsApp</h2>
                     </div>
                     <div class="pill">${d.google_connected ? "Google connected" : "Email verified"}</div>
                   </div>
-
-                  <div class="community-grid">
-                    <div class="info-box">
-                      <span>Phone on file</span>
-                      <strong>${esc(d.whatsapp.customer_phone || d.phone || "—")}</strong>
-                    </div>
-                    <div class="info-box">
-                      <span>Access</span>
-                      <strong>${d.email ? "Unlocked" : "Pending email"}</strong>
-                    </div>
-                  </div>
-
-                  <div style="margin-top:18px;">
-                    <a class="btn" href="${esc(whatsappUrl)}" target="_blank" rel="noopener">Join WhatsApp</a>
-                  </div>
-
-                  <p class="small-note">If the button does not work, replace <strong>WHATSAPP_GROUP_INVITE_URL</strong> in this file with the live group invite link.</p>
+                  ${whatsappCommunityHtml(d)}
                 </div>
               </section>
 
-              <section class="dashboard-page" id="page-course">
+              <section class="dashboard-page" id="page-curriculum">
                 <div class="panel">
                   <div class="panel-head">
                     <div>
                       <div class="panel-kicker">Curriculum</div>
                       <h2>Course access</h2>
-                      <p>Use the same email you used for your Monaco booking.</p>
+                      <p>Log in with <strong>${esc(d.email || "your checkout email")}</strong>.</p>
                     </div>
                     <a class="secondary-btn" href="https://nikkleinherenbrink.podia.com/view/courses/grow-aqcuisition-content-curriculum" target="_blank" rel="noopener">Open course</a>
                   </div>
 
                   <div class="notice">
-                    <p>Log in to the course with <strong>${esc(d.email || "your checkout email")}</strong>.</p>
+                    <p>Use the same email you used for your Monaco booking.</p>
                   </div>
 
                   <div class="course-frame">
@@ -1707,177 +1198,598 @@
             </div>
           </div>
         `;
-      }
-
-      function bindDashboard(d) {
-        logoutBtn.classList.remove("hidden");
-
-        document.querySelectorAll(".dash-tab").forEach(function (btn) {
-          btn.addEventListener("click", function () {
-            const tab = btn.getAttribute("data-tab");
-
-            document.querySelectorAll(".dash-tab").forEach(function (b) {
-              b.classList.toggle("is-active", b === btn);
-            });
-
-            document.querySelectorAll(".dashboard-page").forEach(function (page) {
-              page.classList.toggle("is-active", page.id === "page-" + tab);
-            });
-          });
-        });
 
         const copyBtn = $("copyReferralBtn");
-        if (copyBtn) {
-          copyBtn.addEventListener("click", async function () {
-            const input = $("referralLinkInput");
-            const msg = $("copyMessage");
+        const input = $("referralLinkInput");
 
-            try {
-              await navigator.clipboard.writeText(input.value);
-              msg.textContent = "Referral link copied.";
-            } catch (error) {
-              input.select();
-              document.execCommand("copy");
-              msg.textContent = "Referral link copied.";
-            }
-          });
-        }
-
-        const contactType = $("inviteContactType");
-        const contactValue = $("inviteContactValue");
-
-        if (contactType && contactValue) {
-          contactType.addEventListener("change", function () {
-            if (contactType.value === "phone") {
-              contactValue.type = "tel";
-              contactValue.placeholder = "+44 7399 299 167";
-              contactValue.inputMode = "tel";
-              contactValue.autocomplete = "tel";
-            } else {
-              contactValue.type = "email";
-              contactValue.placeholder = "friend@example.com";
-              contactValue.inputMode = "email";
-              contactValue.autocomplete = "email";
-            }
-          });
-        }
-
-        $("openInviteBtn")?.addEventListener("click", function () {
-          $("inviteFriendName")?.focus();
-        });
-
-        $("inviteInstagramHandle")?.addEventListener("input", function (event) {
-          const input = event.target;
-          const raw = String(input.value || "").replace(/\s+/g, "");
-          input.value = raw ? "@" + raw.replace(/^@+/, "") : "";
-        });
-
-        $("inviteFriendForm")?.addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const btn = $("sendInviteBtn");
-          const msg = $("inviteMessage");
-
-          const friendName = String($("inviteFriendName").value || "").trim() || "Friend";
-          const contactTypeValue = String($("inviteContactType").value || "email");
-          const contactValueText = String($("inviteContactValue").value || "").trim();
-          const instagram = String($("inviteInstagramHandle").value || "").trim();
-          const note = String($("inviteNote").value || "").trim();
-
-          msg.textContent = "";
-          msg.classList.remove("error");
-
-          if (!contactValueText) {
-            msg.textContent = "Add one contact detail first.";
-            msg.classList.add("error");
-            return;
-          }
-
-          btn.disabled = true;
-          btn.textContent = "Sending...";
+        copyBtn?.addEventListener("click", async () => {
+          if (!input.value) return;
 
           try {
-            await api(API.inviteFriend, {
-              method: "POST",
-              body: JSON.stringify({
-                referrer_email: d.email || memberEmailFromUrl(),
-                friend_name: friendName,
-                friend_email: contactTypeValue === "email" ? contactValueText : "",
-                friend_phone: contactTypeValue === "phone" ? contactValueText : "",
-                friend_instagram: instagram,
-                note: note
-              })
+            await navigator.clipboard.writeText(input.value);
+          } catch {
+            input.select();
+            document.execCommand("copy");
+          }
+
+          copyBtn.textContent = "Copied";
+          setTimeout(() => {
+            copyBtn.textContent = "Copy link";
+          }, 1200);
+        });
+
+        $("openInviteModalBtn")?.addEventListener("click", openInviteModal);
+        $("closeInviteModalBtn")?.addEventListener("click", closeInviteModal);
+        $("cancelInviteBtn")?.addEventListener("click", closeInviteModal);
+        $("inviteContactType")?.addEventListener("change", updateInviteContactPlaceholder);
+        $("inviteInstagramHandle")?.addEventListener("focus", handleInstagramFocus);
+        $("inviteInstagramHandle")?.addEventListener("input", handleInstagramInput);
+        $("inviteInstagramHandle")?.addEventListener("blur", handleInstagramBlur);
+        $("inviteModal")?.addEventListener("click", (event) => {
+          if (event.target?.id === "inviteModal") closeInviteModal();
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") closeInviteModal();
+        });
+
+        updateInviteContactPlaceholder();
+
+        $("inviteFriendForm")?.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          await sendReferralInvitation(d);
+        });
+
+        document.querySelectorAll(".dash-tab").forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const page = tab.dataset.page;
+
+            document.querySelectorAll(".dash-tab").forEach((btn) => {
+              btn.classList.remove("is-active");
             });
 
-            $("inviteFriendName").value = "";
-            $("inviteContactValue").value = "";
-            $("inviteInstagramHandle").value = "";
-            $("inviteNote").value = "";
-            $("inviteContactType").value = "email";
-            $("inviteContactValue").type = "email";
-            $("inviteContactValue").placeholder = "friend@example.com";
+            document.querySelectorAll(".dashboard-page").forEach((section) => {
+              section.classList.remove("is-active");
+            });
 
-            msg.textContent = "Invitation sent and saved.";
-          } catch (error) {
-            msg.textContent = error.message || "Could not send invitation.";
-            msg.classList.add("error");
-          } finally {
-            btn.disabled = false;
-            btn.textContent = "Send invitation";
+            tab.classList.add("is-active");
+            document.getElementById(`page-${page}`)?.classList.add("is-active");
+          });
+        });
+
+        bindSetPasswordForm(d);
+      }
+function bindSetPasswordForm(d = {}) {
+  const form = $("setPasswordForm");
+  const passwordInput = $("newDashboardPassword");
+  const currentPasswordInput = $("currentDashboardPassword");
+  const note = $("setPasswordNote");
+
+  if (!form || !passwordInput || !note) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const password = String(passwordInput.value || "");
+    const currentPassword = String(currentPasswordInput?.value || "");
+
+    if (password.length < 8) {
+      note.textContent = "Password must be at least 8 characters.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    const button = form.querySelector("button");
+    const originalText = button?.textContent || "Save password";
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Saving...";
+    }
+
+    try {
+      await json(API.passwordSet, {
+        method: "POST",
+        body: JSON.stringify({
+  email: d.email || memberEmailFromUrl(),
+  password,
+  current_password: currentPassword
+})
+      });
+
+      passwordInput.value = "";
+      if (currentPasswordInput) currentPasswordInput.value = "";
+
+      note.textContent = "Password saved. Next time you can log in with your booking email and password.";
+      note.style.color = "var(--accent)";
+    } catch (err) {
+      note.textContent = err.message || "Could not save password.";
+      note.style.color = "var(--error)";
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+  });
+}
+
+function renderLogin(error = "") {
+  logoutBtn.classList.add("hidden");
+  heroSection?.classList.add("hidden");
+  document.querySelector(".confirm-bar")?.classList.add("hidden");
+
+  app.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card-clean">
+        <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+        <div class="panel-kicker">Member dashboard</div>
+        <h2>Log in with your booking email</h2>
+        <p>Google still works best. For password login, use the exact email from the paid booking.</p>
+
+        ${error ? `<div class="state error login-error">${esc(error)}</div>` : ""}
+
+        <a class="btn google-btn login-google-btn" href="${googleStartUrl()}">
+          ${googleIcon()}
+          Continue with Google
+        </a>
+
+        <div class="login-divider">or</div>
+
+        <form class="login-form" id="passwordLoginForm">
+          <label for="passwordLoginEmail">Booking email</label>
+          <input
+            id="passwordLoginEmail"
+            type="email"
+            autocomplete="username"
+            placeholder="your-booking-email@example.com"
+            required
+          />
+
+          <label for="passwordLoginPassword">Dashboard password</label>
+          <input
+            id="passwordLoginPassword"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Your password"
+            required
+          />
+
+          <button class="secondary-btn" type="submit">Log in</button>
+          <p class="small-note" id="passwordLoginNote">The email only has to match a paid Monaco booking.</p>
+        </form>
+
+        <div class="login-helper-box">
+          <p class="small-note" id="passwordSetupRequestNote">First time here, or forgot the password?</p>
+          <button class="secondary-btn" id="passwordSetupRequestButton" type="button">Create or reset password by email</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  bindPasswordLoginForm();
+  bindPasswordSetupRequestForm();
+}
+
+function renderSetPasswordScreen(options = {}) {
+  logoutBtn.classList.add("hidden");
+  heroSection?.classList.add("hidden");
+  document.querySelector(".confirm-bar")?.classList.add("hidden");
+
+  const token = String(options.token || "");
+  const email = String(options.email || "").trim().toLowerCase();
+  const sessionMode = Boolean(options.sessionMode);
+  const message =
+    options.message ||
+    "Use this secure setup link to create or reset your Monaco dashboard password. Your login email must match the email used for your paid booking.";
+
+  app.innerHTML = `
+    <div class="login-wrap">
+      <div class="login-card-clean">
+        <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+        <div class="panel-kicker">Member dashboard</div>
+        <h2>Set your dashboard password</h2>
+        <p>${esc(message)}</p>
+
+        <form class="login-form" id="setupPasswordForm">
+          <label for="setupPasswordEmail">Username / email used at checkout</label>
+          <input
+            id="setupPasswordEmail"
+            type="email"
+            autocomplete="username"
+            value="${esc(email)}"
+            placeholder="your-booking-email@example.com"
+            ${token ? "readonly" : ""}
+            required
+          />
+
+          <label for="setupPasswordNew">Create password</label>
+          <input
+            id="setupPasswordNew"
+            type="password"
+            autocomplete="new-password"
+            placeholder="At least 8 characters"
+            required
+          />
+
+          <label for="setupPasswordConfirm">Confirm password</label>
+          <input
+            id="setupPasswordConfirm"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Type it again"
+            required
+          />
+
+          <button class="secondary-btn" type="submit">Set password and continue</button>
+          <p class="small-note" id="setupPasswordNote">This password is only for your Monaco dashboard. Keep it somewhere safe.</p>
+        </form>
+
+        ${token ? `<p class="small-note">This setup link is secure, expires automatically, and can only be used once.</p>` : ""}
+      </div>
+    </div>
+  `;
+
+  bindSetupPasswordForm({ token, sessionMode });
+}
+
+function bindSetupPasswordForm(options = {}) {
+  const form = $("setupPasswordForm");
+  const emailInput = $("setupPasswordEmail");
+  const passwordInput = $("setupPasswordNew");
+  const confirmInput = $("setupPasswordConfirm");
+  const note = $("setupPasswordNote");
+
+  if (!form || !emailInput || !passwordInput || !confirmInput || !note) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const password = String(passwordInput.value || "");
+    const confirm = String(confirmInput.value || "");
+    const email = String(emailInput.value || "").trim().toLowerCase();
+
+    if (!email) {
+      note.textContent = "Your login email is required. Use the exact email from your paid booking.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    if (password.length < 8) {
+      note.textContent = "Password must be at least 8 characters.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    if (password !== confirm) {
+      note.textContent = "Passwords do not match.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    const button = form.querySelector("button");
+    const originalText = button?.textContent || "Set password and continue";
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Saving...";
+    }
+
+    note.textContent = "Saving your dashboard password...";
+    note.style.color = "";
+
+    try {
+      const response = options.token
+        ? await json(API.passwordSetWithToken, {
+            method: "POST",
+
+            /*
+              Important:
+              This makes email reset/setup links work independently from
+              old browser cookies or old checkout sessions.
+            */
+            credentials: "omit",
+
+            body: JSON.stringify({
+              token: options.token,
+              email,
+              password
+            })
+          })
+        : await json(API.passwordSet, {
+            method: "POST",
+            body: JSON.stringify({
+              email,
+              password
+            })
+          });
+
+      if (response?.dashboard) {
+        history.replaceState({}, "", "/thankyou-referral-dashboard.html");
+        render(normalise(response));
+        return;
+      }
+
+      const me = await loadMe();
+      history.replaceState({}, "", "/thankyou-referral-dashboard.html");
+      render(normalise(me));
+    } catch (err) {
+      note.textContent = err.message || "Could not save your password. Request a fresh set/reset link.";
+      note.style.color = "var(--error)";
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+  });
+}
+
+async function requestPasswordSetupLink(email, note) {
+  const clean = String(email || "").trim().toLowerCase();
+
+  if (!clean) {
+    if (note) {
+      note.textContent = "Enter the email you used for your paid Monaco booking.";
+      note.style.color = "var(--error)";
+    }
+    return;
+  }
+
+  if (note) {
+    note.textContent = "Sending a secure setup link if this email has a paid booking...";
+    note.style.color = "";
+  }
+
+  try {
+    const response = await json(API.passwordSetupRequest, {
+      method: "POST",
+      body: JSON.stringify({ email: clean })
+    });
+
+    if (note) {
+      note.textContent =
+        response.message ||
+        "If this email belongs to a paid Monaco booking, a secure setup link has been sent.";
+      note.style.color = "var(--accent)";
+    }
+  } catch (err) {
+    if (note) {
+      note.textContent =
+        err.message ||
+        "Could not send the setup link. Continue with Google if this is your Gmail, or contact support.";
+      note.style.color = "var(--error)";
+    }
+  }
+}
+
+function bindPasswordSetupRequestForm() {
+  const button = $("passwordSetupRequestButton");
+  const emailInput = $("passwordLoginEmail") || $("passwordSetupRequestEmail");
+  const note = $("passwordSetupRequestNote") || $("passwordLoginNote");
+
+  if (!button || !emailInput || !note) return;
+
+  button.addEventListener("click", async () => {
+    const originalText = button.textContent || "Create or reset password by email";
+    const email = String(emailInput.value || memberEmailFromUrl() || "").trim().toLowerCase();
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Sending...";
+    }
+
+    await requestPasswordSetupLink(email, note);
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  });
+}
+
+function bindPasswordLoginForm() {
+  const form = $("passwordLoginForm");
+  const emailInput = $("passwordLoginEmail");
+  const passwordInput = $("passwordLoginPassword");
+  const note = $("passwordLoginNote");
+
+  if (!form || !emailInput || !passwordInput || !note) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = String(emailInput.value || "").trim().toLowerCase();
+    const password = String(passwordInput.value || "");
+
+    if (!email || !password) {
+      note.textContent = "Enter the email you used at checkout and your password.";
+      note.style.color = "var(--error)";
+      return;
+    }
+
+    const button = form.querySelector("button");
+    const originalText = button?.textContent || "Log in with username and password";
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Checking password...";
+    }
+
+    note.textContent = "Checking your booking email and password...";
+    note.style.color = "";
+
+    try {
+      const response = await json(API.passwordLogin, {
+        method: "POST",
+        body: JSON.stringify({ email, password })
+      });
+
+      if (response?.dashboard) {
+        render(normalise(response));
+        return;
+      }
+
+      const me = await loadMe();
+      render(normalise(me));
+    } catch (err) {
+      if (err?.data?.code === "PASSWORD_NOT_SET") {
+        const requestNote = $("passwordSetupRequestNote") || note;
+        await requestPasswordSetupLink(err.data.email || email, requestNote);
+
+        note.textContent =
+          "No dashboard password exists yet for this paid email. I sent a setup/reset link. Google login also still works if this is a Gmail address.";
+        note.style.color = "var(--accent)";
+        return;
+      }
+
+      note.textContent = err.message || "Could not log in with that email and password.";
+      note.style.color = "var(--error)";
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
+    }
+  });
+}
+
+
+function bindEmailLoginForm() {
+        const form = $("emailLoginForm");
+        const input = $("bookingEmailLogin");
+        const note = $("emailLoginNote");
+
+        if (!form || !input || !note) return;
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const email = String(input.value || "").trim().toLowerCase();
+
+          if (!email) {
+            note.textContent = "Enter the email you used when signing up for the course.";
+            return;
+          }
+
+          note.textContent = "Checking that booking email...";
+
+          try {
+            const result = await json(API.login, {
+              method: "POST",
+              body: JSON.stringify({ email })
+            });
+
+            note.innerHTML = `Login link ready. <a href="${esc(result.login_url)}">Open your dashboard</a>.`;
+          } catch (err) {
+            note.textContent = err.message || "No booking was found for that email.";
           }
         });
       }
 
-      async function loadDashboard() {
-        state("Loading dashboard...");
+async function boot() {
+  try {
+    const explicitPasswordToken =
+      params.get("set_password_token") ||
+      params.get("password_setup_token") ||
+      params.get("setup_token") ||
+      params.get("reset_token") ||
+      "";
 
-        try {
-          if (sessionId()) {
-            await completeCheckout(1);
-          }
+    const token = params.get("token");
+    const googleError = params.get("error");
 
-          const me = await loadMe();
-          const d = normalise(me);
+    /*
+      Some reset emails use ?token=...
+      Treat plain ?token= as a password setup link unless this URL is clearly
+      a checkout/session return.
+    */
+    const plainTokenLooksLikePasswordSetup =
+      token &&
+      !params.has("checkout_session_id") &&
+      !params.has("session_id") &&
+      !params.has("checkout_configuration_id");
 
-          app.innerHTML = dashboardHtml(d);
-          bindDashboard(d);
-        } catch (error) {
-          if (error.status === 401 || error.status === 403) {
-            renderLogin();
-            return;
-          }
+    const passwordSetupToken =
+      explicitPasswordToken || (plainTokenLooksLikePasswordSetup ? token : "");
 
-          renderLogin(error.message || "Please log in with your booking email.");
-        }
-      }
+    /*
+      Important:
+      Do NOT pre-check the token here.
+      Just show the password form. The backend checks the token only when the
+      user submits the new password.
+    */
+    if (passwordSetupToken) {
+      renderSetPasswordScreen({
+        token: passwordSetupToken,
+        email: memberEmailFromUrl(),
+        message: "Set or reset your dashboard password. Your username is the same email used for your paid Monaco booking."
+      });
+      return;
+    }
 
-      logoutBtn.addEventListener("click", async function () {
-        logoutBtn.disabled = true;
+    if (googleError) {
+      renderLogin(googleError);
+      return;
+    }
 
-        try {
-          await api(API.logout, {
-            method: "POST"
-          });
-        } catch (error) {
-          // Keep going even if logout endpoint fails.
-        }
-
-        logoutBtn.disabled = false;
-        renderLogin("You have been logged out.");
+    if (token && !plainTokenLooksLikePasswordSetup) {
+      await json(API.session, {
+        method: "POST",
+        body: JSON.stringify({ token })
       });
 
-      async function init() {
-        const token = setupTokenFromUrl();
+      history.replaceState({}, "", "/thankyou-referral-dashboard.html");
+    }
 
-        if (token) {
-          renderPasswordSetupFromToken(token);
+    const hasCheckoutReturn =
+      params.has("checkout_session_id") ||
+      params.has("session_id");
+
+    if (hasCheckoutReturn) {
+      const completed = await completeCheckout();
+
+      if (completed?.dashboard) {
+        const dashboard = normalise(completed);
+
+        if (!dashboard.password_set) {
+          renderSetPasswordScreen({
+            email: dashboard.email,
+            sessionMode: true,
+            message: "Your payment is confirmed. Create your dashboard password now so you can come back later with your booking email."
+          });
           return;
         }
 
-        await loadDashboard();
+        render(dashboard);
+        return;
       }
+    }
 
-      init();
+    const me = await loadMe();
+    render(normalise(me));
+  } catch (err) {
+    if (
+      String(err.message || "").toLowerCase().includes("log in") ||
+      String(err.message || "").includes("401")
+    ) {
+      renderLogin();
+      return;
+    }
+
+    state(err.message || "Could not load your dashboard.", "error");
+    setTimeout(() => renderLogin(), 1400);
+  }
+}
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          await json(API.logout, { method: "POST" });
+        } catch {}
+
+        window.location.href = "/monaco.html";
+      });
+
+      boot();
     })();
   </script>
 </body>

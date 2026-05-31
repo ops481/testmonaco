@@ -1,1680 +1,985 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>You're in · Monaco Content Retreat · Grow Acquisition</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>You're in · Monaco Content Retreat · Grow Acquisition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #f5f7f4; --card: #ffffff; --fg: #0e0e0e; --muted: #4b4b4b;
+    --line: #e4e8e3; --accent: #0e5732; --gold: #ccb784;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+  body {
+    font-family: "Inter",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color: var(--fg); background: var(--bg); line-height: 1.55; letter-spacing: .012em; -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  /* confirmation bar */
+  .confirm-bar { background: var(--accent); color: #fff; }
+  .confirm-bar .container { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 24px; font-size: 14.5px; font-weight: 600; text-align: center; }
+  .cb-dot { width: 9px; height: 9px; border-radius: 50%; background: #7be0a4; box-shadow: 0 0 0 4px rgba(123,224,164,.22); flex: 0 0 auto; }
 
-  <style>
-    :root {
-      --bg: #f5f7f4;
-      --card: #ffffff;
-      --fg: #0e0e0e;
-      --muted: #4b4b4b;
-      --line: #e4e8e3;
-      --accent: #0e5732;
-      --accent-2: #174a32;
-      --gold: #ccb784;
-      --soft: #eef4ee;
-      --error: #8a1f1f;
-      --warn: #7a5a13;
-      --shadow: 0 22px 70px rgba(14,87,50,.12);
-    }
+  /* slim header (centered logo) */
+  .ty-top { position: relative; border-bottom: 1px solid var(--line); }
+  .ty-top-row { display: flex; align-items: center; justify-content: center; padding: 16px 24px; }
+  .ty-logo { height: 28px; width: auto; }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      overflow-x: hidden;
-    }
-
-    body {
-      font-family: "Inter", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-      color: var(--fg);
-      background:
-        radial-gradient(circle at 50% -120px, rgba(14,87,50,.15), transparent 34%),
-        radial-gradient(circle at 88% 20%, rgba(204,183,132,.16), transparent 28%),
-        var(--bg);
-      line-height: 1.55;
-      letter-spacing: .012em;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    button,
-    input,
-    textarea,
-    select {
-      font: inherit;
-    }
-
-    .container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .confirm-bar {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .confirm-bar .container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 11px 24px;
-      font-size: 14.5px;
-      font-weight: 750;
-      text-align: center;
-    }
-
-    .cb-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #7be0a4;
-      box-shadow: 0 0 0 4px rgba(123,224,164,.22);
-      flex: 0 0 auto;
-    }
-
-    .top {
-      border-bottom: 1px solid var(--line);
-      background: rgba(245,247,244,.88);
-      backdrop-filter: blur(14px);
-    }
-
-    .top-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px 24px;
-    }
-
-    .logo {
-      height: 28px;
-      width: auto;
-    }
-
-    .hero {
-      position: relative;
-      overflow: hidden;
-      padding: clamp(26px, 4vw, 52px) 0 56px;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      top: -180px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 900px;
-      height: 520px;
-      border-radius: 50%;
-      background: radial-gradient(closest-side, rgba(14,87,50,.12), transparent 70%);
-      pointer-events: none;
-    }
-
-    .ticket-bg {
-      position: absolute;
-      top: 43%;
-      left: 50%;
-      transform: translate(-50%,-50%) rotate(-7deg);
-      width: min(900px, 112%);
-      display: flex;
-      border-radius: 22px;
-      overflow: hidden;
-      background: #272e26;
-      color: #fff;
-      opacity: .05;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .ticket-main {
-      flex: 1;
-      padding: 42px 46px;
-      min-width: 0;
-    }
-
-    .ticket-eyebrow {
-      font-size: 12px;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: #c9a24a;
-      font-weight: 800;
-    }
-
-    .ticket-title {
-      font-size: clamp(34px, 5vw, 48px);
-      font-weight: 760;
-      letter-spacing: -.025em;
-      line-height: 1.04;
-      margin: 10px 0 0;
-    }
-
-    .ticket-meta {
-      display: flex;
-      gap: 32px;
-      margin-top: 26px;
-      flex-wrap: wrap;
-    }
-
-    .ticket-meta > div {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .ticket-meta span {
-      font-size: 11px;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.5);
-    }
-
-    .ticket-meta strong {
-      font-size: 15px;
-      font-weight: 800;
-    }
-
-    .ticket-stub {
-      width: 230px;
-      padding: 40px 26px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-align: center;
-    }
-
-    .ticket-stub::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 18px;
-      bottom: 18px;
-      border-left: 2px dotted rgba(255,255,255,.45);
-    }
-
-    .ticket-admit {
-      font-size: 13px;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: #c9a24a;
-      font-weight: 800;
-    }
-
-    .ticket-price {
-      font-size: 42px;
-      font-weight: 900;
-      letter-spacing: -.02em;
-      line-height: 1;
-    }
-
-    .ticket-sub {
-      font-size: 12px;
-      color: rgba(255,255,255,.6);
-    }
-
-    .hero-wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 760px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      font-size: 12px;
-      letter-spacing: .24em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 900;
-      margin-bottom: 18px;
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin: 0;
-    }
-
-    h1 {
-      position: relative;
-      margin: 0 auto 20px;
-      max-width: 660px;
-      font-size: clamp(34px, 5vw, 58px);
-      font-weight: 760;
-      line-height: 1.02;
-      letter-spacing: -.045em;
-    }
-
-    .lead {
-      max-width: 560px;
-      margin: 0 auto 26px;
-      color: var(--muted);
-      font-size: 16px;
-      font-weight: 560;
-    }
-
+  /* hero */
+  .ty { padding: clamp(20px, 3vw, 44px) 0 70px; position: relative; overflow: hidden; }
+  .ty::before {
+    content: ""; position: absolute; top: -180px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 520px; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(14,87,50,.10), transparent 70%); pointer-events: none;
+  }
+  .ty-ticket-real {
+    position: absolute; top: 45%; left: 50%; transform: translate(-50%,-50%) rotate(-7deg);
+    width: min(900px, 112%); display: flex; border-radius: 22px; overflow: hidden;
+    background: #272e26; color: #fff; opacity: .05; z-index: 0; pointer-events: none;
+  }
+  .rt-main { flex: 1; padding: 42px 46px; min-width: 0; }
+  .rt-eyebrow { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: #c9a24a; font-weight: 700; }
+  .rt-title { font-size: clamp(34px, 5vw, 48px); font-weight: 700; letter-spacing: -.025em; line-height: 1.04; margin: 10px 0 0; }
+  .rt-meta { display: flex; gap: 32px; margin-top: 26px; flex-wrap: wrap; }
+  .rt-meta > div { display: flex; flex-direction: column; gap: 3px; }
+  .rt-meta span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+  .rt-meta strong { font-size: 15px; font-weight: 700; }
+  .rt-stub { width: 230px; padding: 40px 26px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+  .rt-stub::before { content: ""; position: absolute; left: 0; top: 18px; bottom: 18px; border-left: 2px dotted rgba(255,255,255,.45); }
+  .rt-admit { font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: #c9a24a; font-weight: 700; }
+  .rt-price { font-size: 42px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+  .rt-sub { font-size: 12px; color: rgba(255,255,255,.6); }
+  @media (max-width: 640px) { .ty-ticket-real { flex-direction: column; width: 320px; } .rt-stub { width: 100%; } }
+  @media (max-width: 600px) {
+    .container { padding: 0 18px; }
+    .ty { padding: 18px 0 52px; }
+    .ty-quote { font-size: clamp(20px, 5.6vw, 36px); line-height: 1.1; margin: 0 auto 20px; padding: 0 4px; }
     .video-wrap {
-      max-width: 680px;
-      margin: 0 auto 30px;
-      aspect-ratio: 16 / 10;
-      position: relative;
-      border-radius: 18px;
-      overflow: hidden;
-      background: #11150f;
-      border: 1px solid rgba(204,183,132,.55);
-      box-shadow: 0 30px 70px rgba(14,87,50,.18), 0 0 0 6px rgba(204,183,132,.10);
-    }
-
-    .hero-video {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .video-fallback {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      color: rgba(255,255,255,.6);
-      font-size: 14px;
-      background:
-        radial-gradient(120% 120% at 70% 20%, rgba(14,87,50,.55), transparent 60%),
-        linear-gradient(135deg, #1d2a1f, #0d130c);
-    }
-
-    .vf-big {
-      font-size: 18px;
-      color: rgba(255,255,255,.82);
-    }
-
-    .vplay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%,-50%);
-      width: 56px;
-      height: 56px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.95);
-      color: var(--accent);
-      font-size: 17px;
-      padding-left: 3px;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      border: 0;
-      box-shadow: 0 10px 26px rgba(0,0,0,.4);
-      transition: transform .15s ease, opacity .2s ease;
-      z-index: 3;
-      font-family: inherit;
-    }
-
-    .vplay:hover {
-      transform: translate(-50%,-50%) scale(1.07);
-    }
-
-    .video-wrap.playing .vplay {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .vctrls {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 16px 20px 14px;
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      z-index: 3;
-      background: linear-gradient(to top, rgba(0,0,0,.55), transparent);
-      opacity: 0;
-      transition: opacity .2s ease;
-    }
-
-    .video-wrap:hover .vctrls,
-    .video-wrap.paused .vctrls {
-      opacity: 1;
-    }
-
-    .vprogress {
-      flex: 1;
-      height: 5px;
-      background: rgba(255,255,255,.25);
-      border-radius: 999px;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .vfill {
-      height: 100%;
-      width: 0%;
-      background: var(--gold);
-      border-radius: 999px;
-    }
-
-    .vtime {
-      color: rgba(255,255,255,.9);
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .vmute-btn {
-      background: transparent;
-      border: 0;
-      color: #fff;
-      font-size: 17px;
-      cursor: pointer;
-      padding: 4px 6px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      text-align: center;
-      background: var(--gold);
-      color: #241d0c;
-      padding: 17px 36px;
-      border-radius: 999px;
-      font-size: 17px;
-      font-weight: 900;
-      letter-spacing: .01em;
-      transition: transform .15s ease, box-shadow .15s ease, filter .15s ease, background .15s ease, color .15s ease;
-      cursor: pointer;
-      border: 0;
-      box-shadow: 0 8px 20px rgba(120,98,48,.24);
-      font-family: inherit;
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 28px rgba(120,98,48,.32);
-      filter: brightness(1.03);
-    }
-
-    .btn.primary {
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 8px 20px rgba(14,87,50,.18);
-    }
-
-    .btn.primary:hover {
-      background: var(--accent-2);
-      box-shadow: 0 14px 28px rgba(14,87,50,.25);
-    }
-
-    .btn.secondary {
-      background: #fff;
-      color: var(--accent);
-      border: 1.5px solid rgba(14,87,50,.18);
-      box-shadow: none;
-    }
-
-    .btn.secondary:hover {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    button:disabled {
-      opacity: .64;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-
-    .note {
-      margin: 16px auto 0;
-      max-width: 520px;
-      font-size: 13.5px;
-      color: var(--muted);
-    }
-
-    .sync-note {
-      margin: 12px auto 0;
-      max-width: 560px;
-      font-size: 12.5px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .sync-note.is-ok {
-      color: var(--accent);
-    }
-
-    .sync-note.is-warn {
-      color: var(--warn);
-    }
-
-    .sync-note.is-error {
-      color: var(--error);
-    }
-
-    .deal-viz {
-      max-width: 580px;
-      margin: clamp(20px, 3vw, 32px) auto 0;
-      padding: 0 clamp(16px, 4vw, 24px);
-    }
-
-    .dv-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(6px, 1.6vw, 14px);
-    }
-
-    .dv-tier {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: clamp(10px, 1.6vw, 16px);
-      padding: clamp(12px, 2.4vw, 22px) clamp(8px, 2vw, 18px);
-      text-align: center;
-      position: relative;
-      transition: transform .22s ease, box-shadow .22s ease;
-    }
-
-    .dv-tier:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 18px 34px rgba(14,87,50,.14);
-    }
-
-    .dv-tier-label {
-      font-size: clamp(8px, 1.6vw, 10.5px);
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 900;
-      margin-bottom: clamp(6px, 1.4vw, 12px);
-    }
-
-    .dv-tier-deal {
-      font-size: clamp(14px, 3.4vw, 28px);
-      font-weight: 900;
-      letter-spacing: -.015em;
-      line-height: 1.04;
-      color: var(--fg);
-      margin-bottom: clamp(4px, 1vw, 8px);
-    }
-
-    .dv-tier-save {
-      font-size: clamp(9px, 1.7vw, 12.5px);
-      color: var(--muted);
-      font-weight: 700;
-      letter-spacing: .01em;
-    }
-
-    .dv-tier--featured {
-      background: linear-gradient(160deg, #0e5732, #082e1c 55%, #03150b);
-      border: 1px solid #052015;
-      box-shadow: 0 14px 28px rgba(8,46,28,.42);
-    }
-
-    .dv-tier--featured .dv-tier-label {
-      color: #cce8d6;
-    }
-
-    .dv-tier--featured .dv-tier-deal {
-      color: #ffffff;
-    }
-
-    .dv-tier--featured .dv-tier-save {
-      color: #b5e0c5;
-      font-weight: 800;
-    }
-
-    .login-section {
-      padding: 0 0 78px;
-      margin-top: -18px;
-    }
-
-    .login-card-clean {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: clamp(28px, 5vw, 46px);
-      border-radius: 26px;
-      background: rgba(255,255,255,.9);
-      border: 1px solid rgba(14,87,50,.12);
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
-
-    .login-logo {
-      height: 28px;
-      width: auto;
-      margin: 0 auto 24px;
-    }
-
-    .panel-kicker {
-      font-size: 12px;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 900;
-      margin-bottom: 10px;
-    }
-
-    .login-card-clean h2 {
-      margin: 0;
-      font-size: clamp(28px, 4vw, 42px);
-      line-height: 1.06;
-      letter-spacing: -.03em;
-    }
-
-    .login-card-clean p {
-      margin: 14px auto 0;
-      max-width: 470px;
-      color: var(--muted);
-      font-size: 15px;
-      font-weight: 560;
-    }
-
-    .login-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 24px;
-    }
-
-    .small-note {
-      font-size: 13px !important;
-      color: var(--muted);
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 300;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 22px;
-      background: rgba(14,14,14,.48);
-      backdrop-filter: blur(8px);
-    }
-
-    .modal-overlay.is-open {
-      display: flex;
-    }
-
-    .modal-card {
-      width: min(100%, 880px);
-      max-height: calc(100vh - 44px);
-      overflow: auto;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      box-shadow: 0 26px 80px rgba(14,87,50,.22);
-      padding: clamp(24px, 4vw, 34px);
-      position: relative;
-      text-align: center;
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 36px;
-      height: 36px;
-      border-radius: 999px;
-      background: #f7f8f5;
-      color: var(--muted);
-      border: 1px solid var(--line);
-      cursor: pointer;
-      font-size: 22px;
-      line-height: 1;
-    }
-
-    .modal-head {
-      max-width: 620px;
       margin: 0 auto 22px;
+      width: calc(100% - 48px);
     }
+    .btn { padding: 16px 32px; font-size: 17px; }
+    .confirm-bar .container { font-size: clamp(7.5px, 2.1vw, 13px); padding: 9px 6px; white-space: nowrap; }
+  }
+  .ty-wrap { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; text-align: center; }
 
-    .modal-head h2 {
-      margin: 0;
-      font-size: clamp(25px, 4vw, 38px);
-      line-height: 1.06;
-      letter-spacing: -.03em;
-    }
+  .ty-eyebrow { display: inline-block; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); font-weight: 800; margin-bottom: 18px; }
 
-    .modal-head p {
-      margin-top: 12px;
-      color: var(--muted);
-      font-weight: 560;
-    }
+  .ty-quote {
+    position: relative; margin: 0 auto 26px; max-width: 620px;
+    font-size: clamp(28px, 4.6vw, 50px); font-weight: 700; line-height: 1.08; letter-spacing: -.03em;
+  }
 
-    .google-btn {
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-      background: #fff;
-      color: #1f1f1f;
-      border: 1px solid #dadce0;
-      box-shadow: 0 8px 20px rgba(0,0,0,.05);
-    }
+  /* premium gold-framed video */
+  .video-wrap {
+    max-width: 680px; margin: 0 auto 30px; aspect-ratio: 16 / 10; position: relative;
+    border-radius: 18px; overflow: hidden; background: #11150f;
+    border: 1px solid rgba(204,183,132,.55);
+    box-shadow: 0 30px 70px rgba(14,87,50,.18), 0 0 0 6px rgba(204,183,132,.10);
+  }
+  .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; color: rgba(255,255,255,.6); font-size: 14px; background: radial-gradient(120% 120% at 70% 20%, rgba(14,87,50,.55), transparent 60%), linear-gradient(135deg, #1d2a1f, #0d130c); }
+  .vf-big { font-size: 18px; color: rgba(255,255,255,.82); }
+  .vplay { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 56px; height: 56px; border-radius: 999px; background: rgba(255,255,255,.95); color: var(--accent); font-size: 17px; padding-left: 3px; display: grid; place-items: center; cursor: pointer; border: 0; box-shadow: 0 10px 26px rgba(0,0,0,.4); transition: transform .15s ease, opacity .2s ease; z-index: 3; font-family: inherit; }
+  .vplay:hover { transform: translate(-50%,-50%) scale(1.07); }
+  .video-wrap.playing .vplay { opacity: 0; pointer-events: none; }
+  .vctrls { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 20px 14px; display: flex; align-items: center; gap: 13px; z-index: 3; background: linear-gradient(to top, rgba(0,0,0,.55), transparent); opacity: 0; transition: opacity .2s ease; }
+  .video-wrap:hover .vctrls, .video-wrap.paused .vctrls { opacity: 1; }
+  .vprogress { flex: 1; height: 5px; background: rgba(255,255,255,.25); border-radius: 999px; cursor: pointer; position: relative; }
+  .vfill { height: 100%; width: 0%; background: var(--gold); border-radius: 999px; }
+  .vtime { color: rgba(255,255,255,.9); font-size: 12px; white-space: nowrap; }
+  .vmute-btn { background: transparent; border: 0; color: #fff; font-size: 17px; cursor: pointer; padding: 4px 6px; }
 
-    .google-btn:hover {
-      background: #fff;
-      color: #1f1f1f;
-    }
+  /* buttons */
+  .btn { display: inline-block; text-align: center; background: var(--gold); color: #241d0c; padding: 18px 46px; border-radius: 999px; font-size: 18px; font-weight: 800; letter-spacing: .01em; transition: transform .15s ease, box-shadow .15s ease, filter .15s ease; cursor: pointer; border: 0; box-shadow: 0 8px 20px rgba(120,98,48,.24); font-family: inherit; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(120,98,48,.32); filter: brightness(1.03); }
+  .ty-note { margin: 16px auto 0; max-width: 420px; font-size: 13.5px; color: var(--muted); }
 
-    .google-mark {
-      width: 20px;
-      height: 20px;
-      flex: 0 0 auto;
-    }
+  .sync-note {
+    margin: 12px auto 0;
+    max-width: 520px;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .sync-note.is-ok { color: var(--accent); }
+  .sync-note.is-warn { color: #7a5a13; }
+  .sync-note.is-error { color: #8a1f1f; }
 
-    .auth-divider {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin: 22px 0;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      font-weight: 850;
-    }
+  /* ===== THE DEAL: clean pricing-tier cards, fluid at every width ===== */
+  .deal-viz {
+    max-width: 580px;
+    margin: clamp(20px, 3vw, 32px) auto 0;
+    padding: 0 clamp(16px, 4vw, 24px);
+  }
+  .dv-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(6px, 1.6vw, 14px);
+  }
+  .dv-tier {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: clamp(10px, 1.6vw, 16px);
+    padding: clamp(12px, 2.4vw, 22px) clamp(8px, 2vw, 18px);
+    text-align: center;
+    position: relative;
+    transition: transform .22s ease, box-shadow .22s ease;
+  }
+  .dv-tier:hover { transform: translateY(-5px); box-shadow: 0 18px 34px rgba(14,87,50,.14); }
+  .dv-tier-label {
+    font-size: clamp(8px, 1.6vw, 10.5px); letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--muted); font-weight: 800;
+    margin-bottom: clamp(6px, 1.4vw, 12px);
+  }
+  .dv-tier-deal {
+    font-size: clamp(14px, 3.4vw, 28px);
+    font-weight: 800; letter-spacing: -.015em; line-height: 1.04;
+    color: var(--fg);
+    margin-bottom: clamp(4px, 1vw, 8px);
+  }
+  .dv-tier-save {
+    font-size: clamp(9px, 1.7vw, 12.5px);
+    color: var(--muted); font-weight: 600;
+    letter-spacing: .01em;
+  }
+  .dv-tier--featured {
+    background: linear-gradient(160deg, #0e5732, #082e1c 55%, #03150b);
+    border: 1px solid #052015;
+    box-shadow: 0 14px 28px rgba(8,46,28,.42);
+  }
+  .dv-tier--featured:hover { box-shadow: 0 22px 40px rgba(8,46,28,.52); }
+  .dv-tier--featured .dv-tier-label { color: #cce8d6; }
+  .dv-tier--featured .dv-tier-deal { color: #ffffff; }
+  .dv-tier--featured .dv-tier-save { color: #b5e0c5; font-weight: 700; }
 
-    .auth-divider::before,
-    .auth-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--line);
-    }
+  /* member login section: shown underneath the referral/video information */
+  .login-section { padding: 0 0 78px; margin-top: -18px; }
+  .login-card-clean {
+    max-width: 620px; margin: 0 auto; padding: clamp(28px, 5vw, 46px);
+    border-radius: 26px; background: rgba(255,255,255,.86); border: 1px solid rgba(14,87,50,.12);
+    box-shadow: 0 24px 70px rgba(14,87,50,.12); text-align: center;
+  }
+  .login-logo { height: 28px; width: auto; margin: 0 auto 24px; }
+  .panel-kicker { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); font-weight: 900; margin-bottom: 10px; }
+  .login-card-clean h2 { margin: 0; font-size: clamp(28px, 4vw, 42px); line-height: 1.06; letter-spacing: -.03em; }
+  .login-card-clean p { margin: 14px auto 0; max-width: 430px; color: var(--muted); font-size: 15px; }
+  .google-btn {
+    margin-top: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    background: #fff; color: #101510; border: 1px solid rgba(14,87,50,.16); box-shadow: 0 12px 30px rgba(14,87,50,.12);
+  }
+  .google-btn svg { width: 18px; height: 18px; flex: 0 0 auto; }
+  .small-note { font-size: 13px !important; color: var(--muted); }
+  @media (max-width: 600px) { .login-section { padding-bottom: 54px; } .login-card-clean { border-radius: 22px; } .google-btn { width: 100%; } }
 
-    .auth-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      text-align: left;
-    }
 
-    .auth-option {
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 20px;
-      background: #fbfcfb;
-    }
 
-    .auth-option.featured {
-      background:
-        radial-gradient(circle at top right, rgba(204,183,132,.26), transparent 34%),
-        #fff;
-      border-color: rgba(14,87,50,.18);
-    }
+  /* login choice popup: hidden until a dashboard CTA is clicked */
+  .login-modal-overlay {
+    position: fixed; inset: 0; z-index: 300; display: none; align-items: center; justify-content: center;
+    padding: 22px; background: rgba(14,14,14,.48); backdrop-filter: blur(8px);
+  }
+  .login-modal-overlay.is-open { display: flex; }
+  .login-modal-card {
+    width: min(100%, 480px); max-height: calc(100dvh - 32px); overflow-y: auto; background: #fff; border: 1px solid var(--line); border-radius: 24px;
+    box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(22px, 4vw, 30px); position: relative; text-align: center;
+  }
+  .login-modal-close {
+    position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 999px;
+    background: #f7f8f5; color: var(--fg); font-size: 22px; line-height: 1; border: 0; cursor: pointer;
+  }
+  .login-modal-card h2 { margin: 0; font-size: clamp(24px, 3.4vw, 34px); line-height: 1.08; letter-spacing: -.03em; }
+  .login-modal-card p { margin: 10px auto 0; max-width: 390px; color: var(--muted); font-size: 14px; }
+  .login-choice-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+  .email-btn {
+    background: var(--gold); color: #241d0c; border: 0; box-shadow: 0 8px 20px rgba(120,98,48,.20);
+  }
+  .login-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0 12px; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+  .login-divider::before, .login-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .email-login-form { display: grid; gap: 10px; text-align: left; }
+  .email-login-form label { font-size: 13px; font-weight: 800; }
+  .email-login-form input {
+    width: 100%; padding: 13px 14px; border: 1px solid var(--line); border-radius: 11px; background: #fbfcfb; color: var(--fg); font-family: inherit; font-size: 15px;
+  }
+  .email-login-form input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,87,50,.12); background: #fff; }
+  .email-login-note { min-height: 18px; margin-top: 8px !important; text-align: center; font-size: 12.5px !important; font-weight: 700; }
+  .inline-reset-btn { width: 100%; margin-top: 2px; padding: 11px 14px; font-size: 14px; background: #fff; color: var(--accent); border: 1.5px solid rgba(14,87,50,.20); box-shadow: none; }
+  .password-setup-form.is-hidden, .email-login-form.is-hidden, .login-divider.is-hidden { display: none; }
+  .dashboard-choice-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .dashboard-choice-actions .btn { margin-top: 0; }
+  @media (max-width: 600px) {
+    .login-choice-row { grid-template-columns: 1fr; }
+    .dashboard-choice-actions { display: grid; }
+  }
 
-    .auth-option h3 {
-      margin: 0 0 7px;
-      font-size: 18px;
-      letter-spacing: -.01em;
-    }
-
-    .auth-option p {
-      margin: 0 0 15px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 560;
-    }
-
-    .form-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    input {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fbfcfb;
-      color: var(--fg);
-    }
-
-    input::placeholder {
-      color: #a8ada6;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(14,87,50,.12);
-      background: #fff;
-    }
-
-    .form-message {
-      display: block;
-      min-height: 18px;
-      margin-top: 4px;
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 750;
-    }
-
-    .form-message.error {
-      color: var(--error);
-    }
-
-    .password-setup-only {
-      display: none;
-    }
-
-    .modal-card.setup-mode .normal-login-only {
-      display: none;
-    }
-
-    .modal-card.setup-mode .password-setup-only {
-      display: block;
-    }
-
-    .setup-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      text-align: left;
-    }
-
-    footer {
-      border-top: 1px solid var(--line);
-      padding: 34px 0 42px;
-    }
-
-    .footer-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    @media (max-width: 760px) {
-      .container {
-        padding: 0 18px;
-      }
-
-      .hero {
-        padding: 24px 0 46px;
-      }
-
-      h1 {
-        font-size: clamp(31px, 9vw, 44px);
-      }
-
-      .video-wrap {
-        width: calc(100% - 10px);
-        margin-bottom: 24px;
-      }
-
-      .dv-grid,
-      .auth-grid,
-      .setup-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-card {
-        border-radius: 18px;
-        padding: 24px 18px;
-      }
-
-      .login-card-clean {
-        border-radius: 20px;
-      }
-
-      .login-actions .btn,
-      .google-btn,
-      .auth-option .btn {
-        width: 100%;
-      }
-
-      .confirm-bar .container {
-        font-size: clamp(8px, 2.3vw, 13px);
-        padding: 9px 6px;
-        white-space: nowrap;
-      }
-
-      .footer-row {
-        display: grid;
-        justify-items: start;
-      }
-    }
-  </style>
+  /* footer */
+  footer { padding: 54px 0 36px; }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
+  .footer-links a { font-size: 14px; color: var(--muted); }
+  .footer-links a:hover { color: var(--fg); }
+  .copy { font-size: 13px; color: var(--muted); margin-top: 22px; }
+</style>
 </head>
-
 <body>
-  <div class="confirm-bar">
-    <div class="container">
-      <span class="cb-dot"></span>
-      Your Monaco Content Retreat booking is confirmed.
+
+<!-- confirmation -->
+<div class="confirm-bar">
+  <div class="container"><span class="cb-dot"></span> <span id="confirmationText">Your spot in Monaco is secured. A confirmation is on its way to your inbox.</span></div>
+</div>
+
+<!-- header -->
+<header class="ty-top">
+  <div class="ty-top-row"><img class="ty-logo" src="ga-wordmark.png" alt="grow acquisition" /></div>
+</header>
+
+<!-- hero -->
+<main class="ty">
+  <div class="ty-ticket-real" aria-hidden="true">
+    <div class="rt-main">
+      <div class="rt-eyebrow">Grow Acquisition presents</div>
+      <div class="rt-title">The Monaco<br>Content Retreat</div>
+      <div class="rt-meta">
+        <div><span>Dates</span><strong>18 &amp; 19 July 2026</strong></div>
+        <div><span>Location</span><strong>Monaco</strong></div>
+        <div><span>Access</span><strong>2 full days, in person</strong></div>
+      </div>
+    </div>
+    <div class="rt-stub">
+      <div class="rt-admit">Admit one</div>
+      <div class="rt-price">&euro;2,600</div>
+      <div class="rt-sub">per seat</div>
     </div>
   </div>
+  <div class="ty-wrap">
+    <h1 class="ty-quote">Wait... what if you can get<br>your ticket for free?</h1>
 
-  <header class="top">
-    <div class="top-row">
-      <img class="logo" src="ga-wordmark.png" alt="grow acquisition" />
+    <!-- VIDEO: drop "referral-video.mp4" into this folder to go live -->
+    <div class="video-wrap" id="heroVideo" aria-label="Referral video">
+      <div class="video-fallback" id="vFallback">
+        <div><span class="vf-big">&#9654; Your video</span></div>
+      </div>
+      <video class="hero-video" id="vEl" playsinline preload="metadata" style="display:none;">
+        <source src="https://vppzxigpj9vbo5d1.public.blob.vercel-storage.com/referral-video.mp4" type="video/mp4" />
+      </video>
+      <button class="vplay" id="vplayBtn" type="button" aria-label="Play">&#9654;</button>
+      <div class="vctrls">
+        <div class="vprogress" id="vprog"><div class="vfill" id="vfill"></div></div>
+        <div class="vtime" id="vtime">0:00 / 0:00</div>
+        <button class="vmute-btn" id="muteToggle" type="button" aria-label="Toggle sound">&#128266;</button>
+      </div>
     </div>
-  </header>
 
-  <main>
-    <section class="hero">
-      <div class="ticket-bg" aria-hidden="true">
-        <div class="ticket-main">
-          <div class="ticket-eyebrow">Monaco Content Retreat</div>
-          <div class="ticket-title">Confirmed booking</div>
-          <div class="ticket-meta">
-            <div>
-              <span>Location</span>
-              <strong>Monaco</strong>
-            </div>
-            <div>
-              <span>Status</span>
-              <strong>Paid</strong>
-            </div>
-          </div>
+    <a class="btn" id="referFriendBtn" href="/auth/google/start">I want to refer a friend</a>
+    <p class="ty-note">Refer 2 friends who join and your own ticket is on us.</p>
+    <p class="sync-note is-warn" id="paymentSyncNote">Confirming your payment and syncing your booking...</p>
+
+    <!-- ===== THE DEAL: clean pricing tiers under the CTA ===== -->
+    <div class="deal-viz" aria-label="Referral rewards">
+      <div class="dv-grid">
+        <div class="dv-tier">
+          <div class="dv-tier-label">Refer 1 friend</div>
+          <div class="dv-tier-deal">50% off</div>
+          <div class="dv-tier-save">&euro;1,300 refunded</div>
         </div>
-        <div class="ticket-stub">
-          <div class="ticket-admit">Admit one</div>
-          <div class="ticket-price">✓</div>
-          <div class="ticket-sub">Members pass</div>
+        <div class="dv-tier dv-tier--featured">
+          <div class="dv-tier-label">Refer 2 friends</div>
+          <div class="dv-tier-deal">Ticket free</div>
+          <div class="dv-tier-save">&euro;2,600 refunded</div>
         </div>
       </div>
+    </div>
 
-      <div class="container">
-        <div class="hero-wrap">
-          <span class="eyebrow">You're in</span>
-          <h1 id="confirmationTitle">Your spot in Monaco is secured.</h1>
-          <p class="lead" id="confirmationText">
-            We are confirming your payment and preparing your Members dashboard.
-          </p>
+  </div>
+</main>
 
-          <div class="video-wrap" id="videoWrap">
-            <video
-              class="hero-video"
-              id="heroVideo"
-              preload="metadata"
-              playsinline
-              poster=""
-            >
-              <source src="monaco-thankyou-video.mp4" type="video/mp4" />
-            </video>
-
-            <div class="video-fallback" id="videoFallback">
-              <div>
-                <div class="vf-big">Welcome to Monaco</div>
-                <div>Next steps are below.</div>
-              </div>
-            </div>
-
-            <button class="vplay" id="videoPlayBtn" type="button" aria-label="Play video">▶</button>
-
-            <div class="vctrls">
-              <button class="vmute-btn" id="videoMuteBtn" type="button" aria-label="Mute video">🔊</button>
-              <div class="vprogress" id="videoProgress">
-                <div class="vfill" id="videoFill"></div>
-              </div>
-              <span class="vtime" id="videoTime">0:00</span>
-            </div>
-          </div>
-
-          <button class="btn primary" id="openDashboardBtn" type="button">
-            Open Members dashboard
-          </button>
-
-          <p class="note">
-            Use the email from your paid booking. Google sign-in is easiest, or set a simple password below.
-          </p>
-
-          <p class="sync-note is-warn" id="syncNote">
-            Confirming your payment and syncing your dashboard...
-          </p>
-
-          <div class="deal-viz" aria-label="Referral reward summary">
-            <div class="dv-grid">
-              <div class="dv-tier">
-                <div class="dv-tier-label">One friend joins</div>
-                <div class="dv-tier-deal">Referral tracked</div>
-                <div class="dv-tier-save">Saved in dashboard</div>
-              </div>
-
-              <div class="dv-tier dv-tier--featured">
-                <div class="dv-tier-label">Two friends join</div>
-                <div class="dv-tier-deal">Reward unlocked</div>
-                <div class="dv-tier-save">Confirmed internally</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="login-section">
-      <div class="container">
-        <div class="login-card-clean">
-          <img class="login-logo" src="ga-wordmark.png" alt="grow acquisition" />
-          <div class="panel-kicker">Members access</div>
-          <h2>Access your dashboard</h2>
-          <p>
-            Continue with Google, or use the password area. If this is your first time, choose
-            <strong>Set/reset password</strong> instead of trying to log in.
-          </p>
-
-          <div class="login-actions">
-            <button class="btn primary" id="openDashboardBtn2" type="button">Open dashboard</button>
-            <button class="btn secondary" id="openPasswordSetupBtn" type="button">Set/reset password</button>
-          </div>
-
-          <p class="small-note">
-            The only thing that matters is that the email matches your paid Whop/payment email.
-          </p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <div class="modal-overlay" id="loginModal" aria-hidden="true">
-    <div class="modal-card" id="loginModalCard" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
-      <button class="modal-close" id="loginModalClose" type="button" aria-label="Close">×</button>
-
-      <div class="normal-login-only">
-        <div class="modal-head">
-          <div class="panel-kicker">Members dashboard</div>
-          <h2 id="loginModalTitle">Log in with your paid booking email</h2>
-          <p>
-            Google is the fastest option. Password login is separate below, and first-time setup has its own box.
-          </p>
-        </div>
-
-        <button class="btn google-btn" id="googleLoginBtn" type="button">
-          <svg class="google-mark" viewBox="0 0 48 48" aria-hidden="true">
-            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.4-.4-3.5z"/>
-            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/>
-            <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.3-11.3-7.9l-6.6 5.1C9.4 39.6 16.1 44 24 44z"/>
-            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C36.9 39.3 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/>
-          </svg>
+<!-- member login, placed after the referral explanation -->
+<section class="login-section" id="dashboard-login">
+  <div class="container">
+    <div class="login-card-clean">
+      <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+      <div class="panel-kicker">Member dashboard</div>
+      <h2>Log in to your Monaco Members dashboard</h2>
+      <p>Continue with the email you used to pay, or with the Google account connected to your Monaco booking.</p>
+      <div class="dashboard-choice-actions">
+        <button class="btn email-btn" id="emailLoginBtn" type="button">Continue with your email</button>
+        <a class="btn google-btn" id="googleLoginBtn" href="/auth/google/start">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.223 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
           Continue with Google
-        </button>
-
-        <div class="auth-divider">or use password</div>
-
-        <div class="auth-grid">
-          <section class="auth-option featured">
-            <h3>Already set a password?</h3>
-            <p>Log in with your booking email and dashboard password.</p>
-
-            <form class="form-grid" id="emailLoginForm">
-              <input id="emailLoginInput" type="email" placeholder="Booking email" autocomplete="email" required />
-              <input id="emailPasswordInput" type="password" placeholder="Password" autocomplete="current-password" required />
-              <button class="btn primary" id="emailLoginSubmit" type="submit">Log in</button>
-              <span class="form-message" id="emailLoginNote"></span>
-            </form>
-          </section>
-
-          <section class="auth-option">
-            <h3>First time or forgot?</h3>
-            <p>Send yourself a fresh set/reset link. This ignores stale browser cookies.</p>
-
-            <form class="form-grid" id="passwordRequestForm">
-              <input id="passwordRequestEmailInput" type="email" placeholder="Booking email" autocomplete="email" required />
-              <button class="btn secondary" id="passwordRequestSubmit" type="submit">Send set/reset link</button>
-              <span class="form-message" id="passwordRequestNote"></span>
-            </form>
-          </section>
-        </div>
+        </a>
       </div>
-
-      <div class="password-setup-only">
-        <div class="modal-head">
-          <div class="panel-kicker">Set dashboard password</div>
-          <h2>Create or reset your dashboard password</h2>
-          <p id="passwordSetupIntro">
-            Use your paid booking email. This flow does not rely on old cookies.
-          </p>
-        </div>
-
-        <div class="setup-grid">
-          <section class="auth-option featured">
-            <h3>Set password now</h3>
-            <p>If this page opened from a reset email, the link token will be used directly.</p>
-
-            <form class="form-grid" id="passwordSetupForm">
-              <input id="passwordSetupEmailInput" type="email" placeholder="Booking email" autocomplete="email" required />
-              <input id="passwordSetupInput" type="password" placeholder="New password" autocomplete="new-password" minlength="6" required />
-              <input id="passwordSetupConfirmInput" type="password" placeholder="Confirm password" autocomplete="new-password" minlength="6" required />
-              <button class="btn primary" id="passwordSetupSubmit" type="submit">Save password</button>
-              <span class="form-message" id="passwordSetupNote"></span>
-            </form>
-          </section>
-
-          <section class="auth-option">
-            <h3>Need a fresh link?</h3>
-            <p>Use this if the email link is old, opened in the wrong browser, or says expired.</p>
-
-            <form class="form-grid" id="freshLinkForm">
-              <input id="freshLinkEmailInput" type="email" placeholder="Booking email" autocomplete="email" required />
-              <button class="btn secondary" id="freshLinkSubmit" type="submit">Send fresh link</button>
-              <span class="form-message" id="freshLinkNote"></span>
-            </form>
-
-            <button class="btn secondary" id="backToLoginBtn" type="button" style="margin-top:12px;width:100%;">Back to login</button>
-          </section>
-        </div>
-      </div>
+      <p class="small-note">Access your profile, referrals, curriculum, and WhatsApp community.</p>
     </div>
   </div>
+</section>
 
-  <footer>
-    <div class="container">
-      <div class="footer-row">
-        <img src="ga-wordmark.png" alt="grow acquisition" style="height:30px;width:auto;" />
-        <div>Grow Acquisition. Copyright 2026. All rights reserved.</div>
+
+
+<!-- dashboard login choice popup -->
+<div class="login-modal-overlay" id="dashboardLoginModal" aria-hidden="true">
+  <div class="login-modal-card" role="dialog" aria-modal="true" aria-labelledby="dashboardLoginModalTitle">
+    <button class="login-modal-close" id="closeDashboardLoginModal" type="button" aria-label="Close login popup">×</button>
+    <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
+    <div class="panel-kicker">Member dashboard</div>
+    <h2 id="dashboardLoginModalTitle">Log in with your booking email</h2>
+    <p id="dashboardLoginModalText">Google still works best. Password login only needs the email from the paid booking.</p>
+
+    <a class="btn google-btn login-google-btn" id="modalGoogleLoginBtn" href="/auth/google/start">
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.654 32.657 29.223 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+        <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+        <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+        <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+      </svg>
+      Continue with Google
+    </a>
+
+    <div class="login-divider" id="emailLoginDivider">or</div>
+
+    <form class="email-login-form" id="thankyouEmailLoginForm">
+      <label for="thankyouLoginEmail">Booking email</label>
+      <input id="thankyouLoginEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
+
+      <label for="thankyouLoginPassword">Dashboard password</label>
+      <input id="thankyouLoginPassword" type="password" autocomplete="current-password" placeholder="Your password" required />
+
+      <button class="btn email-btn" id="thankyouEmailLoginSubmit" type="submit">Log in</button>
+      <button class="btn inline-reset-btn" id="thankyouPasswordRequestInline" type="button">Create or reset password by email</button>
+      <p class="email-login-note" id="thankyouEmailLoginNote">The email only has to match a paid Monaco booking.</p>
+    </form>
+
+    <form class="email-login-form password-setup-form is-hidden" id="thankyouPasswordSetupForm">
+      <label for="thankyouSetupEmail">Booking email</label>
+      <input id="thankyouSetupEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
+
+      <label for="thankyouSetupPassword">Create password</label>
+      <input id="thankyouSetupPassword" type="password" autocomplete="new-password" placeholder="At least 8 characters" required />
+
+      <label for="thankyouSetupPasswordConfirm">Confirm password</label>
+      <input id="thankyouSetupPasswordConfirm" type="password" autocomplete="new-password" placeholder="Type it again" required />
+
+      <button class="btn email-btn" id="thankyouPasswordSetupSubmit" type="submit">Create password and continue</button>
+      <p class="email-login-note" id="thankyouPasswordSetupNote">Your username is the same email used for your paid Monaco booking.</p>
+    </form>
+
+    <div class="login-divider is-hidden" id="passwordRequestDivider">first time here?</div>
+
+    <form class="email-login-form password-request-form is-hidden" id="thankyouPasswordRequestForm">
+      <label for="thankyouPasswordRequestEmail">Paid booking email</label>
+      <input id="thankyouPasswordRequestEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
+
+      <button class="btn email-btn" id="thankyouPasswordRequestSubmit" type="submit">Email me a secure setup link</button>
+      <p class="email-login-note" id="thankyouPasswordRequestNote">If you already paid, we will email a one-time setup link to your booking email. No browser storage is used.</p>
+    </form>
+  </div>
+</div>
+
+<!-- footer -->
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <img src="ga-wordmark.png" alt="grow acquisition" style="height: 30px; width:auto;" />
+      <div class="footer-links">
+        <a href="https://www.instagram.com/niksetting/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.youtube.com/@niksetting" target="_blank" rel="noopener">YouTube</a>
+        <a href="/monaco.html">Home</a>
       </div>
     </div>
-  </footer>
+    <div class="copy">Grow Acquisition. Copyright 2026. All rights reserved.</div>
+  </div>
+</footer>
 
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
+<script>
+  (function(){
+    var wrap=document.getElementById('heroVideo'), v=document.getElementById('vEl'),
+        fallback=document.getElementById('vFallback'), playBtn=document.getElementById('vplayBtn'),
+        prog=document.getElementById('vprog'), fill=document.getElementById('vfill'),
+        timeEl=document.getElementById('vtime'), muteBtn=document.getElementById('muteToggle');
+    if(!v||!wrap) return;
+    var hasVideo=false;
+    v.addEventListener('loadeddata',function(){ hasVideo=true; v.style.display='block'; if(fallback) fallback.style.display='none'; });
+    v.addEventListener('error',function(){});
+    function fmt(s){ if(!isFinite(s)) return '0:00'; s=Math.max(0,s|0); var m=(s/60)|0,sec=s%60; return m+':'+(sec<10?'0':'')+sec; }
+    function updateState(){ wrap.classList.toggle('playing',!v.paused); wrap.classList.toggle('paused',v.paused); playBtn.innerHTML=v.paused?'&#9654;':'&#10074;&#10074;'; }
+    function updateProgress(){ if(!v.duration) return; fill.style.width=(v.currentTime/v.duration*100)+'%'; timeEl.textContent=fmt(v.currentTime)+' / '+fmt(v.duration); }
+    function syncMute(){ muteBtn.innerHTML=v.muted?'&#128263;':'&#128266;'; }
+    playBtn.addEventListener('click',function(){
+      if (v.style.display === 'none') { v.style.display = 'block'; if (fallback) fallback.style.display = 'none'; }
+      if (v.paused) { v.muted = false; syncMute(); v.play().catch(function(){}); }
+      else { v.pause(); }
+    });
+    prog.addEventListener('click',function(e){ var r=prog.getBoundingClientRect(); if(v.duration) v.currentTime=(e.clientX-r.left)/r.width*v.duration; });
+    muteBtn.addEventListener('click',function(){ v.muted=!v.muted; if(!v.muted) v.play(); syncMute(); });
+    v.addEventListener('play',updateState); v.addEventListener('pause',updateState);
+    v.addEventListener('timeupdate',updateProgress); v.addEventListener('loadedmetadata',updateProgress);
+    updateState(); syncMute();
+  })();
 
-      const loginModal = document.getElementById("loginModal");
-      const loginModalCard = document.getElementById("loginModalCard");
-      const loginModalClose = document.getElementById("loginModalClose");
-      const openDashboardBtn = document.getElementById("openDashboardBtn");
-      const openDashboardBtn2 = document.getElementById("openDashboardBtn2");
-      const openPasswordSetupBtn = document.getElementById("openPasswordSetupBtn");
-      const googleLoginBtn = document.getElementById("googleLoginBtn");
+  /*
+    This block is the important fix.
 
-      const emailLoginForm = document.getElementById("emailLoginForm");
-      const emailLoginInput = document.getElementById("emailLoginInput");
-      const emailPasswordInput = document.getElementById("emailPasswordInput");
-      const emailLoginSubmit = document.getElementById("emailLoginSubmit");
-      const emailLoginNote = document.getElementById("emailLoginNote");
+    Your checkout page sends abandoned leads before Whop opens.
+    This thank-you page confirms the paid checkout after Whop sends the customer back here.
 
-      const passwordRequestForm = document.getElementById("passwordRequestForm");
-      const passwordRequestEmailInput = document.getElementById("passwordRequestEmailInput");
-      const passwordRequestSubmit = document.getElementById("passwordRequestSubmit");
-      const passwordRequestNote = document.getElementById("passwordRequestNote");
+    It calls:
+      /api/referrals/complete-checkout?session_id=...
 
-      const passwordSetupForm = document.getElementById("passwordSetupForm");
-      const passwordSetupEmailInput = document.getElementById("passwordSetupEmailInput");
-      const passwordSetupInput = document.getElementById("passwordSetupInput");
-      const passwordSetupConfirmInput = document.getElementById("passwordSetupConfirmInput");
-      const passwordSetupSubmit = document.getElementById("passwordSetupSubmit");
-      const passwordSetupNote = document.getElementById("passwordSetupNote");
-      const passwordSetupIntro = document.getElementById("passwordSetupIntro");
+    Your backend then:
+      1. checks/syncs the Whop payment,
+      2. runs handlePaymentSucceeded,
+      3. sends the paid customer to Google Apps Script,
+      4. Google Apps Script adds them to Airtable → Paid customers.
+  */
+  (function(){
+    var googleBtn = document.getElementById('googleLoginBtn');
+    var modalGoogleBtn = document.getElementById('modalGoogleLoginBtn');
+    var emailBtn = document.getElementById('emailLoginBtn');
+    var referBtn = document.getElementById('referFriendBtn');
+    var loginModal = document.getElementById('dashboardLoginModal');
+    var closeLoginModalBtn = document.getElementById('closeDashboardLoginModal');
+    var modalTitle = document.getElementById('dashboardLoginModalTitle');
+    var modalText = document.getElementById('dashboardLoginModalText');
+    var emailLoginDivider = document.getElementById('emailLoginDivider');
+    var emailLoginForm = document.getElementById('thankyouEmailLoginForm');
+    var emailLoginInput = document.getElementById('thankyouLoginEmail');
+    var emailPasswordInput = document.getElementById('thankyouLoginPassword');
+    var emailLoginNote = document.getElementById('thankyouEmailLoginNote');
+    var passwordSetupForm = document.getElementById('thankyouPasswordSetupForm');
+    var setupEmailInput = document.getElementById('thankyouSetupEmail');
+    var setupPasswordInput = document.getElementById('thankyouSetupPassword');
+    var setupPasswordConfirmInput = document.getElementById('thankyouSetupPasswordConfirm');
+    var setupPasswordNote = document.getElementById('thankyouPasswordSetupNote');
+    var passwordRequestDivider = document.getElementById('passwordRequestDivider');
+    var passwordRequestForm = document.getElementById('thankyouPasswordRequestForm');
+    var passwordRequestEmailInput = document.getElementById('thankyouPasswordRequestEmail');
+    var passwordRequestInlineBtn = document.getElementById('thankyouPasswordRequestInline');
+    var passwordRequestNote = document.getElementById('thankyouPasswordRequestNote');
+    var syncNote = document.getElementById('paymentSyncNote');
+    var confirmationText = document.getElementById('confirmationText');
 
-      const freshLinkForm = document.getElementById("freshLinkForm");
-      const freshLinkEmailInput = document.getElementById("freshLinkEmailInput");
-      const freshLinkSubmit = document.getElementById("freshLinkSubmit");
-      const freshLinkNote = document.getElementById("freshLinkNote");
-      const backToLoginBtn = document.getElementById("backToLoginBtn");
+    var params = new URLSearchParams(location.search);
 
-      const syncNote = document.getElementById("syncNote");
-      const confirmationText = document.getElementById("confirmationText");
+    
+    var checkoutId =
+  params.get('checkout_session_id') ||
+  params.get('session_id') ||
+  params.get('checkout_configuration_id') ||
+  '';
 
-      const videoWrap = document.getElementById("videoWrap");
-      const heroVideo = document.getElementById("heroVideo");
-      const videoPlayBtn = document.getElementById("videoPlayBtn");
-      const videoMuteBtn = document.getElementById("videoMuteBtn");
-      const videoProgress = document.getElementById("videoProgress");
-      const videoFill = document.getElementById("videoFill");
-      const videoTime = document.getElementById("videoTime");
-      const videoFallback = document.getElementById("videoFallback");
+var bookingEmail =
+  params.get('email') ||
+  '';
 
-      const checkoutId =
-        params.get("checkout_session_id") ||
-        params.get("session_id") ||
-        params.get("checkout_configuration_id") ||
-        "";
+var passwordSetupToken =
+  params.get('set_password_token') ||
+  params.get('password_setup_token') ||
+  params.get('setup_token') ||
+  params.get('reset_token') ||
+  params.get('token') ||
+  '';
 
-      const setupToken =
-        params.get("set_password_token") ||
-        params.get("password_setup_token") ||
-        params.get("setup_token") ||
-        params.get("reset_token") ||
-        params.get("token") ||
-        "";
+var loginUrl = checkoutId
+  ? '/thankyou-referral-dashboard.html?checkout_session_id=' + encodeURIComponent(checkoutId)
+  : '/thankyou-referral-dashboard.html';
 
-      let bookingEmail = (
-        params.get("member_email") ||
-        params.get("email") ||
-        localStorage.getItem("monaco_booking_email") ||
-        ""
-      ).trim().toLowerCase();
+    var dashboardPasswordSet = null;
+    var hasCheckoutSessionCookie = false;
 
-      let checkoutSessionConfirmed = false;
+    function setBookingEmail(email) {
+      email = String(email || '').trim().toLowerCase();
+      if (!email) return;
 
-      function setBookingEmail(email) {
-        bookingEmail = String(email || "").trim().toLowerCase();
+      bookingEmail = email;
 
-        if (bookingEmail) {
-          localStorage.setItem("monaco_booking_email", bookingEmail);
-        }
 
-        [
-          emailLoginInput,
-          passwordRequestEmailInput,
-          passwordSetupEmailInput,
-          freshLinkEmailInput
-        ].forEach(function (input) {
-          if (input && !input.value && bookingEmail) {
-            input.value = bookingEmail;
-          }
-        });
+      if (emailLoginInput) {
+        emailLoginInput.placeholder = email;
+        if (!emailLoginInput.value) emailLoginInput.value = email;
       }
 
+      if (setupEmailInput) {
+        setupEmailInput.placeholder = email;
+        if (!setupEmailInput.value) setupEmailInput.value = email;
+      }
+
+      if (passwordRequestEmailInput) {
+        passwordRequestEmailInput.placeholder = email;
+        if (!passwordRequestEmailInput.value) passwordRequestEmailInput.value = email;
+      }
+    }
+
+    setBookingEmail(bookingEmail);
+
+    var normalGoogleLoginUrl = '/auth/google/start';
+
+var checkoutGoogleLinkingUrl = checkoutId
+  ? '/auth/google/start?checkout_session_id=' + encodeURIComponent(checkoutId)
+  : normalGoogleLoginUrl;
+
+/*
+  On the immediate thank-you page, passing checkout_session_id is okay.
+  It is signed by the server in OAuth state and only helps with immediate
+  post-checkout Google linking.
+
+  But if there is no checkout ID in the current URL, the button must be a
+  pure database-backed login:
+    /auth/google/start
+*/
+if (googleBtn) googleBtn.href = checkoutGoogleLinkingUrl;
+if (modalGoogleBtn) modalGoogleBtn.href = checkoutGoogleLinkingUrl;
+
+function showEmailLoginMode() {
+  if (modalTitle) modalTitle.textContent = 'Log in with your booking email';
+  if (modalText) modalText.textContent = 'Google still works best. Password login only needs the email from the paid booking.';
+  emailLoginDivider?.classList.remove('is-hidden');
+  emailLoginForm?.classList.remove('is-hidden');
+  passwordSetupForm?.classList.add('is-hidden');
+  passwordRequestDivider?.classList.add('is-hidden');
+  passwordRequestForm?.classList.add('is-hidden');
+
+  setBookingEmail(bookingEmail);
+
+  if (emailLoginNote) {
+    emailLoginNote.textContent = 'The email only has to match a paid Monaco booking.';
+    emailLoginNote.style.color = '';
+  }
+}
+
+function showPasswordSetupMode(message) {
+  if (modalTitle) modalTitle.textContent = 'Set your dashboard password';
+  if (modalText) {
+    modalText.textContent =
+      message ||
+      'Use this secure setup link to create or reset your Monaco dashboard password. Your login email must match the email used for your paid booking.';
+  }
+
+  emailLoginDivider?.classList.remove('is-hidden');
+  emailLoginForm?.classList.add('is-hidden');
+  passwordSetupForm?.classList.remove('is-hidden');
+  passwordRequestDivider?.classList.add('is-hidden');
+  passwordRequestForm?.classList.add('is-hidden');
+
+  setBookingEmail(bookingEmail);
+
+  if (setupPasswordNote) {
+    setupPasswordNote.textContent = 'Your username is the same email used for your paid Monaco booking.';
+    setupPasswordNote.style.color = '';
+  }
+
+  setTimeout(function(){
+    setupPasswordInput?.focus();
+  }, 80);
+}
+
+async function requestPasswordSetupLink(email, noteElement) {
+  email = String(email || '').trim().toLowerCase();
+
+  if (!email) {
+    if (noteElement) {
+      noteElement.textContent = 'Enter the email you used for your paid Monaco booking.';
+      noteElement.style.color = '#8a1f1f';
+    }
+    return;
+  }
+
+  if (noteElement) {
+    noteElement.textContent = 'Sending a secure setup link if this email has a paid booking...';
+    noteElement.style.color = '';
+  }
+
+  try {
+    var response = await fetch('/api/referrals/password-setup-request', {
+      method: 'POST',
+      credentials: 'omit',
+      cache: 'no-store',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: email })
+    });
+
+    var data = await response.json().catch(function(){ return {}; });
+
+    if (!response.ok) {
+      throw new Error(data.error || data.message || 'Could not send setup link.');
+    }
+
+    if (noteElement) {
+      noteElement.textContent =
+        data.message ||
+        'If this email belongs to a paid Monaco booking, a secure setup link has been sent.';
+      noteElement.style.color = '#0e5732';
+    }
+  } catch (error) {
+    if (noteElement) {
+      noteElement.textContent =
+        error.message ||
+        'Could not send setup link. Continue with Google if this is your Gmail, or contact support.';
+      noteElement.style.color = '#8a1f1f';
+    }
+  }
+}
+
+    function openDashboardLoginModal(event) {
+      if (event) event.preventDefault();
       setBookingEmail(bookingEmail);
 
-      function setMessage(el, message, isError) {
-        if (!el) return;
-
-        el.textContent = message || "";
-        el.classList.toggle("error", Boolean(isError));
+      if (checkoutId && dashboardPasswordSet !== true) {
+        showPasswordSetupMode('You have paid. Create a dashboard password now, or continue with Google anytime.');
+      } else {
+        showEmailLoginMode();
       }
 
-      function setSyncNote(message, type) {
-        if (!syncNote) return;
+      loginModal?.classList.add('is-open');
+      loginModal?.setAttribute('aria-hidden', 'false');
+      setTimeout(function(){
+        if (passwordSetupForm?.classList.contains('is-hidden')) emailLoginInput?.focus();
+        else setupPasswordInput?.focus();
+      }, 80);
+    }
 
-        syncNote.textContent = message;
-        syncNote.className = "sync-note" + (type ? " " + type : "");
-      }
+    function closeDashboardLoginModal() {
+      loginModal?.classList.remove('is-open');
+      loginModal?.setAttribute('aria-hidden', 'true');
+    }
 
-      function cleanUrlAfterSetup() {
-        const cleanUrl = window.location.origin + window.location.pathname;
-        history.replaceState({}, document.title, cleanUrl);
-      }
+    if (referBtn) {
+      referBtn.href = loginUrl;
+      referBtn.addEventListener('click', openDashboardLoginModal);
+    }
 
-      function openLoginModal() {
-        loginModalCard.classList.remove("setup-mode");
-        loginModal.classList.add("is-open");
-        loginModal.setAttribute("aria-hidden", "false");
-      }
+    if (emailBtn) {
+      emailBtn.addEventListener('click', openDashboardLoginModal);
+    }
 
-      function openSetupModal(message) {
-        if (message && passwordSetupIntro) {
-          passwordSetupIntro.textContent = message;
+    closeLoginModalBtn?.addEventListener('click', closeDashboardLoginModal);
+    loginModal?.addEventListener('click', function(event) {
+      if (event.target && event.target.id === 'dashboardLoginModal') closeDashboardLoginModal();
+    });
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') closeDashboardLoginModal();
+    });
+
+    emailLoginForm?.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      var email = String(emailLoginInput?.value || '').trim().toLowerCase();
+      var password = String(emailPasswordInput?.value || '');
+
+      if (!email || !password) {
+        if (emailLoginNote) {
+          emailLoginNote.textContent = 'Enter the email you used at checkout and your password.';
+          emailLoginNote.style.color = '#8a1f1f';
         }
-
-        loginModalCard.classList.add("setup-mode");
-        loginModal.classList.add("is-open");
-        loginModal.setAttribute("aria-hidden", "false");
-
-        setBookingEmail(bookingEmail);
+        return;
       }
 
-      function closeModal() {
-        loginModal.classList.remove("is-open");
-        loginModal.setAttribute("aria-hidden", "true");
+      setBookingEmail(email);
+
+      var submitBtn = document.getElementById('thankyouEmailLoginSubmit');
+      var originalText = submitBtn ? submitBtn.textContent : 'Log in';
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Checking...';
       }
 
-      async function readJson(response) {
-        const text = await response.text();
-
-        try {
-          return text ? JSON.parse(text) : {};
-        } catch (error) {
-          return {};
-        }
+      if (emailLoginNote) {
+        emailLoginNote.textContent = 'Checking your booking email and password...';
+        emailLoginNote.style.color = '';
       }
 
-      async function postJson(url, payload, credentials) {
-        const response = await fetch(url, {
-          method: "POST",
-          credentials: credentials || "include",
-          cache: "no-store",
+      try {
+        var response = await fetch('/api/referrals/password-login', {
+          method: 'POST',
+          credentials: 'include',
+          cache: 'no-store',
           headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify(payload || {})
+          body: JSON.stringify({ email: email, password: password, checkout_session_id: checkoutId })
         });
 
-        const data = await readJson(response);
+        var data = await response.json().catch(function(){ return {}; });
 
         if (!response.ok) {
-          const error = new Error(data.error || data.message || "Request failed.");
-          error.status = response.status;
-          error.data = data;
-          throw error;
-        }
+          if (data && data.code === 'PASSWORD_NOT_SET') {
+            if (checkoutId || hasCheckoutSessionCookie) {
+              showPasswordSetupMode('No password exists yet for this paid email. Create your dashboard password now.');
+              return;
+            }
 
-        return data;
-      }
+            if (passwordRequestEmailInput && !passwordRequestEmailInput.value) {
+              passwordRequestEmailInput.value = data.email || email;
+            }
 
-      async function getJson(url) {
-        const response = await fetch(url, {
-          method: "GET",
-          credentials: "include",
-          cache: "no-store",
-          headers: {
-            "Accept": "application/json"
+            await requestPasswordSetupLink(data.email || email, passwordRequestNote || emailLoginNote);
+
+            if (emailLoginNote) {
+              emailLoginNote.textContent =
+                'No dashboard password exists yet. I sent a secure setup link if this email has a paid booking. If it is a Gmail address, you can also use Continue with Google.';
+              emailLoginNote.style.color = '#0e5732';
+            }
+            return;
           }
+          throw new Error(data.error || data.message || 'Could not log in with that email and password.');
+        }
+
+        window.location.href = '/thankyou-referral-dashboard.html';
+      } catch (error) {
+        if (emailLoginNote) {
+          emailLoginNote.textContent = error.message || 'Could not log in with that email and password.';
+          emailLoginNote.style.color = '#8a1f1f';
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+    });
+
+    passwordRequestInlineBtn?.addEventListener('click', async function() {
+      var email = String(emailLoginInput?.value || bookingEmail || '').trim().toLowerCase();
+      setBookingEmail(email);
+
+      var originalText = passwordRequestInlineBtn.textContent || 'Create or reset password by email';
+      passwordRequestInlineBtn.disabled = true;
+      passwordRequestInlineBtn.textContent = 'Sending...';
+
+      await requestPasswordSetupLink(email, emailLoginNote || passwordRequestNote);
+
+      passwordRequestInlineBtn.disabled = false;
+      passwordRequestInlineBtn.textContent = originalText;
+    });
+
+
+
+    passwordRequestForm?.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      var email = String(passwordRequestEmailInput?.value || '').trim().toLowerCase();
+      setBookingEmail(email);
+
+      var submitBtn = document.getElementById('thankyouPasswordRequestSubmit');
+      var originalText = submitBtn ? submitBtn.textContent : 'Email me a secure setup link';
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+      }
+
+      await requestPasswordSetupLink(email, passwordRequestNote);
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+
+
+    passwordSetupForm?.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      var email = String(setupEmailInput?.value || '').trim().toLowerCase();
+      var password = String(setupPasswordInput?.value || '');
+      var confirm = String(setupPasswordConfirmInput?.value || '');
+
+      if (!email || !password || !confirm) {
+        if (setupPasswordNote) {
+          setupPasswordNote.textContent = 'Enter your paid booking email and create a password.';
+          setupPasswordNote.style.color = '#8a1f1f';
+        }
+        return;
+      }
+
+      if (password.length < 8) {
+        if (setupPasswordNote) {
+          setupPasswordNote.textContent = 'Password must be at least 8 characters.';
+          setupPasswordNote.style.color = '#8a1f1f';
+        }
+        return;
+      }
+
+      if (password !== confirm) {
+        if (setupPasswordNote) {
+          setupPasswordNote.textContent = 'Passwords do not match.';
+          setupPasswordNote.style.color = '#8a1f1f';
+        }
+        return;
+      }
+
+      setBookingEmail(email);
+
+      var submitBtn = document.getElementById('thankyouPasswordSetupSubmit');
+      var originalText = submitBtn ? submitBtn.textContent : 'Create password and continue';
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+      }
+
+      if (setupPasswordNote) {
+        setupPasswordNote.textContent = 'Creating your dashboard password...';
+        setupPasswordNote.style.color = '';
+      }
+
+      try {
+        var setupEndpoint = passwordSetupToken
+  ? '/api/referrals/password-set-with-token'
+  : '/api/referrals/password-set';
+
+var setupPayload = passwordSetupToken
+  ? {
+      token: passwordSetupToken,
+      email: email,
+      password: password
+    }
+  : {
+      email: email,
+      password: password,
+      checkout_session_id: checkoutId
+    };
+
+var response = await fetch(setupEndpoint, {
+  method: 'POST',
+  credentials: passwordSetupToken ? 'omit' : 'include',
+  cache: 'no-store',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(setupPayload)
+
         });
 
-        const data = await readJson(response);
+        var data = await response.json().catch(function(){ return {}; });
 
         if (!response.ok) {
-          const error = new Error(data.error || data.message || "Request failed.");
-          error.status = response.status;
-          error.data = data;
-          throw error;
+          throw new Error(data.error || data.message || 'Could not set your dashboard password.');
         }
 
-        return data;
+        window.location.href = '/thankyou-referral-dashboard.html';
+      } catch (error) {
+        if (!checkoutId && !hasCheckoutSessionCookie) {
+          await requestPasswordSetupLink(email, setupPasswordNote);
+        } else if (setupPasswordNote) {
+          setupPasswordNote.textContent = error.message || 'Could not set your dashboard password.';
+          setupPasswordNote.style.color = '#8a1f1f';
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+    });
+
+    function setSyncNote(message, type) {
+      if (!syncNote) return;
+
+      syncNote.textContent = message;
+      syncNote.className = 'sync-note' + (type ? ' ' + type : '');
+    }
+
+    async function completeCheckoutSync(attempt) {
+      attempt = attempt || 1;
+
+      if (!checkoutId) {
+        setSyncNote('Booking confirmed. Continue with your email or Google to open your dashboard.', 'is-warn');
+        console.warn('No checkout session ID found on thankyou page. Paid customer sync could not run from browser.');
+        return;
       }
 
-      function dashboardUrl() {
-        if (bookingEmail) {
-          return "/thankyou-referral-dashboard.html?email=" + encodeURIComponent(bookingEmail);
+      setSyncNote('Confirming your payment and syncing your booking...', 'is-warn');
+
+      try {
+        var response = await fetch(
+          '/api/referrals/complete-checkout?session_id=' + encodeURIComponent(checkoutId),
+          {
+            method: 'GET',
+            credentials: 'include',
+            cache: 'no-store',
+            headers: {
+              'Accept': 'application/json'
+            }
+          }
+        );
+
+        var data = await response.json().catch(function(){ return {}; });
+
+        console.log('Checkout completion sync response:', data);
+
+        if (data.dashboard && data.dashboard.email) {
+          setBookingEmail(data.dashboard.email);
+          dashboardPasswordSet = Boolean(data.dashboard.password_set || data.dashboard.passwordSet);
+          hasCheckoutSessionCookie = true;
         }
 
-        return "/thankyou-referral-dashboard.html";
-      }
+        if (data.status === 'complete') {
+          setSyncNote('Payment confirmed. Your Members dashboard is ready.', 'is-ok');
 
-      function googleStartUrl() {
+          if (confirmationText) {
+            confirmationText.textContent = 'Your spot in Monaco is secured. Your payment has been confirmed.';
+          }
+
+          if (dashboardPasswordSet !== true) {
+            setTimeout(function(){
+              showPasswordSetupMode('Your payment is confirmed. Create your dashboard password now, or continue with Google anytime.');
+              loginModal?.classList.add('is-open');
+              loginModal?.setAttribute('aria-hidden', 'false');
+            }, 450);
+          }
+
+          return;
+        }
+
         /*
-          Keep Google simple. Google login should only need the Google email
-          to match a paid customer in the backend.
+          Sometimes Whop payment sync takes a few seconds.
+          Try a few times automatically.
         */
-        return "/auth/google/start";
-      }
-
-      async function requestPasswordSetupLink(email, noteElement) {
-        const cleanEmail = String(email || "").trim().toLowerCase();
-
-        if (!cleanEmail) {
-          setMessage(noteElement, "Enter the booking email first.", true);
+        if (attempt < 5) {
+          setTimeout(function(){
+            completeCheckoutSync(attempt + 1);
+          }, 3000);
           return;
         }
 
-        setBookingEmail(cleanEmail);
-        setMessage(noteElement, "Sending a fresh set/reset link...", false);
+        setSyncNote('Your payment is still processing. You can log in now, or refresh this page in a moment.', 'is-warn');
 
-        try {
-          await postJson(
-            "/api/referrals/password-setup-request",
-            { email: cleanEmail },
-            "omit"
-          );
+      } catch (error) {
+        console.error('Could not complete checkout sync:', error);
 
-          setMessage(noteElement, "Fresh set/reset link sent. Check your inbox.", false);
-        } catch (error) {
-          setMessage(
-            noteElement,
-            error.message || "Could not send the set/reset link.",
-            true
-          );
-        }
-      }
-
-      function formatTime(seconds) {
-        if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
-
-        const minutes = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-
-        return minutes + ":" + String(secs).padStart(2, "0");
-      }
-
-      function initVideo() {
-        if (!heroVideo || !videoWrap) return;
-
-        heroVideo.addEventListener("loadedmetadata", function () {
-          if (videoFallback) videoFallback.style.display = "none";
-          if (videoTime) videoTime.textContent = formatTime(heroVideo.duration);
-        });
-
-        heroVideo.addEventListener("error", function () {
-          if (videoFallback) videoFallback.style.display = "grid";
-        });
-
-        videoPlayBtn?.addEventListener("click", async function () {
-          try {
-            if (heroVideo.paused) {
-              await heroVideo.play();
-            } else {
-              heroVideo.pause();
-            }
-          } catch (error) {
-            console.warn("Video play failed:", error);
-          }
-        });
-
-        heroVideo.addEventListener("play", function () {
-          videoWrap.classList.add("playing");
-          videoWrap.classList.remove("paused");
-        });
-
-        heroVideo.addEventListener("pause", function () {
-          videoWrap.classList.remove("playing");
-          videoWrap.classList.add("paused");
-        });
-
-        heroVideo.addEventListener("timeupdate", function () {
-          const duration = heroVideo.duration || 0;
-          const percent = duration ? (heroVideo.currentTime / duration) * 100 : 0;
-
-          if (videoFill) videoFill.style.width = percent + "%";
-          if (videoTime) videoTime.textContent = formatTime(heroVideo.currentTime);
-        });
-
-        videoMuteBtn?.addEventListener("click", function () {
-          heroVideo.muted = !heroVideo.muted;
-          videoMuteBtn.textContent = heroVideo.muted ? "🔇" : "🔊";
-        });
-
-        videoProgress?.addEventListener("click", function (event) {
-          const duration = heroVideo.duration || 0;
-          if (!duration) return;
-
-          const rect = videoProgress.getBoundingClientRect();
-          const x = event.clientX - rect.left;
-          const percent = Math.max(0, Math.min(1, x / rect.width));
-
-          heroVideo.currentTime = duration * percent;
-        });
-      }
-
-      async function completeCheckoutSync(attempt) {
-        attempt = attempt || 1;
-
-        if (!checkoutId) {
-          setSyncNote("Booking confirmed. Continue with your email or Google to open your dashboard.", "is-warn");
+        if (attempt < 3) {
+          setTimeout(function(){
+            completeCheckoutSync(attempt + 1);
+          }, 3000);
           return;
         }
 
-        setSyncNote("Confirming your payment and syncing your booking...", "is-warn");
-
-        try {
-          const data = await getJson(
-            "/api/referrals/complete-checkout?session_id=" + encodeURIComponent(checkoutId)
-          );
-
-          console.log("Checkout completion sync response:", data);
-
-          if (data.dashboard && data.dashboard.email) {
-            setBookingEmail(data.dashboard.email);
-          }
-
-          if (data.customer && data.customer.email) {
-            setBookingEmail(data.customer.email);
-          }
-
-          if (data.status === "complete" || data.ok === true) {
-            checkoutSessionConfirmed = true;
-
-            setSyncNote("Payment confirmed. Your Members dashboard is ready.", "is-ok");
-
-            if (confirmationText) {
-              confirmationText.textContent = "Your payment has been confirmed. Open the dashboard with Google, or set a password for email login.";
-            }
-
-            const dashboard = data.dashboard || data.customer || {};
-            const passwordSet = Boolean(dashboard.password_set || dashboard.passwordSet);
-
-            if (!passwordSet) {
-              setTimeout(function () {
-                openSetupModal("Your payment is confirmed. Create your dashboard password now, or continue with Google anytime.");
-              }, 450);
-            }
-
-            return;
-          }
-
-          if ((data.status === "processing" || data.status === "pending") && attempt < 5) {
-            setTimeout(function () {
-              completeCheckoutSync(attempt + 1);
-            }, 3000);
-            return;
-          }
-
-          setSyncNote("Your payment is still processing. You can log in now, or refresh this page in a moment.", "is-warn");
-        } catch (error) {
-          console.error("Could not complete checkout sync:", error);
-
-          if (attempt < 3) {
-            setTimeout(function () {
-              completeCheckoutSync(attempt + 1);
-            }, 3000);
-            return;
-          }
-
-          setSyncNote("Booking confirmed. If your dashboard is not ready yet, refresh this page in a moment.", "is-error");
-        }
+        setSyncNote('Booking confirmed. If your dashboard is not ready yet, refresh this page in a moment.', 'is-error');
       }
+    }
 
-      openDashboardBtn?.addEventListener("click", openLoginModal);
-      openDashboardBtn2?.addEventListener("click", openLoginModal);
+    if (passwordSetupToken) {
+  showPasswordSetupMode('Set or reset your dashboard password. Your username is the same email used for your paid Monaco booking.');
+  loginModal?.classList.add('is-open');
+  loginModal?.setAttribute('aria-hidden', 'false');
+} else {
+  completeCheckoutSync(1);
+}
+  })();
 
-      openPasswordSetupBtn?.addEventListener("click", function () {
-        openSetupModal("Set or reset your dashboard password. Use the same email as your paid booking.");
-      });
+</script>
 
-      loginModalClose?.addEventListener("click", closeModal);
-
-      loginModal?.addEventListener("click", function (event) {
-        if (event.target === loginModal) closeModal();
-      });
-
-      document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape") closeModal();
-      });
-
-      backToLoginBtn?.addEventListener("click", function () {
-        loginModalCard.classList.remove("setup-mode");
-      });
-
-      googleLoginBtn?.addEventListener("click", function () {
-        window.location.href = googleStartUrl();
-      });
-
-      emailLoginForm?.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const email = String(emailLoginInput.value || "").trim().toLowerCase();
-        const password = String(emailPasswordInput.value || "");
-
-        if (!email || !password) {
-          setMessage(emailLoginNote, "Enter your booking email and password.", true);
-          return;
-        }
-
-        setBookingEmail(email);
-
-        emailLoginSubmit.disabled = true;
-        emailLoginSubmit.textContent = "Checking...";
-        setMessage(emailLoginNote, "Checking your booking email and password...", false);
-
-        try {
-          await postJson(
-            "/api/referrals/password-login",
-            {
-              email: email,
-              password: password,
-              checkout_session_id: checkoutId
-            },
-            "include"
-          );
-
-          window.location.href = dashboardUrl();
-        } catch (error) {
-          const data = error.data || {};
-
-          if (data.code === "PASSWORD_NOT_SET") {
-            setMessage(emailLoginNote, "No password exists yet. Use the set/reset box on the right.", true);
-            if (passwordRequestEmailInput) passwordRequestEmailInput.value = email;
-            return;
-          }
-
-          setMessage(
-            emailLoginNote,
-            error.message || "Could not log in with that email and password.",
-            true
-          );
-        } finally {
-          emailLoginSubmit.disabled = false;
-          emailLoginSubmit.textContent = "Log in";
-        }
-      });
-
-      passwordRequestForm?.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const email = String(passwordRequestEmailInput.value || "").trim().toLowerCase();
-
-        passwordRequestSubmit.disabled = true;
-        passwordRequestSubmit.textContent = "Sending...";
-
-        await requestPasswordSetupLink(email, passwordRequestNote);
-
-        passwordRequestSubmit.disabled = false;
-        passwordRequestSubmit.textContent = "Send set/reset link";
-      });
-
-      freshLinkForm?.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const email = String(freshLinkEmailInput.value || "").trim().toLowerCase();
-
-        freshLinkSubmit.disabled = true;
-        freshLinkSubmit.textContent = "Sending...";
-
-        await requestPasswordSetupLink(email, freshLinkNote);
-
-        freshLinkSubmit.disabled = false;
-        freshLinkSubmit.textContent = "Send fresh link";
-      });
-
-      passwordSetupForm?.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const email = String(passwordSetupEmailInput.value || "").trim().toLowerCase();
-        const password = String(passwordSetupInput.value || "");
-        const confirm = String(passwordSetupConfirmInput.value || "");
-
-        setMessage(passwordSetupNote, "", false);
-
-        if (!email || !password || !confirm) {
-          setMessage(passwordSetupNote, "Enter your booking email and new password.", true);
-          return;
-        }
-
-        if (password.length < 6) {
-          setMessage(passwordSetupNote, "Password must be at least 6 characters.", true);
-          return;
-        }
-
-        if (password !== confirm) {
-          setMessage(passwordSetupNote, "Passwords do not match.", true);
-          return;
-        }
-
-        setBookingEmail(email);
-
-        passwordSetupSubmit.disabled = true;
-        passwordSetupSubmit.textContent = "Saving...";
-        setMessage(passwordSetupNote, "Saving your dashboard password...", false);
-
-        try {
-          if (setupToken) {
-            /*
-              Important fix:
-              Reset/setup link uses the token directly and omits cookies.
-              This prevents stale cookies from making a fresh link look expired.
-            */
-            await postJson(
-              "/api/referrals/password-set-with-token",
-              {
-                token: setupToken,
-                email: email,
-                password: password
-              },
-              "omit"
-            );
-
-            cleanUrlAfterSetup();
-          } else if (checkoutId || checkoutSessionConfirmed) {
-            await postJson(
-              "/api/referrals/password-set",
-              {
-                email: email,
-                password: password,
-                checkout_session_id: checkoutId
-              },
-              "include"
-            );
-          } else {
-            /*
-              No checkout session and no token: don't pretend we can set it.
-              Send a clean reset link instead.
-            */
-            await requestPasswordSetupLink(email, passwordSetupNote);
-            return;
-          }
-
-          setMessage(passwordSetupNote, "Password saved. Opening your dashboard...", false);
-
-          setTimeout(function () {
-            window.location.href = dashboardUrl();
-          }, 600);
-        } catch (error) {
-          setMessage(
-            passwordSetupNote,
-            error.message || "Could not save password. Request a fresh link.",
-            true
-          );
-        } finally {
-          passwordSetupSubmit.disabled = false;
-          passwordSetupSubmit.textContent = "Save password";
-        }
-      });
-
-      function init() {
-        initVideo();
-        completeCheckoutSync(1);
-
-        if (setupToken) {
-          openSetupModal("Create or reset your password from the email link. This ignores old browser cookies.");
-        }
-      }
-
-      init();
-    })();
-  </script>
 </body>
 </html>
