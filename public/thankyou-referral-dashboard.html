@@ -46,6 +46,10 @@ img { max-width: 100%; display: block; }
 button, input, select, textarea { font: inherit; }
 .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 .hidden { display: none !important; }
+body.auth-checking .confirm-bar,
+body.auth-checking #heroSection {
+  display: none !important;
+}
 
 /* top */
 .confirm-bar { background: var(--accent); color: #fff; font-weight: 600; }
@@ -446,7 +450,7 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
 }
 </style>
 </head>
-<body>
+<body class="auth-checking">
   <div class="confirm-bar">
     <div class="container">
       <span class="cb-dot"></span>
@@ -1046,7 +1050,9 @@ async function loadMe() {
       }
 
       function render(d) {
+        document.body.classList.remove("auth-checking");
         heroSection?.classList.remove("hidden");
+        
 
         const rows = d.referrals.length
           ? d.referrals.map((r) => `
@@ -1470,6 +1476,7 @@ function bindSetPasswordForm(d = {}) {
 }
 
 function renderLogin(message = "", prefillEmail = "") {
+  document.body.classList.remove("auth-checking");
   logoutBtn.classList.add("hidden");
   heroSection?.classList.add("hidden");
   document.querySelector(".confirm-bar")?.classList.add("hidden");
