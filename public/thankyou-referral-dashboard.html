@@ -1805,15 +1805,19 @@ async function boot() {
       Just show the password form. The backend checks the token only when the
       user submits the new password.
     */
-    if (passwordSetupToken) {
-      renderSetPasswordScreen({
-        token: passwordSetupToken,
-        email: memberEmailFromUrl(),
-        message: "Choose your dashboard password. Use the booking email that received this setup email."
-      });
-      return;
-    }
+const passwordSetupMode =
+  urlParam("setup_password") === "1" ||
+  urlParam("set_password") === "1" ||
+  urlParam("create_password") === "1";
 
+if (passwordSetupToken || passwordSetupMode) {
+  renderSetPasswordScreen({
+    token: passwordSetupToken,
+    email: memberEmailFromUrl(),
+    message: "Set or reset your dashboard password. Use the booking email that received this link, then choose a new password."
+  });
+  return;
+}
     if (googleError) {
       renderLogin(googleError);
       return;
