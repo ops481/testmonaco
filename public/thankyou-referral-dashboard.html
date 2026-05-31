@@ -340,7 +340,11 @@ td { color: var(--fg); font-weight: 550; }
 .modal-card { width: min(100%, 720px); background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(22px, 4vw, 30px); position: relative; }
 .modal-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 999px; background: #f7f8f5; color: var(--fg); font-size: 22px; line-height: 1; }
 .invite-form { display: grid; gap: 12px; margin-top: 18px; }
-.contact-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; }
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
 .invite-message { display: block; color: var(--accent); font-size: 13px; font-weight: 700; }
 .invite-message.error { color: var(--error); }
 .modal-success {
@@ -738,7 +742,10 @@ async function loadMe() {
 
         success?.classList.remove("is-visible");
         modal?.classList.add("is-open");
-        setTimeout(() => $("inviteContactValue")?.focus(), 50);
+        setTimeout(() => {
+          initInvitePhonePicker();
+          $("inviteContactValue")?.focus();
+        }, 50);
       }
 
       function closeInviteModal() {
@@ -746,7 +753,7 @@ async function loadMe() {
       }
 
       function initInvitePhonePicker() {
-        const input = $("inviteContactValue");
+        const input = $("inviteWhatsappValue");
         if (!input || !window.intlTelInput || invitePhoneInput) return;
 
         invitePhoneInput = window.intlTelInput(input, {
@@ -809,27 +816,6 @@ async function loadMe() {
         };
       }
 
-      function resetInviteContactInputForType(type) {
-        const input = $("inviteContactValue");
-        if (!input) return;
-
-        input.value = "";
-
-        if (type === "phone") {
-          input.type = "tel";
-          input.placeholder = "7939 299 167";
-          input.inputMode = "tel";
-          input.autocomplete = "tel";
-          setTimeout(initInvitePhonePicker, 0);
-          return;
-        }
-
-        destroyInvitePhonePicker();
-        input.type = "email";
-        input.placeholder = "friend@example.com";
-        input.inputMode = "email";
-        input.autocomplete = "email";
-      }
 
 
       function normaliseInstagramHandle(value) {
@@ -862,15 +848,10 @@ async function loadMe() {
         }
       }
 
-      function updateInviteContactPlaceholder() {
-        const type = String($("inviteContactType")?.value || "email");
-        resetInviteContactInputForType(type);
-      }
-
       async function sendReferralInvitation(d) {
         const nameInput = $("inviteFriendName");
-        const contactTypeInput = $("inviteContactType");
-        const contactInput = $("inviteContactValue");
+        const emailInput = $("inviteContactValue");
+        const whatsappInput = $("inviteWhatsappValue");
         const instagramInput = $("inviteInstagramHandle");
         const noteInput = $("inviteNote");
         const btn = $("sendInviteBtn");
@@ -878,14 +859,10 @@ async function loadMe() {
         const success = $("inviteSuccess");
 
         const friendName = String(nameInput?.value || "").trim() || "Friend";
-        const contactType = String(contactTypeInput?.value || "email").trim();
-        const rawContactValue = String(contactInput?.value || "").trim();
-        const phoneResult = contactType === "phone"
-          ? normaliseWhatsappNumber(rawContactValue)
-          : null;
-        const contactValue = contactType === "phone"
-          ? phoneResult.value
-          : rawContactValue;
+        const friendEmail = String(emailInput?.value || "").trim().toLowerCase();
+        const rawWhatsapp = String(whatsappInput?.value || "").trim();
+        const phoneResult = normaliseWhatsappNumber(rawWhatsapp);
+        const friendPhone = phoneResult.value;
         const friendInstagram = normaliseInstagramHandle(instagramInput?.value || "");
         const note = String(noteInput?.value || "").trim();
 
@@ -895,13 +872,23 @@ async function loadMe() {
           msg.classList.toggle("error", type === "error");
         }
 
-        if (!contactValue) {
-          setMessage("Add one contact detail first.", "error");
+        if (!friendEmail) {
+          setMessage("Add their email first.", "error");
           return;
         }
 
-        if (contactType === "phone" && phoneResult && !phoneResult.ok) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(friendEmail)) {
+          setMessage("Add a valid email address.", "error");
+          return;
+        }
+
+        if (!phoneResult.ok) {
           setMessage(phoneResult.message, "error");
+          return;
+        }
+
+        if (!friendInstagram) {
+          setMessage("Add their Instagram handle first.", "error");
           return;
         }
 
@@ -909,9 +896,6 @@ async function loadMe() {
           setMessage("Your referral link is not ready yet.", "error");
           return;
         }
-
-        const friendEmail = contactType === "email" ? contactValue : "";
-        const friendPhone = contactType === "phone" ? contactValue : "";
 
         btn.disabled = true;
         btn.textContent = "Sending...";
@@ -922,21 +906,20 @@ async function loadMe() {
           await json(API.inviteFriend, {
             method: "POST",
             body: JSON.stringify({
-  referrer_email: d.email || memberEmailFromUrl(),
-  friend_name: friendName,
-  friend_email: friendEmail,
-  friend_phone: friendPhone,
-  friend_instagram: friendInstagram,
-  note
-})
+              referrer_email: d.email || memberEmailFromUrl(),
+              friend_name: friendName,
+              friend_email: friendEmail,
+              friend_phone: friendPhone,
+              friend_instagram: friendInstagram,
+              note
+            })
           });
 
           if (nameInput) nameInput.value = "";
-          if (contactInput) contactInput.value = "";
+          if (emailInput) emailInput.value = "";
+          if (whatsappInput) whatsappInput.value = "";
           if (instagramInput) instagramInput.value = "";
           if (noteInput) noteInput.value = "";
-          if (contactTypeInput) contactTypeInput.value = "email";
-          updateInviteContactPlaceholder();
 
           if (success) {
             success.innerHTML = `
@@ -963,7 +946,6 @@ async function loadMe() {
           btn.textContent = "Send invitation";
         }
       }
-
 
       function whatsappCommunityHtml(d) {
         const whatsapp = d.whatsapp || {};
@@ -1140,20 +1122,17 @@ async function loadMe() {
                     <button class="modal-close" id="closeInviteModalBtn" type="button" aria-label="Close invitation popup">×</button>
                     <div class="panel-kicker">Invitation</div>
                     <h2 id="inviteModalTitle">Invite a friend</h2>
-                    <p>Add an email or WhatsApp number.</p>
+                    <p>Add their email and WhatsApp number.</p>
 
                     <form class="invite-form" id="inviteFriendForm">
                       <input id="inviteFriendName" class="input" type="text" placeholder="Friend's name" autocomplete="name" />
 
-                      <div class="contact-row">
-                        <select id="inviteContactType" class="input" aria-label="Contact type">
-                          <option value="email">Email</option>
-                          <option value="phone">WhatsApp</option>
-                        </select>
-                        <input id="inviteContactValue" class="input" type="email" placeholder="friend@example.com" required />
-                      </div>
+                     <div class="contact-row">
+  <input id="inviteContactValue" class="input" type="email" placeholder="friend@example.com" autocomplete="email" required />
+  <input id="inviteWhatsappValue" class="input" type="tel" placeholder="WhatsApp number" autocomplete="tel" required />
+</div>
 
-                      <input id="inviteInstagramHandle" class="input" type="text" placeholder="@instagram_handle" autocomplete="off" inputmode="text" />
+                      <input id="inviteInstagramHandle" class="input" type="text" placeholder="@instagram_handle" autocomplete="off" inputmode="text" required/>
 
                       <input id="inviteNote" class="input" type="text" placeholder="Optional note" />
 
@@ -1195,7 +1174,6 @@ async function loadMe() {
                           <div class="profile-field"><span>Company</span><strong>${esc(d.company || "—")}</strong></div>
                           <div class="profile-field"><span>Google</span><strong>${d.google_connected ? "Connected" : "Optional"}</strong></div>
                           <div class="profile-field"><span>Status</span><strong>Active</strong></div>
-                          <div class="profile-field"><span>Referral code</span><strong>${esc(d.referral_code || "Pending")}</strong></div>
                         </div>
 
                         <div class="profile-actions">
@@ -1298,7 +1276,7 @@ async function loadMe() {
         $("openInviteModalBtn")?.addEventListener("click", openInviteModal);
         $("closeInviteModalBtn")?.addEventListener("click", closeInviteModal);
         $("cancelInviteBtn")?.addEventListener("click", closeInviteModal);
-        $("inviteContactType")?.addEventListener("change", updateInviteContactPlaceholder);
+
         $("inviteInstagramHandle")?.addEventListener("focus", handleInstagramFocus);
         $("inviteInstagramHandle")?.addEventListener("input", handleInstagramInput);
         $("inviteInstagramHandle")?.addEventListener("blur", handleInstagramBlur);
@@ -1310,7 +1288,6 @@ async function loadMe() {
           if (event.key === "Escape") closeInviteModal();
         });
 
-        updateInviteContactPlaceholder();
 
         $("inviteFriendForm")?.addEventListener("submit", async (event) => {
           event.preventDefault();
