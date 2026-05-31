@@ -97,7 +97,7 @@ const PASSWORD_SETUP_TOKEN_TTL_MS = cleanEnvNumber(
   1000 * 60 * 60 * 24 * 7
 );
 
-const SESSION_COOKIE = "monaco_session";
+const SESSION_COOKIE = "monaco_session_v2";
 
 const SESSION_TTL_MS = cleanEnvNumber(
   process.env.SESSION_TTL_MS,
@@ -2664,7 +2664,9 @@ async function sessionEmail(req) {
 }
 
 async function clearServerSession(req, res) {
-  const token = String(req.cookies?.[SESSION_COOKIE] || "");
+  const token =
+    String(req.cookies?.monaco_session_v2 || "") ||
+    String(req.cookies?.monaco_session || "");
 
   if (token) {
     await db()
@@ -2673,7 +2675,8 @@ async function clearServerSession(req, res) {
       .eq("token_hash", sha256(token));
   }
 
-  res.clearCookie(SESSION_COOKIE, cookieOptions(0));
+  res.clearCookie("monaco_session_v2", cookieOptions(0));
+  res.clearCookie("monaco_session", cookieOptions(0));
 }
 
 function cookieOptions(maxAge) {
