@@ -1050,43 +1050,60 @@ async function loadMe() {
                 <div class="panel">
                   <div class="panel-head">
                     <div>
-                      <div class="panel-kicker">Referrals</div>
+                      <div class="panel-kicker">Refefrrals</div>
                       <h2>Your referral link</h2>
                       <p>Share your link. Paid referrals show below after verification.</p>
                     </div>
                     <div class="pill">${d.paid_referrals}/${d.max_referrals} complete</div>
                   </div>
 
-                  <div class="referral-group">
-                    <div class="referral-card feature">
-                      <h3>Share this link</h3>
-                      <p>Send it directly, or use the invite flow below.</p>
-                      <div class="link-row">
-                        <input id="referralLinkInput" class="input" value="${esc(d.referral_link)}" readonly aria-label="Your referral link" />
-                        <button id="copyReferralBtn" class="btn" type="button">Copy link</button>
-                      </div>
-                      <div class="inline-actions compact-note">
-                        <button id="openInviteModalBtn" class="secondary-btn" type="button">Invite a friend</button>
-                        <p>Rewards are issued after payment verification.</p>
-                      </div>
-                    </div>
 
-                    <div class="referral-card referral-progress">
-                      <div>
-                        <div class="progress-top">
-                          <strong>${d.paid_referrals}/${d.max_referrals}</strong>
-                          <span>complete</span>
-                        </div>
-                        <div class="progress-track" aria-hidden="true">
-                          <div class="progress-fill" style="width:${Math.min(100, Math.max(0, (d.paid_referrals / Math.max(1, d.max_referrals)) * 100))}%"></div>
-                        </div>
-                      </div>
-                      <div class="referral-meta">
-                        <div><span>Remaining</span><strong>${Math.max(0, d.max_referrals - d.paid_referrals)}</strong></div>
-                        <div><span>Link</span><strong>${d.referral_code ? "Ready" : "Pending"}</strong></div>
-                      </div>
-                    </div>
-                  </div>
+
+
+<div class="referral-group">
+  <div class="referral-card feature referral-progress">
+    <div>
+      <h3>Invite a friend</h3>
+      <p>Use the invite flow below. Rewards are issued after payment verification.</p>
+
+      <div class="inline-actions compact-note">
+        <button id="openInviteModalBtn" class="secondary-btn" type="button">
+          Invite a friend
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="progress-top">
+        <strong>${d.paid_referrals}/${d.max_referrals}</strong>
+        <span>complete</span>
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <div
+          class="progress-fill"
+          style="width:${Math.min(100, Math.max(0, (d.paid_referrals / Math.max(1, d.max_referrals)) * 100))}%"
+        ></div>
+      </div>
+    </div>
+
+    <div class="referral-meta">
+      <div>
+        <span>Remaining</span>
+        <strong>${Math.max(0, d.max_referrals - d.paid_referrals)}</strong>
+      </div>
+
+      <div>
+        <span>Invites</span>
+        <strong>${d.referral_code ? "Ready" : "Pending"}</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
 
                   <div class="referral-activity-card">
                     <div class="referral-activity-grid">
