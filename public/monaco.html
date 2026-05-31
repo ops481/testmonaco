@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "wzs9i6kbw0");
+</script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Monaco Content Retreat · Grow Acquisition</title>
@@ -8,8 +15,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-
-
 
 
 
@@ -122,12 +127,22 @@
   @media (max-width: 540px) { .f1-light { width: 22px; height: 22px; } .f1-gantry { gap: 10px; padding: 12px 16px; } }
 
   /* ===== VIDEO (custom player, from careers site) ===== */
-  .video-wrap {
-    max-width: 980px; margin: 0 auto 30px;
-    aspect-ratio: 16 / 10; background: #11150f;
-    border-radius: 16px; overflow: hidden; position: relative;
-    box-shadow: 0 18px 50px rgba(14,87,50,.16);
-  }
+.video-wrap {
+  max-width: 980px;
+  margin: 0 auto 30px;
+  aspect-ratio: 16 / 9;
+  background: #11150f;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 18px 50px rgba(14,87,50,.16);
+}
+
+.video-wrap wistia-player {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
   .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .video-fallback {
     position: absolute; inset: 0;
@@ -708,6 +723,570 @@
 .login-btn:hover { transform: translateY(-1px); background:rgba(231,194,92,.14); border-color:rgba(231,194,92,.75); }
 @media (max-width: 700px) { .top-nav { top: 92px; } .login-btn { min-height:30px; padding:7px 12px; font-size:10px; } }
 
+
+
+/* ===== MOBILE POLISH OVERRIDES ===== */
+.mobile-only-break {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  html,
+  body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    line-height: 1.45;
+  }
+
+  .container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  section {
+    padding-top: 42px;
+    padding-bottom: 42px;
+  }
+
+  /* Top countdown bar: headline on one line, timer underneath, tighter green area. */
+  .deal-bar-inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px 48px 6px 12px;
+  }
+
+  .deal-left {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .deal-text {
+    display: block;
+    width: 100%;
+    font-size: clamp(8.4px, 2.48vw, 10.3px);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .countdown {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    transform: scale(0.94);
+    transform-origin: top center;
+  }
+
+  .cd {
+    min-width: 29px;
+    padding: 1px 3px;
+    border-radius: 5px;
+    line-height: 1;
+  }
+
+  .cd span {
+    font-size: 10.5px;
+  }
+
+  .cd i {
+    font-size: 5.8px;
+    letter-spacing: 0.03em;
+  }
+
+  .bar-login-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    min-height: 23px;
+    padding: 5px 7px;
+    font-size: 8px;
+    letter-spacing: 0.04em;
+    transform: translateY(-50%);
+  }
+
+  .bar-login-btn:hover {
+    transform: translateY(-50%);
+  }
+
+  /* Hero: slightly zoomed out, with less space between headline and video. */
+  .hero {
+    padding-top: 46px;
+    padding-bottom: 30px;
+  }
+
+  .hero h1 {
+    font-size: clamp(25px, 8.15vw, 34px);
+    line-height: 1.03;
+    letter-spacing: -0.04em;
+    margin-bottom: 16px;
+  }
+
+  .video-wrap {
+    margin-bottom: 14px;
+    border-radius: 12px;
+    aspect-ratio: 16 / 10.4;
+  }
+
+  .hero-cta {
+    margin-top: 16px;
+  }
+
+  .btn {
+    padding: 13px 28px;
+    font-size: 15px;
+  }
+
+  /* Team section: heading is exactly two lines on mobile and closer to the first videos. */
+  #team {
+    padding-top: 34px;
+    padding-bottom: 36px;
+  }
+
+  .mobile-only-break {
+    display: block;
+  }
+
+  #team .section-title {
+    max-width: 360px;
+    font-size: clamp(24px, 6.8vw, 30px);
+    line-height: 1.06;
+    margin: 0 auto 16px !important;
+  }
+
+  .team-grid {
+    gap: 10px 12px;
+  }
+
+  .person .photo {
+    margin-bottom: 8px;
+    border-radius: 12px;
+  }
+
+  .person h3 {
+    font-size: 16px;
+  }
+
+  .person .role {
+    font-size: 11.5px;
+    line-height: 1.2;
+  }
+
+  /* Experience headline: keep it on one mobile line above the track. */
+  #experience {
+    padding-top: 38px;
+    padding-bottom: 40px;
+  }
+
+  #experience .section-title.exp-intro {
+    max-width: 100%;
+    font-size: clamp(15px, 4.75vw, 21px);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    white-space: nowrap;
+    margin-bottom: 14px;
+  }
+
+  #experience .stage-wrap {
+    margin-top: 0;
+  }
+
+  /* Ticket: vertical card on phone. */
+  #claim {
+    padding-top: 36px;
+    padding-bottom: 42px;
+  }
+
+  #claim .section-title {
+    font-size: clamp(26px, 7vw, 34px);
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+  }
+
+  .ticket {
+    --stub-w: 100%;
+    max-width: 360px;
+    flex-direction: column;
+    border-radius: 18px;
+  }
+
+  .ticket-main {
+    width: 100%;
+    padding: 24px 20px 20px;
+    text-align: center;
+  }
+
+  .t-title {
+    font-size: clamp(29px, 8.8vw, 38px);
+    line-height: 0.98;
+  }
+
+  .t-meta {
+    justify-content: center;
+    gap: 14px 20px;
+    margin-top: 18px;
+  }
+
+  .ticket-stub {
+    width: 100%;
+    padding: 18px 20px 20px;
+    gap: 8px;
+    border-top: 2px dotted rgba(255,255,255,.32);
+  }
+
+  .ticket-stub::before,
+  .ticket .hole {
+    display: none;
+  }
+
+  .stub-price {
+    font-size: clamp(31px, 9vw, 40px);
+  }
+
+  .ticket .t-btn {
+    max-width: 230px;
+    padding: 12px 18px;
+    font-size: 13px;
+  }
+
+  /* Extra mobile tightening so the page feels less zoomed in overall. */
+  #meet-more {
+    padding-top: 36px;
+    padding-bottom: 40px;
+  }
+
+  .duo {
+    gap: 12px;
+  }
+
+  .duo-video {
+    border-radius: 12px;
+  }
+
+  #founders {
+    padding-top: 40px;
+    padding-bottom: 46px;
+  }
+
+  .section-sub {
+    margin-bottom: 26px;
+  }
+
+  .center-cta {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 380px) {
+  .deal-text {
+    font-size: 8.2px;
+  }
+
+  .cd {
+    min-width: 27px;
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .cd span {
+    font-size: 10px;
+  }
+
+  #experience .section-title.exp-intro {
+    font-size: 14.7px;
+    letter-spacing: -0.045em;
+  }
+
+  #team .section-title {
+    font-size: 23px;
+  }
+}
+
+/* ===== PHONE TEXT SCALE OVERRIDES =====
+   Makes text about 6% smaller on phones only; desktop/tablet layouts stay unchanged.
+   To tweak later, regenerate these values from the original font-size rules. */
+@media (max-width: 600px) {
+  .deal-text { font-size: 13.16px; }
+  .cd span { font-size: 14.1px; }
+  .cd i { font-size: 7.52px; }
+  .deal-text { font-size: 10.81px; }
+  .cd span { font-size: 11.28px; }
+  .cd i { font-size: 6.58px; }
+  .hero h1 { font-size: clamp(22.56px, 5.452vw, 60.16px); }
+  .cta-note { font-size: 13.16px; }
+  .f1-hint { font-size: 11.28px; }
+  .video-fallback { font-size: 13.16px; }
+  .video-fallback .vf-big { font-size: 16.92px; }
+  .vplay { font-size: 24.44px; }
+  .vtime { font-size: 11.28px; }
+  .vmute-btn { font-size: 16.92px; }
+  .btn { font-size: 16.92px; }
+  .section-title { font-size: clamp(28.2px, 4.136vw, 50.76px); }
+  .section-sub { font-size: 15.04px; }
+  .person .mono { font-size: 37.6px; }
+  .person h3 { font-size: 18.8px; }
+  .person .role { font-size: 12.22px; }
+  .vplay-team { font-size: 13.16px; }
+  .polaroid .pimg { font-size: 11.28px; }
+  .polaroid .pcap { font-size: 15.04px; }
+  .castle-note .cn-text { font-size: clamp(13.16px, 1.457vw, 20.68px); }
+  .polaroid .psub { font-size: 11.28px; }
+  .day-tag { font-size: 11.28px; }
+  .polaroid .daymark i { font-size: 8.46px; }
+  .polaroid .daymark b { font-size: 13.16px; }
+  .finish-label { font-size: 11.28px; }
+  .polaroid .pcap { font-size: clamp(6.58px, 1.504vw, 12.22px); }
+  .polaroid .daymark i { font-size: clamp(4.7px, 1.034vw, 7.52px); }
+  .polaroid .daymark b { font-size: clamp(7.52px, 1.598vw, 11.28px); }
+  .day-tag { font-size: clamp(6.58px, 1.316vw, 9.4px); }
+  .finish-label { font-size: clamp(6.58px, 1.316vw, 9.4px); }
+  .castle-note .cn-text { font-size: clamp(7.52px, 2.068vw, 15.04px); }
+  .wp.open .wpc-name { font-size: 15.98px; }
+  .wp.open .wpc-desc { font-size: 10.34px; }
+  .deal-text { font-size: 13.16px; }
+  .cd span { font-size: 14.1px; }
+  .cd i { font-size: 7.52px; }
+  .bar-login-btn { font-size: 11.28px; }
+  #founders .section-title { font-size: clamp(15.98px, 5.076vw, 50.76px); }
+  #founders .center-cta .btn { font-size: 13.16px; }
+  .founder .ring .mono { font-size: 31.96px; }
+  .founder h3 { font-size: 16.92px; }
+  .founder .role { font-size: 12.22px; }
+  .wp-circle { font-size: 9.4px; }
+  .wp-city { font-size: clamp(7.99px, 0.733vw, 10.34px); }
+  .wpc-name { font-size: 19.74px; }
+  .wpc-role { font-size: 8.46px; }
+  .wpc-prob .pl { font-size: 7.99px; }
+  .wpc-prob .pv { font-size: 12.22px; }
+  .wpc-desc { font-size: 10.81px; }
+  .mco-label { font-size: clamp(12.22px, 1.41vw, 18.8px); }
+  .faq2-q { font-size: 15.04px; }
+  .faq2-q .qnum { font-size: 11.28px; }
+  .faq2-a .qnum-big { font-size: 22.56px; }
+  .faq2-a h4 { font-size: 23.5px; }
+  .faq2-a p { font-size: 15.04px; }
+  .faq2-a p { font-size: 14.1px; }
+  .t-eyebrow { font-size: clamp(8.46px, 0.799vw, 11.28px); }
+  .t-title { font-size: clamp(13.16px, 3.196vw, 47px); }
+  .t-meta span { font-size: clamp(7.05px, 0.799vw, 10.34px); }
+  .t-meta strong { font-size: clamp(8.93px, 1.034vw, 15.04px); }
+  .stub-admit { font-size: clamp(7.52px, 0.846vw, 12.22px); }
+  .stub-price { font-size: clamp(14.1px, 2.726vw, 39.48px); }
+  .stub-sub { font-size: clamp(7.05px, 0.799vw, 11.28px); }
+  .ticket .t-btn { font-size: clamp(7.05px, 1.034vw, 15.04px); }
+  .stub-note { font-size: clamp(7.05px, 0.799vw, 11.28px); }
+  .footer-links a { font-size: 13.16px; }
+  .copy { font-size: 12.22px; }
+  .duo-name { font-size: clamp(15.98px, 1.88vw, 19.74px); }
+  .duo-role { font-size: 8.93px; }
+  .btn { font-size: 15.98px; }
+  .wp-city { font-size: 7.52px; }
+  .faq2-q { font-size: 13.16px; }
+  .faq2-a h4 { font-size: 18.8px; }
+  .faq2-a .qnum-big { font-size: 17.86px; }
+  .login-btn { font-size: 11.28px; }
+  .login-btn { font-size: 9.4px; }
+  .deal-text { font-size: clamp(7.9px, 2.331vw, 9.68px); }
+  .cd span { font-size: 9.87px; }
+  .cd i { font-size: 5.45px; }
+  .bar-login-btn { font-size: 7.52px; }
+  .hero h1 { font-size: clamp(23.5px, 7.661vw, 31.96px); }
+  .btn { font-size: 14.1px; }
+  #team .section-title { font-size: clamp(22.56px, 6.392vw, 28.2px); }
+  .person h3 { font-size: 15.04px; }
+  .person .role { font-size: 10.81px; }
+  #experience .section-title.exp-intro { font-size: clamp(14.1px, 4.465vw, 19.74px); }
+  #claim .section-title { font-size: clamp(24.44px, 6.58vw, 31.96px); }
+  .t-title { font-size: clamp(27.26px, 8.272vw, 35.72px); }
+  .stub-price { font-size: clamp(29.14px, 8.46vw, 37.6px); }
+  .ticket .t-btn { font-size: 12.22px; }
+}
+
+@media (max-width: 380px) {
+  .deal-text { font-size: 7.71px; }
+  .cd span { font-size: 9.4px; }
+  #experience .section-title.exp-intro { font-size: 13.82px; }
+  #team .section-title { font-size: 21.62px; }
+}
+
+
+/* ===== MOBILE COUNTDOWN BOX COMPACT OVERRIDE =====
+   Keeps the timer boxes from looking stretched on phones. */
+@media (max-width: 600px) {
+  .countdown {
+    gap: 4px !important;
+    transform: none !important;
+    align-items: center !important;
+  }
+
+  .cd {
+    width: 34px !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    padding: 3px 2px 2px !important;
+    border-radius: 7px !important;
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+  }
+
+  .cd span {
+    font-size: 12px !important;
+    line-height: 1 !important;
+  }
+
+  .cd i {
+    font-size: 6px !important;
+    line-height: 1 !important;
+    margin-top: 4px !important;
+    letter-spacing: 0.035em !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .cd {
+    width: 32px !important;
+    height: 36px !important;
+  }
+
+  .cd span {
+    font-size: 11px !important;
+  }
+
+  .cd i {
+    font-size: 5.5px !important;
+  }
+}
+
+
+/* ===== MOBILE HERO + COUNTDOWN SPACING REBALANCE =====
+   Phone-only polish: makes the deal bar feel less tall, keeps the timer tiles compact,
+   and pulls the hero headline closer to the top so the first screen breathes naturally. */
+@media (max-width: 700px) {
+  .deal-bar-inner,
+  .deal-bar .container {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    padding: 8px 14px 10px !important;
+  }
+
+  .deal-left {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+  }
+
+  .deal-text {
+    width: auto !important;
+    max-width: 34ch !important;
+    font-size: clamp(11px, 2.9vw, 12px) !important;
+    line-height: 1.18 !important;
+    letter-spacing: -0.02em !important;
+    text-align: center !important;
+    white-space: normal !important;
+  }
+
+  .countdown {
+    gap: 7px !important;
+    transform: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .cd {
+    width: 31px !important;
+    min-width: 0 !important;
+    height: 35px !important;
+    padding: 3px 2px 2px !important;
+    border-radius: 7px !important;
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+  }
+
+  .cd span {
+    font-size: 11.5px !important;
+    line-height: 1 !important;
+  }
+
+  .cd i {
+    font-size: 5.5px !important;
+    line-height: 1 !important;
+    margin-top: 3px !important;
+    letter-spacing: 0.04em !important;
+  }
+
+  .hero {
+    padding-top: 30px !important;
+    padding-bottom: 30px !important;
+  }
+
+  .hero h1 {
+    max-width: 390px !important;
+    font-size: clamp(27px, 7.1vw, 32px) !important;
+    line-height: 1.07 !important;
+    letter-spacing: -0.042em !important;
+    margin-bottom: 18px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .deal-bar-inner,
+  .deal-bar .container {
+    padding-top: 7px !important;
+    padding-bottom: 9px !important;
+  }
+
+  .deal-left {
+    gap: 5px !important;
+  }
+
+  .countdown {
+    gap: 6px !important;
+  }
+
+  .cd {
+    width: 30px !important;
+    height: 34px !important;
+  }
+
+  .cd span {
+    font-size: 11px !important;
+  }
+
+  .cd i {
+    font-size: 5.25px !important;
+  }
+
+  .hero {
+    padding-top: 26px !important;
+  }
+
+  .hero h1 {
+    font-size: clamp(25.5px, 7vw, 29px) !important;
+    margin-bottom: 16px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -725,7 +1304,7 @@
       </div>
     </div>
 
-    <a href="/thankyou-referral-dashboard.html" class="bar-login-btn">Login</a>
+    <!-- <a href="/thankyou-referral-dashboard.html" class="bar-login-btn">Login</a> -->
   </div>
 </div>
 
@@ -739,19 +1318,10 @@
 
     <!-- VIDEO: drop "monaco-hero.mp4" + "monaco-hero-poster.jpg" into this folder to go live -->
     <div class="video-wrap" id="heroVideo" aria-label="Monaco Retreat intro video">
-      <div class="video-fallback" id="vFallback">
-        <div>
-          <span class="vf-big">▶ Your hero video</span>
-          <span>drop <strong>monaco-hero.mp4</strong> into this folder</span>
-        </div>
-      </div>
+
 <script src="https://fast.wistia.com/player.js" async></script><script src="https://fast.wistia.com/embed/tssg37xbj8.js" async type="module"></script><style>wistia-player[media-id='tssg37xbj8']:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/tssg37xbj8/swatch'); display: block; filter: blur(5px); padding-top:56.25%; }</style> <wistia-player media-id="tssg37xbj8" aspect="1.7777777777777777"></wistia-player>
       <button class="vplay" id="vplayBtn" type="button" aria-label="Play / Pause">▶</button>
-      <div class="vctrls">
-        <div class="vprogress" id="vprog"><div class="vfill" id="vfill"></div></div>
-        <div class="vtime" id="vtime">0:00 / 0:00</div>
-        <button class="vmute-btn" id="muteToggle" type="button" aria-label="Toggle sound">🔊</button>
-      </div>
+
     </div>
 
     <div class="hero-cta">
@@ -764,7 +1334,7 @@
 <!-- ===== TEAM ===== -->
 <section id="team">
   <div class="container">
-    <h2 class="section-title" style="margin-bottom:48px;">The Grow Acquisition team you'll meet in Monaco.</h2>
+    <h2 class="section-title" style="margin-bottom:48px;">The Grow Acquisition team<br class="mobile-only-break"> you'll meet in Monaco.</h2>
     <div class="team-grid">
       <div class="person">
         <div class="photo"><video src="https://vppzxigpj9vbo5d1.public.blob.vercel-storage.com/nik.mp4" poster="nik-cover.jpg" playsinline preload="none"></video></div>
