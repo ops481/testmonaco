@@ -803,6 +803,8 @@
       var code = getReferralCode();
       if (!note) return;
       if (code) {
+        var leadSource = $("leadSource");
+        if (leadSource && !leadSource.value) leadSource.value = "referral";
         note.style.display = "block";
         note.textContent = "Referral code applied: " + code;
       } else {
@@ -858,7 +860,7 @@ function formPayload() {
     phone: fullPhoneNumber(),
     company: value("company"),
     instagram: normalizeInstagram(value("instagram")),
-    lead_source: value("leadSource"),
+    lead_source: value("leadSource") || (getReferralCode() ? "referral" : ""),
     referral_code: getReferralCode(),
     referred_by: getReferralCode(),
     visitor_id: getVisitorId(),

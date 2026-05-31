@@ -188,20 +188,20 @@
   }
   .login-modal-overlay.is-open { display: flex; }
   .login-modal-card {
-    width: min(100%, 520px); background: #fff; border: 1px solid var(--line); border-radius: 24px;
-    box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(24px, 4vw, 34px); position: relative; text-align: center;
+    width: min(100%, 480px); max-height: calc(100dvh - 32px); overflow-y: auto; background: #fff; border: 1px solid var(--line); border-radius: 24px;
+    box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(22px, 4vw, 30px); position: relative; text-align: center;
   }
   .login-modal-close {
     position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 999px;
     background: #f7f8f5; color: var(--fg); font-size: 22px; line-height: 1; border: 0; cursor: pointer;
   }
   .login-modal-card h2 { margin: 0; font-size: clamp(24px, 3.4vw, 34px); line-height: 1.08; letter-spacing: -.03em; }
-  .login-modal-card p { margin: 12px auto 0; max-width: 390px; color: var(--muted); font-size: 14px; }
+  .login-modal-card p { margin: 10px auto 0; max-width: 390px; color: var(--muted); font-size: 14px; }
   .login-choice-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
   .email-btn {
     background: var(--gold); color: #241d0c; border: 0; box-shadow: 0 8px 20px rgba(120,98,48,.20);
   }
-  .login-divider { display: flex; align-items: center; gap: 12px; margin: 22px 0 14px; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+  .login-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0 12px; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
   .login-divider::before, .login-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
   .email-login-form { display: grid; gap: 10px; text-align: left; }
   .email-login-form label { font-size: 13px; font-weight: 800; }
@@ -210,6 +210,7 @@
   }
   .email-login-form input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,87,50,.12); background: #fff; }
   .email-login-note { min-height: 18px; margin-top: 8px !important; text-align: center; font-size: 12.5px !important; font-weight: 700; }
+  .inline-reset-btn { width: 100%; margin-top: 2px; padding: 11px 14px; font-size: 14px; background: #fff; color: var(--accent); border: 1.5px solid rgba(14,87,50,.20); box-shadow: none; }
   .password-setup-form.is-hidden, .email-login-form.is-hidden, .login-divider.is-hidden { display: none; }
   .dashboard-choice-actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
   .dashboard-choice-actions .btn { margin-top: 0; }
@@ -327,8 +328,8 @@
     <button class="login-modal-close" id="closeDashboardLoginModal" type="button" aria-label="Close login popup">×</button>
     <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
     <div class="panel-kicker">Member dashboard</div>
-    <h2 id="dashboardLoginModalTitle">Log in to your Monaco dashboard</h2>
-    <p id="dashboardLoginModalText">Continue with Google, or use your booking email and dashboard password.</p>
+    <h2 id="dashboardLoginModalTitle">Log in with your booking email</h2>
+    <p id="dashboardLoginModalText">Google still works best. Password login only needs the email from the paid booking.</p>
 
     <a class="btn google-btn login-google-btn" id="modalGoogleLoginBtn" href="/auth/google/start">
       <svg viewBox="0 0 48 48" aria-hidden="true">
@@ -343,18 +344,19 @@
     <div class="login-divider" id="emailLoginDivider">or</div>
 
     <form class="email-login-form" id="thankyouEmailLoginForm">
-      <label for="thankyouLoginEmail">Username / email used at checkout</label>
+      <label for="thankyouLoginEmail">Booking email</label>
       <input id="thankyouLoginEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
 
-      <label for="thankyouLoginPassword">Password</label>
-      <input id="thankyouLoginPassword" type="password" autocomplete="current-password" placeholder="Your dashboard password" required />
+      <label for="thankyouLoginPassword">Dashboard password</label>
+      <input id="thankyouLoginPassword" type="password" autocomplete="current-password" placeholder="Your password" required />
 
-      <button class="btn email-btn" id="thankyouEmailLoginSubmit" type="submit">Log in with username and password</button>
-      <p class="email-login-note" id="thankyouEmailLoginNote">Use this only if you have already created your dashboard password.</p>
+      <button class="btn email-btn" id="thankyouEmailLoginSubmit" type="submit">Log in</button>
+      <button class="btn inline-reset-btn" id="thankyouPasswordRequestInline" type="button">Create or reset password by email</button>
+      <p class="email-login-note" id="thankyouEmailLoginNote">The email only has to match a paid Monaco booking.</p>
     </form>
 
     <form class="email-login-form password-setup-form is-hidden" id="thankyouPasswordSetupForm">
-      <label for="thankyouSetupEmail">Username / email used at checkout</label>
+      <label for="thankyouSetupEmail">Booking email</label>
       <input id="thankyouSetupEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
 
       <label for="thankyouSetupPassword">Create password</label>
@@ -367,9 +369,9 @@
       <p class="email-login-note" id="thankyouPasswordSetupNote">Your username is the same email used for your paid Monaco booking.</p>
     </form>
 
-    <div class="login-divider" id="passwordRequestDivider">first time here?</div>
+    <div class="login-divider is-hidden" id="passwordRequestDivider">first time here?</div>
 
-    <form class="email-login-form password-request-form" id="thankyouPasswordRequestForm">
+    <form class="email-login-form password-request-form is-hidden" id="thankyouPasswordRequestForm">
       <label for="thankyouPasswordRequestEmail">Paid booking email</label>
       <input id="thankyouPasswordRequestEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
 
@@ -457,6 +459,7 @@
     var passwordRequestDivider = document.getElementById('passwordRequestDivider');
     var passwordRequestForm = document.getElementById('thankyouPasswordRequestForm');
     var passwordRequestEmailInput = document.getElementById('thankyouPasswordRequestEmail');
+    var passwordRequestInlineBtn = document.getElementById('thankyouPasswordRequestInline');
     var passwordRequestNote = document.getElementById('thankyouPasswordRequestNote');
     var syncNote = document.getElementById('paymentSyncNote');
     var confirmationText = document.getElementById('confirmationText');
@@ -473,6 +476,18 @@
 var bookingEmail =
   params.get('email') ||
   '';
+
+var explicitPasswordToken =
+  params.get('set_password_token') ||
+  params.get('password_setup_token') ||
+  params.get('setup_token') ||
+  params.get('reset_token') ||
+  '';
+
+if (explicitPasswordToken) {
+  window.location.replace('/thankyou-referral-dashboard.html?set_password_token=' + encodeURIComponent(explicitPasswordToken));
+  return;
+}
 
 var loginUrl = checkoutId
   ? '/thankyou-referral-dashboard.html?checkout_session_id=' + encodeURIComponent(checkoutId)
@@ -525,18 +540,18 @@ if (googleBtn) googleBtn.href = checkoutGoogleLinkingUrl;
 if (modalGoogleBtn) modalGoogleBtn.href = checkoutGoogleLinkingUrl;
 
 function showEmailLoginMode() {
-  if (modalTitle) modalTitle.textContent = 'Log in to your Monaco dashboard';
-  if (modalText) modalText.textContent = 'Continue with Google, or use your booking email and dashboard password.';
+  if (modalTitle) modalTitle.textContent = 'Log in with your booking email';
+  if (modalText) modalText.textContent = 'Google still works best. Password login only needs the email from the paid booking.';
   emailLoginDivider?.classList.remove('is-hidden');
   emailLoginForm?.classList.remove('is-hidden');
   passwordSetupForm?.classList.add('is-hidden');
-  passwordRequestDivider?.classList.remove('is-hidden');
-  passwordRequestForm?.classList.remove('is-hidden');
+  passwordRequestDivider?.classList.add('is-hidden');
+  passwordRequestForm?.classList.add('is-hidden');
 
   setBookingEmail(bookingEmail);
 
   if (emailLoginNote) {
-    emailLoginNote.textContent = 'Your username is the email you used for your paid booking.';
+    emailLoginNote.textContent = 'The email only has to match a paid Monaco booking.';
     emailLoginNote.style.color = '';
   }
 }
@@ -622,7 +637,7 @@ async function requestPasswordSetupLink(email, noteElement) {
       setBookingEmail(bookingEmail);
 
       if (checkoutId && dashboardPasswordSet !== true) {
-        showPasswordSetupMode('You have paid. Set your dashboard password now so you can refer friends and return later with your checkout email.');
+        showPasswordSetupMode('You have paid. Create a dashboard password now, or continue with Google anytime.');
       } else {
         showEmailLoginMode();
       }
@@ -674,7 +689,7 @@ async function requestPasswordSetupLink(email, noteElement) {
       setBookingEmail(email);
 
       var submitBtn = document.getElementById('thankyouEmailLoginSubmit');
-      var originalText = submitBtn ? submitBtn.textContent : 'Log in with your password';
+      var originalText = submitBtn ? submitBtn.textContent : 'Log in';
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -682,7 +697,7 @@ async function requestPasswordSetupLink(email, noteElement) {
       }
 
       if (emailLoginNote) {
-        emailLoginNote.textContent = 'Checking your booking email...';
+        emailLoginNote.textContent = 'Checking your booking email and password...';
         emailLoginNote.style.color = '';
       }
 
@@ -735,6 +750,20 @@ async function requestPasswordSetupLink(email, noteElement) {
           submitBtn.textContent = originalText;
         }
       }
+    });
+
+    passwordRequestInlineBtn?.addEventListener('click', async function() {
+      var email = String(emailLoginInput?.value || bookingEmail || '').trim().toLowerCase();
+      setBookingEmail(email);
+
+      var originalText = passwordRequestInlineBtn.textContent || 'Create or reset password by email';
+      passwordRequestInlineBtn.disabled = true;
+      passwordRequestInlineBtn.textContent = 'Sending...';
+
+      await requestPasswordSetupLink(email, emailLoginNote || passwordRequestNote);
+
+      passwordRequestInlineBtn.disabled = false;
+      passwordRequestInlineBtn.textContent = originalText;
     });
 
 
@@ -892,7 +921,7 @@ async function requestPasswordSetupLink(email, noteElement) {
 
           if (dashboardPasswordSet !== true) {
             setTimeout(function(){
-              showPasswordSetupMode('Your payment is confirmed. Create your dashboard password now so you can come back later with your booking email.');
+              showPasswordSetupMode('Your payment is confirmed. Create your dashboard password now, or continue with Google anytime.');
               loginModal?.classList.add('is-open');
               loginModal?.setAttribute('aria-hidden', 'false');
             }, 450);
