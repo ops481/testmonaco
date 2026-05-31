@@ -506,7 +506,7 @@
 
       <form class="key-panel" id="keyForm">
         <div class="key-row">
-          <input id="adminKey" type="password" autocomplete="current-password" placeholder="Admin API key" />
+          <input id="adminKey" type="password" autocomplete="current-password" placeholder="ADMIN_API_KEY" />
           <button class="btn" type="submit">Load</button>
           <button class="btn ghost" id="clearKey" type="button">Clear</button>
         </div>
@@ -516,7 +516,7 @@
     <div class="message" id="message"></div>
 
     <section class="panel" id="dashboard">
-      <div class="notice">Enter your admin key to load referral data.</div>
+      <div class="notice">Enter your admin key to load referrals.</div>
     </section>
   </main>
 
@@ -564,8 +564,16 @@
       return String(value || "").trim().toLowerCase();
     }
 
+    function cleanAdminKey(value) {
+      return String(value || "")
+        .trim()
+        .replace(/^[\s\u2022\u2023\u25E6\u2043\u2219•]+/g, "")
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
+        .trim();
+    }
+
     function adminKey() {
-      return adminKeyInput.value.trim();
+      return cleanAdminKey(adminKeyInput.value);
     }
 
     function maxReferrals() {
@@ -750,11 +758,15 @@
     }
 
     async function api(path, options = {}) {
+      const key = adminKey();
+
       const response = await fetch(`${API_BASE}${path}`, {
         ...options,
+        cache: "no-store",
+        credentials: "same-origin",
         headers: {
           Accept: "application/json",
-          "X-Admin-Key": adminKey(),
+          "X-Admin-Api-Key": key,
           ...(options.body ? { "Content-Type": "application/json" } : {}),
           ...(options.headers || {})
         }
@@ -763,6 +775,10 @@
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Unauthorized. Use the exact ADMIN_API_KEY from your environment. This page sends it as X-Admin-Api-Key.");
+        }
+
         throw new Error(data.error || "Request failed.");
       }
 
@@ -781,7 +797,9 @@
         return;
       }
 
-      localStorage.setItem(KEY_STORAGE, adminKey());
+      const key = adminKey();
+      adminKeyInput.value = key;
+      localStorage.setItem(KEY_STORAGE, key);
       showMessage("");
       dashboard.innerHTML = `<div class="notice">Loading referral data…</div>`;
 
@@ -1108,7 +1126,7 @@
       adminKeyInput.value = "";
       state.data = null;
       showMessage("Admin key cleared.", "warn");
-      dashboard.innerHTML = `<div class="notice">Enter your admin key to load referral data.</div>`;
+      dashboard.innerHTML = `<div class="notice">Enter your admin key to load referrals.</div>`;
     });
 
     dashboard.addEventListener("input", (event) => {
