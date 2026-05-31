@@ -905,27 +905,58 @@ app.post("/api/referrals/invite-friend", async (req, res) => {
 
     if (error) throw error;
 
-    if (GOOGLE_SCRIPT_URL) {
-      fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          event_type: "monaco_referral_invitation",
-          friend_email: friendEmail,
-          friend_name: friendName,
-          friend_phone: friendPhone,
-          friend_insta: friendInstagram,
-          invited_by_name: dashboard.name,
-          invited_by_email: dashboard.email,
-          invited_by_company: dashboard.company,
-          contact_method: contactMethod,
-          referral_link: dashboard.referral_link,
-          note
-        })
-      }).catch((error) => {
-        console.error("Referral invite Apps Script call failed:", error);
-      });
-    }
+    let scriptData = null;
+
+if (GOOGLE_SCRIPT_URL) {
+  const scriptResponse = await fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({
+      event_type: "monaco_referral_invitation",
+      friend_email: friendEmail,
+      friend_name: friendName,
+      friend_phone: friendPhone,
+      friend_insta: friendInstagram,
+      invited_by_name: dashboard.name,
+      invited_by_email: dashboard.email,
+      invited_by_company: dashboard.company,
+      contact_method: contactMethod,
+      referral_link: dashboard.referral_link,
+      note
+    })
+  });
+
+  const scriptText = await scriptResponse.text();
+
+  try {
+    scriptData = scriptText ? JSON.parse(scriptText) : {};
+  } catch {
+    scriptData = { raw: scriptText };
+  }
+
+  if (!scriptResponse.ok || scriptData.ok === false) {
+    console.error("Referral invite Apps Script failed:", scriptResponse.status, scriptData);
+
+    return res.status(502).json({
+      error: "Invite was saved, but the email service failed.",
+      details: scriptData
+    });
+  }
+
+  if (friendEmail && scriptData.email_sent === false) {
+    console.error("Referral invite email was not sent:", scriptData);
+
+    return res.status(502).json({
+      error: "Invite was saved, but the email was not sent.",
+      details: scriptData
+    });
+  }
+}
+
+res.json({ ok: true, script: scriptData });
 
     res.json({ ok: true });
   } catch (error) {
