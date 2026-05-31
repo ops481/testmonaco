@@ -653,7 +653,17 @@ app.post("/api/referrals/password-set", async (req, res) => {
     res.status(500).json({ error: error.message || "Could not set password." });
   }
 });
-
+function htmlEscape(value) {
+  return String(value || '').replace(/[&<>"']/g, function(char) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[char];
+  });
+}
 async function passwordSetupRequestHandler(req, res) {
   try {
     const email = cleanEmail(req.body?.email || req.query?.email || "");
