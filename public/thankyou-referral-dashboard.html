@@ -340,11 +340,7 @@ td { color: var(--fg); font-weight: 550; }
 .modal-card { width: min(100%, 720px); background: #fff; border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 26px 80px rgba(14,87,50,.22); padding: clamp(22px, 4vw, 30px); position: relative; }
 .modal-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 999px; background: #f7f8f5; color: var(--fg); font-size: 22px; line-height: 1; }
 .invite-form { display: grid; gap: 12px; margin-top: 18px; }
-.contact-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
+.contact-row { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px; }
 .invite-message { display: block; color: var(--accent); font-size: 13px; font-weight: 700; }
 .invite-message.error { color: var(--error); }
 .modal-success {
@@ -742,10 +738,7 @@ async function loadMe() {
 
         success?.classList.remove("is-visible");
         modal?.classList.add("is-open");
-        setTimeout(() => {
-  initInvitePhonePicker();
-  $("inviteFriendEmail")?.focus();
-}, 50);
+        setTimeout(() => $("inviteContactValue")?.focus(), 50);
       }
 
       function closeInviteModal() {
@@ -816,6 +809,27 @@ async function loadMe() {
         };
       }
 
+      function resetInviteContactInputForType(type) {
+        const input = $("inviteContactValue");
+        if (!input) return;
+
+        input.value = "";
+
+        if (type === "phone") {
+          input.type = "tel";
+          input.placeholder = "7939 299 167";
+          input.inputMode = "tel";
+          input.autocomplete = "tel";
+          setTimeout(initInvitePhonePicker, 0);
+          return;
+        }
+
+        destroyInvitePhonePicker();
+        input.type = "email";
+        input.placeholder = "friend@example.com";
+        input.inputMode = "email";
+        input.autocomplete = "email";
+      }
 
 
       function normaliseInstagramHandle(value) {
@@ -848,107 +862,109 @@ async function loadMe() {
         }
       }
 
+      function updateInviteContactPlaceholder() {
+        const type = String($("inviteContactType")?.value || "email");
+        resetInviteContactInputForType(type);
+      }
 
-async function sendReferralInvitation(d) {
-  const nameInput = $("inviteFriendName");
-  const emailInput = $("inviteFriendEmail");
-  const phoneInput = $("inviteContactValue");
-  const instagramInput = $("inviteInstagramHandle");
-  const noteInput = $("inviteNote");
-  const btn = $("sendInviteBtn");
-  const msg = $("inviteMessage");
-  const success = $("inviteSuccess");
+      async function sendReferralInvitation(d) {
+        const nameInput = $("inviteFriendName");
+        const contactTypeInput = $("inviteContactType");
+        const contactInput = $("inviteContactValue");
+        const instagramInput = $("inviteInstagramHandle");
+        const noteInput = $("inviteNote");
+        const btn = $("sendInviteBtn");
+        const msg = $("inviteMessage");
+        const success = $("inviteSuccess");
 
-  const friendName = String(nameInput?.value || "").trim() || "Friend";
-  const friendEmail = String(emailInput?.value || "").trim().toLowerCase();
-  const rawPhone = String(phoneInput?.value || "").trim();
-  const friendInstagram = normaliseInstagramHandle(instagramInput?.value || "");
-  const note = String(noteInput?.value || "").trim();
+        const friendName = String(nameInput?.value || "").trim() || "Friend";
+        const contactType = String(contactTypeInput?.value || "email").trim();
+        const rawContactValue = String(contactInput?.value || "").trim();
+        const phoneResult = contactType === "phone"
+          ? normaliseWhatsappNumber(rawContactValue)
+          : null;
+        const contactValue = contactType === "phone"
+          ? phoneResult.value
+          : rawContactValue;
+        const friendInstagram = normaliseInstagramHandle(instagramInput?.value || "");
+        const note = String(noteInput?.value || "").trim();
 
-  const phoneResult = rawPhone
-    ? normaliseWhatsappNumber(rawPhone)
-    : { ok: true, value: "", message: "" };
+        function setMessage(text, type = "success") {
+          if (!msg) return;
+          msg.textContent = text;
+          msg.classList.toggle("error", type === "error");
+        }
 
-  const friendPhone = phoneResult.value;
+        if (!contactValue) {
+          setMessage("Add one contact detail first.", "error");
+          return;
+        }
 
-  function setMessage(text, type = "success") {
-    if (!msg) return;
-    msg.textContent = text;
-    msg.classList.toggle("error", type === "error");
-  }
+        if (contactType === "phone" && phoneResult && !phoneResult.ok) {
+          setMessage(phoneResult.message, "error");
+          return;
+        }
 
-  if (!friendEmail && !friendPhone && !friendInstagram) {
-    setMessage("Add an email, WhatsApp number, or Instagram first.", "error");
-    return;
-  }
+        if (!d.referral_link) {
+          setMessage("Your referral link is not ready yet.", "error");
+          return;
+        }
 
-  if (friendEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(friendEmail)) {
-    setMessage("Add a valid email address.", "error");
-    return;
-  }
+        const friendEmail = contactType === "email" ? contactValue : "";
+        const friendPhone = contactType === "phone" ? contactValue : "";
 
-  if (rawPhone && phoneResult && !phoneResult.ok) {
-    setMessage(phoneResult.message, "error");
-    return;
-  }
+        btn.disabled = true;
+        btn.textContent = "Sending...";
+        setMessage("");
+        success?.classList.remove("is-visible");
 
-  if (!d.referral_link) {
-    setMessage("Your referral link is not ready yet.", "error");
-    return;
-  }
+        try {
+          await json(API.inviteFriend, {
+            method: "POST",
+            body: JSON.stringify({
+  referrer_email: d.email || memberEmailFromUrl(),
+  friend_name: friendName,
+  friend_email: friendEmail,
+  friend_phone: friendPhone,
+  friend_instagram: friendInstagram,
+  note
+})
+          });
 
-  const contactMethod = "Email";
+          if (nameInput) nameInput.value = "";
+          if (contactInput) contactInput.value = "";
+          if (instagramInput) instagramInput.value = "";
+          if (noteInput) noteInput.value = "";
+          if (contactTypeInput) contactTypeInput.value = "email";
+          updateInviteContactPlaceholder();
 
-  btn.disabled = true;
-  btn.textContent = "Sending...";
-  setMessage("");
-  success?.classList.remove("is-visible");
+          if (success) {
+            success.innerHTML = `
+              <span class="success-icon">✓</span>
+              <span class="success-copy">
+                <strong>Invitation sent to ${esc(friendName)}.</strong>
+                <span>We’ve logged their details and included your referral link.</span>
+              </span>
+            `;
+            success.classList.add("is-visible");
+          }
 
-  try {
-    await json(API.inviteFriend, {
-      method: "POST",
-      body: JSON.stringify({
-        referrer_email: d.email || memberEmailFromUrl(),
-        friend_name: friendName,
-        friend_email: friendEmail,
-        friend_phone: friendPhone,
-        friend_instagram: friendInstagram,
-        contact_method: "Email",
-        note
-      })
-    });
+          setMessage("");
 
-    if (nameInput) nameInput.value = "";
-    if (emailInput) emailInput.value = "";
-    if (phoneInput) phoneInput.value = "";
-    if (instagramInput) instagramInput.value = "";
-    if (noteInput) noteInput.value = "";
+          setTimeout(() => {
+            closeInviteModal();
+            success?.classList.remove("is-visible");
+            setMessage("");
+          }, 2400);
+        } catch (err) {
+          setMessage(err.message || "Could not send the invitation.", "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Send invitation";
+        }
+      }
 
-    if (success) {
-      success.innerHTML = `
-        <span class="success-icon">✓</span>
-        <span class="success-copy">
-          <strong>Invitation sent to ${esc(friendName)}.</strong>
-          <span>We’ve logged their email and WhatsApp details with your referral link.</span>
-        </span>
-      `;
-      success.classList.add("is-visible");
-    }
 
-    setMessage("");
-
-    setTimeout(() => {
-      closeInviteModal();
-      success?.classList.remove("is-visible");
-      setMessage("");
-    }, 2400);
-  } catch (err) {
-    setMessage(err.message || "Could not send the invitation.", "error");
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "Send invitation";
-  }
-}
       function whatsappCommunityHtml(d) {
         const whatsapp = d.whatsapp || {};
         const groupUrl = String(whatsapp.group_invite_url || "").trim() || configuredWhatsappGroupUrl();
@@ -1130,23 +1146,12 @@ async function sendReferralInvitation(d) {
                       <input id="inviteFriendName" class="input" type="text" placeholder="Friend's name" autocomplete="name" />
 
                       <div class="contact-row">
-  <input
-    id="inviteFriendEmail"
-    class="input"
-    type="email"
-    placeholder="Friend email"
-    autocomplete="email"
-  />
-
-  <input
-    id="inviteContactValue"
-    class="input"
-    type="tel"
-    placeholder="WhatsApp number"
-    autocomplete="tel"
-    inputmode="tel"
-  />
-</div>
+                        <select id="inviteContactType" class="input" aria-label="Contact type">
+                          <option value="email">Email</option>
+                          <option value="phone">WhatsApp</option>
+                        </select>
+                        <input id="inviteContactValue" class="input" type="email" placeholder="friend@example.com" required />
+                      </div>
 
                       <input id="inviteInstagramHandle" class="input" type="text" placeholder="@instagram_handle" autocomplete="off" inputmode="text" />
 
@@ -1293,6 +1298,7 @@ async function sendReferralInvitation(d) {
         $("openInviteModalBtn")?.addEventListener("click", openInviteModal);
         $("closeInviteModalBtn")?.addEventListener("click", closeInviteModal);
         $("cancelInviteBtn")?.addEventListener("click", closeInviteModal);
+        $("inviteContactType")?.addEventListener("change", updateInviteContactPlaceholder);
         $("inviteInstagramHandle")?.addEventListener("focus", handleInstagramFocus);
         $("inviteInstagramHandle")?.addEventListener("input", handleInstagramInput);
         $("inviteInstagramHandle")?.addEventListener("blur", handleInstagramBlur);
