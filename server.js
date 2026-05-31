@@ -664,43 +664,40 @@ async function passwordSetupRequestHandler(req, res) {
       });
     }
 
-    /*
-      Do not let this endpoint become an email-enumeration tool.
-      The public response is intentionally the same whether the email exists or not.
-    */
     const genericResponse = {
       ok: true,
-      message: "If that email belongs to a paid Monaco booking, a secure password setup link has been sent."
+      message: "If that email belongs to a paid Monaco booking, a setup email has been sent."
     };
 
     const customer = await getCustomer(email);
 
+    // Important: do not reveal whether the email exists.
     if (!customer || customer.status !== "paid") {
+      console.log("Password setup requested for non-paid or unknown email:", email);
       return res.json(genericResponse);
     }
 
     if (!GOOGLE_SCRIPT_URL) {
+      console.error("GOOGLE_SCRIPT_URL is missing. Password setup email cannot send.");
       return res.status(503).json({
         code: "PASSWORD_EMAIL_NOT_CONFIGURED",
-        error: "Password setup emails are not configured yet. Continue with Google if this is your Gmail, or contact support."
+        error: "Password setup emails are not configured yet."
       });
     }
 
-    await revokeUnusedPasswordTokens(customer.email);
-
-    const token = await createPasswordSetupToken(customer.email);
-    const setupUrl = `${APP_URL}/thankyou-referral-dashboard.html?set_password_token=${encodeURIComponent(token)}`;
+    const setupUrl =
+  `${APP_URL}/thankyou-referral-dashboard.html?setup_password=1&email=${encodeURIComponent(customer.email)}`;
 
     await sendPasswordSetupEmail({
       customer,
       setup_url: setupUrl
     });
 
-    res.json(genericResponse);
+    return res.json(genericResponse);
   } catch (error) {
     console.error("password-setup-request failed:", error);
-    res.status(500).json({
-      error: error.message || "Could not send password setup link."
+    return res.status(500).json({
+      error: error.message || "Could not send password setup email."
     });
   }
 }
@@ -2891,29 +2888,34 @@ async function revokeUnusedPasswordTokens(email) {
 }
 
 async function sendPasswordSetupEmail({ customer, setup_url }) {
-  if (!GOOGLE_SCRIPT_URL) {
-    throw new Error("Password setup emails are not configured.");
-  }
+  const payload = {
+    event_type: "monaco_password_setup_link",
+    email: customer.email,
+    customer_email: customer.email,
+    full_name: customer.name || customer.full_name || customer.fullName || "",
+    name: customer.name || customer.full_name || customer.fullName || "",
+    setup_url,
+    setupUrl: setup_url,
+    app: "monaco-content-retreat"
+  };
+
+  console.log("Sending password setup email via Google Script:", {
+    email: payload.email,
+    setup_url: payload.setup_url
+  });
 
   const response = await fetch(GOOGLE_SCRIPT_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json"
+      "Accept": "application/json"
     },
-    body: JSON.stringify({
-      event_type: "monaco_password_setup_link",
-      email: customer.email,
-      full_name: customer.name || "",
-      setup_url,
-      expires_hours: Math.max(1, Math.round(PASSWORD_SETUP_TOKEN_TTL_MS / (1000 * 60 * 60))),
-      app: "monaco-content-retreat"
-    })
+    body: JSON.stringify(payload)
   });
 
   const text = await response.text();
-  let data = {};
 
+  let data = {};
   try {
     data = text ? JSON.parse(text) : {};
   } catch {
@@ -2921,8 +2923,22 @@ async function sendPasswordSetupEmail({ customer, setup_url }) {
   }
 
   if (!response.ok || data.ok === false) {
-    throw withDetails("Could not send password setup email.", data);
+    console.error("Google Script password setup email failed:", {
+      status: response.status,
+      response: data
+    });
+
+    throw new Error(
+      data.error ||
+      data.message ||
+      "Google Script could not send the password setup email."
+    );
   }
+
+  console.log("Google Script password setup email sent:", {
+    email: payload.email,
+    response: data
+  });
 
   return data;
 }

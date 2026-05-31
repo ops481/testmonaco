@@ -289,6 +289,51 @@ td { color: var(--fg); font-weight: 550; }
 .state.error { color: var(--error); }
 .state.warn { color: #7a5a13; }
 
+
+
+/* ===== Final dashboard auth UI: matches thank-you modal ===== */
+.login-card-clean {
+  width: min(100%, 660px);
+  max-height: calc(100dvh - 96px);
+  overflow-y: auto;
+  text-align: center;
+  background: var(--card);
+  border: 1px solid rgba(14,87,50,.12);
+  border-radius: 28px;
+  padding: clamp(26px, 4vw, 42px);
+  box-shadow: 0 30px 90px rgba(14,87,50,.16);
+  position: relative;
+}
+.login-card-clean::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(204,183,132,.22);
+  border-radius: 22px;
+  pointer-events: none;
+}
+.login-card-clean > * { position: relative; z-index: 1; }
+.login-card-clean h2 {
+  margin: 4px 0 10px;
+  font-size: clamp(26px, 4vw, 38px);
+  line-height: 1.06;
+  letter-spacing: -.035em;
+}
+.login-card-clean p { color: var(--muted); font-weight: 500; }
+.auth-message { margin: 16px 0 0; text-align: center; }
+.login-google-btn { width: 100%; max-width: none; margin-top: 22px; min-height: 52px; }
+.login-form { display: grid; gap: 10px; margin-top: 0; text-align: left; }
+.login-form label { font-size: 13px; font-weight: 850; }
+.login-form input { min-height: 50px; border-radius: 13px; }
+.login-form .secondary-btn,
+.login-form .btn { width: 100%; min-height: 52px; margin-top: 4px; }
+.login-divider { margin: 22px 0 14px; font-size: 11px; font-weight: 900; letter-spacing: .14em; }
+.login-helper-box { border: 0; background: transparent; padding: 0; margin: 0; }
+@media (max-width: 680px) {
+  .login-card-clean { width: 100%; border-radius: 22px; padding: 26px 18px; }
+  .login-card-clean::before { inset: 8px; border-radius: 18px; }
+}
+
 /* modal */
 .modal-overlay { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 22px; background: rgba(14,14,14,.48); backdrop-filter: blur(8px); }
 .modal-overlay.is-open { display: flex; }
@@ -1329,27 +1374,46 @@ function bindSetPasswordForm(d = {}) {
   });
 }
 
-function renderLogin(error = "") {
+function renderLogin(message = "", prefillEmail = "") {
   logoutBtn.classList.add("hidden");
   heroSection?.classList.add("hidden");
   document.querySelector(".confirm-bar")?.classList.add("hidden");
+
+  const cleanEmail = String(prefillEmail || memberEmailFromUrl() || "").trim().toLowerCase();
 
   app.innerHTML = `
     <div class="login-wrap">
       <div class="login-card-clean">
         <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
         <div class="panel-kicker">Member dashboard</div>
-        <h2>Log in with your booking email</h2>
-        <p>Google still works best. For password login, use the exact email from the paid booking.</p>
+        <h2>Access your dashboard</h2>
+        <p>Continue with Google, set up your password, or log in with your booking email.</p>
 
-        ${error ? `<div class="state error login-error">${esc(error)}</div>` : ""}
+        ${message ? `<div class="state warn auth-message">${esc(message)}</div>` : ""}
 
         <a class="btn google-btn login-google-btn" href="${googleStartUrl()}">
           ${googleIcon()}
           Continue with Google
         </a>
 
-        <div class="login-divider">or</div>
+        <div class="login-divider">or set up your password</div>
+
+        <form class="login-form" id="passwordSetupRequestForm">
+          <label for="passwordSetupRequestEmail">Setup email</label>
+          <input
+            id="passwordSetupRequestEmail"
+            type="email"
+            autocomplete="username"
+            value="${esc(cleanEmail)}"
+            placeholder="your-booking-email@example.com"
+            required
+          />
+
+          <button class="secondary-btn" id="passwordSetupRequestButton" type="submit">Send setup email</button>
+          <p class="small-note" id="passwordSetupRequestNote">Use the email from your paid Monaco booking.</p>
+        </form>
+
+        <div class="login-divider">or log in with email and password</div>
 
         <form class="login-form" id="passwordLoginForm">
           <label for="passwordLoginEmail">Booking email</label>
@@ -1357,11 +1421,12 @@ function renderLogin(error = "") {
             id="passwordLoginEmail"
             type="email"
             autocomplete="username"
+            value="${esc(cleanEmail)}"
             placeholder="your-booking-email@example.com"
             required
           />
 
-          <label for="passwordLoginPassword">Dashboard password</label>
+          <label for="passwordLoginPassword">Password</label>
           <input
             id="passwordLoginPassword"
             type="password"
@@ -1371,19 +1436,14 @@ function renderLogin(error = "") {
           />
 
           <button class="secondary-btn" type="submit">Log in</button>
-          <p class="small-note" id="passwordLoginNote">The email only has to match a paid Monaco booking.</p>
+          <p class="small-note" id="passwordLoginNote">The email must match a paid Monaco booking.</p>
         </form>
-
-        <div class="login-helper-box">
-          <p class="small-note" id="passwordSetupRequestNote">First time here, or forgot the password?</p>
-          <button class="secondary-btn" id="passwordSetupRequestButton" type="button">Create or reset password by email</button>
-        </div>
       </div>
     </div>
   `;
 
-  bindPasswordLoginForm();
   bindPasswordSetupRequestForm();
+  bindPasswordLoginForm();
 }
 
 function renderSetPasswordScreen(options = {}) {
@@ -1392,15 +1452,15 @@ function renderSetPasswordScreen(options = {}) {
   document.querySelector(".confirm-bar")?.classList.add("hidden");
 
   const token = String(options.token || "");
-  const email = String(options.email || "").trim().toLowerCase();
+  const email = String(options.email || memberEmailFromUrl() || "").trim().toLowerCase();
   const sessionMode = Boolean(options.sessionMode);
   const hasPrefilledEmail = Boolean(email);
   const isSecureLink = Boolean(token);
   const message =
     options.message ||
     (isSecureLink
-      ? "Secure link recognised. Enter your booking email if needed, then choose a dashboard password."
-      : "Create a dashboard password so you can come back later with your booking email.");
+      ? "Enter your booking email, then choose your dashboard password."
+      : "Enter your booking email, then choose your dashboard password.");
 
   app.innerHTML = `
     <div class="login-wrap">
@@ -1421,7 +1481,6 @@ function renderSetPasswordScreen(options = {}) {
             ${isSecureLink && hasPrefilledEmail ? "readonly" : ""}
             required
           />
-          <p class="small-note" style="margin-top:0">${hasPrefilledEmail ? "Use the email already filled in from your booking." : "Use the same email you used for your paid Monaco booking."}</p>
 
           <label for="setupPasswordNew">New password</label>
           <input
@@ -1442,10 +1501,8 @@ function renderSetPasswordScreen(options = {}) {
           />
 
           <button class="secondary-btn" type="submit">${sessionMode ? "Create password and open dashboard" : "Save password and open dashboard"}</button>
-          <p class="small-note" id="setupPasswordNote">This password is only for your Monaco dashboard.</p>
+          <p class="small-note" id="setupPasswordNote">Your username is your booking email.</p>
         </form>
-
-        ${isSecureLink ? `<p class="small-note">This secure link expires automatically and can only be used once.</p>` : ""}
       </div>
     </div>
   `;
@@ -1537,7 +1594,7 @@ function bindSetupPasswordForm(options = {}) {
       render(normalise(me));
     } catch (err) {
       note.textContent = options.token
-        ? (err.message || "This setup link is expired or has already been used. Request a fresh password email from the login page.")
+        ? (err.message || "That setup link could not be used. Request a fresh setup email from the login page.")
         : (err.message || "Could not save your password. Try again or contact support.");
       note.style.color = "var(--error)";
     } finally {
@@ -1561,7 +1618,7 @@ async function requestPasswordSetupLink(email, note) {
   }
 
   if (note) {
-    note.textContent = "Sending a secure setup link if this email has a paid booking...";
+    note.textContent = "Sending your setup email...";
     note.style.color = "";
   }
 
@@ -1574,42 +1631,47 @@ async function requestPasswordSetupLink(email, note) {
     if (note) {
       note.textContent =
         response.message ||
-        "If this email belongs to a paid Monaco booking, a secure setup link has been sent.";
+        "If this email belongs to a paid Monaco booking, a setup email has been sent.";
       note.style.color = "var(--accent)";
     }
   } catch (err) {
     if (note) {
       note.textContent =
         err.message ||
-        "Could not send the setup link. Continue with Google if this is your Gmail, or contact support.";
+        "Could not send the setup email. Continue with Google if this is your Gmail, or contact support.";
       note.style.color = "var(--error)";
     }
   }
 }
 
 function bindPasswordSetupRequestForm() {
+  const form = $("passwordSetupRequestForm");
   const button = $("passwordSetupRequestButton");
-  const emailInput = $("passwordLoginEmail") || $("passwordSetupRequestEmail");
+  const emailInput = $("passwordSetupRequestEmail") || $("passwordLoginEmail");
   const note = $("passwordSetupRequestNote") || $("passwordLoginNote");
 
   if (!button || !emailInput || !note) return;
 
-  button.addEventListener("click", async () => {
-    const originalText = button.textContent || "Create or reset password by email";
+  const send = async (event) => {
+    if (event) event.preventDefault();
+
+    const originalText = button.textContent || "Send setup email";
     const email = String(emailInput.value || memberEmailFromUrl() || "").trim().toLowerCase();
 
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Sending...";
-    }
+    button.disabled = true;
+    button.textContent = "Sending...";
 
     await requestPasswordSetupLink(email, note);
 
-    if (button) {
-      button.disabled = false;
-      button.textContent = originalText;
-    }
-  });
+    button.disabled = false;
+    button.textContent = originalText;
+  };
+
+  if (form) {
+    form.addEventListener("submit", send);
+  } else {
+    button.addEventListener("click", send);
+  }
 }
 
 function bindPasswordLoginForm() {
@@ -1662,7 +1724,7 @@ function bindPasswordLoginForm() {
         await requestPasswordSetupLink(err.data.email || email, requestNote);
 
         note.textContent =
-          "No dashboard password exists yet for this paid email. I sent a setup/reset link. Google login also still works if this is a Gmail address.";
+          "No password exists yet. Check your inbox for the setup email, or continue with Google.";
         note.style.color = "var(--accent)";
         return;
       }
@@ -1747,7 +1809,7 @@ async function boot() {
       renderSetPasswordScreen({
         token: passwordSetupToken,
         email: memberEmailFromUrl(),
-        message: "Set or reset your dashboard password. Use the booking email that received this link, then choose a new password."
+        message: "Choose your dashboard password. Use the booking email that received this setup email."
       });
       return;
     }
@@ -1777,11 +1839,7 @@ async function boot() {
         const dashboard = normalise(completed);
 
         if (!dashboard.password_set) {
-          renderSetPasswordScreen({
-            email: dashboard.email,
-            sessionMode: true,
-            message: "Your payment is confirmed. Create your dashboard password now so you can come back later with your booking email."
-          });
+          renderLogin("Payment confirmed. Enter your booking email below to send your setup email.", dashboard.email);
           return;
         }
 
