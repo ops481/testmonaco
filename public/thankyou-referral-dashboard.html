@@ -413,6 +413,17 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
       const logoutBtn = document.getElementById("logoutBtn");
       const heroSection = document.getElementById("heroSection");
       const params = new URLSearchParams(location.search);
+      const rawHash = String(location.hash || "").replace(/^#/, "");
+      const hashQuery = rawHash.includes("?") ? rawHash.slice(rawHash.indexOf("?") + 1) : rawHash;
+      const hashParams = new URLSearchParams(hashQuery);
+
+      function urlParam(name) {
+        return params.get(name) || hashParams.get(name) || "";
+      }
+
+      function hasUrlParam(name) {
+        return params.has(name) || hashParams.has(name);
+      }
 
       /*
         IMPORTANT:
@@ -580,8 +591,12 @@ function googleStartUrlForCheckoutLinkingOnly() {
 
      function memberEmailFromUrl() {
   return String(
-    params.get("member_email") ||
-      params.get("email") ||
+    urlParam("member_email") ||
+      urlParam("email") ||
+      urlParam("customer_email") ||
+      urlParam("customerEmail") ||
+      urlParam("booking_email") ||
+      urlParam("bookingEmail") ||
       ""
   ).trim().toLowerCase();
 }
@@ -1379,31 +1394,36 @@ function renderSetPasswordScreen(options = {}) {
   const token = String(options.token || "");
   const email = String(options.email || "").trim().toLowerCase();
   const sessionMode = Boolean(options.sessionMode);
+  const hasPrefilledEmail = Boolean(email);
+  const isSecureLink = Boolean(token);
   const message =
     options.message ||
-    "Use this secure setup link to create or reset your Monaco dashboard password. Your login email must match the email used for your paid booking.";
+    (isSecureLink
+      ? "Secure link recognised. Enter your booking email if needed, then choose a dashboard password."
+      : "Create a dashboard password so you can come back later with your booking email.");
 
   app.innerHTML = `
     <div class="login-wrap">
       <div class="login-card-clean">
         <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
         <div class="panel-kicker">Member dashboard</div>
-        <h2>Set your dashboard password</h2>
+        <h2>Create your password</h2>
         <p>${esc(message)}</p>
 
         <form class="login-form" id="setupPasswordForm">
-          <label for="setupPasswordEmail">Username / email used at checkout</label>
+          <label for="setupPasswordEmail">Booking email</label>
           <input
             id="setupPasswordEmail"
             type="email"
             autocomplete="username"
             value="${esc(email)}"
             placeholder="your-booking-email@example.com"
-            ${token ? "readonly" : ""}
+            ${isSecureLink && hasPrefilledEmail ? "readonly" : ""}
             required
           />
+          <p class="small-note" style="margin-top:0">${hasPrefilledEmail ? "Use the email already filled in from your booking." : "Use the same email you used for your paid Monaco booking."}</p>
 
-          <label for="setupPasswordNew">Create password</label>
+          <label for="setupPasswordNew">New password</label>
           <input
             id="setupPasswordNew"
             type="password"
@@ -1421,11 +1441,11 @@ function renderSetPasswordScreen(options = {}) {
             required
           />
 
-          <button class="secondary-btn" type="submit">Set password and continue</button>
-          <p class="small-note" id="setupPasswordNote">This password is only for your Monaco dashboard. Keep it somewhere safe.</p>
+          <button class="secondary-btn" type="submit">${sessionMode ? "Create password and open dashboard" : "Save password and open dashboard"}</button>
+          <p class="small-note" id="setupPasswordNote">This password is only for your Monaco dashboard.</p>
         </form>
 
-        ${token ? `<p class="small-note">This setup link is secure, expires automatically, and can only be used once.</p>` : ""}
+        ${isSecureLink ? `<p class="small-note">This secure link expires automatically and can only be used once.</p>` : ""}
       </div>
     </div>
   `;
@@ -1450,7 +1470,9 @@ function bindSetupPasswordForm(options = {}) {
     const email = String(emailInput.value || "").trim().toLowerCase();
 
     if (!email) {
-      note.textContent = "Your login email is required. Use the exact email from your paid booking.";
+      note.textContent = options.token
+        ? "Enter the booking email that received this setup link."
+        : "Enter the exact email from your paid booking.";
       note.style.color = "var(--error)";
       return;
     }
@@ -1514,7 +1536,9 @@ function bindSetupPasswordForm(options = {}) {
       history.replaceState({}, "", "/thankyou-referral-dashboard.html");
       render(normalise(me));
     } catch (err) {
-      note.textContent = err.message || "Could not save your password. Request a fresh set/reset link.";
+      note.textContent = options.token
+        ? (err.message || "This setup link is expired or has already been used. Request a fresh password email from the login page.")
+        : (err.message || "Could not save your password. Try again or contact support.");
       note.style.color = "var(--error)";
     } finally {
       if (button) {
@@ -1690,14 +1714,14 @@ function bindEmailLoginForm() {
 async function boot() {
   try {
     const explicitPasswordToken =
-      params.get("set_password_token") ||
-      params.get("password_setup_token") ||
-      params.get("setup_token") ||
-      params.get("reset_token") ||
+      urlParam("set_password_token") ||
+      urlParam("password_setup_token") ||
+      urlParam("setup_token") ||
+      urlParam("reset_token") ||
       "";
 
-    const token = params.get("token");
-    const googleError = params.get("error");
+    const token = urlParam("token");
+    const googleError = urlParam("error");
 
     /*
       Some reset emails use ?token=...
@@ -1706,9 +1730,9 @@ async function boot() {
     */
     const plainTokenLooksLikePasswordSetup =
       token &&
-      !params.has("checkout_session_id") &&
-      !params.has("session_id") &&
-      !params.has("checkout_configuration_id");
+      !hasUrlParam("checkout_session_id") &&
+      !hasUrlParam("session_id") &&
+      !hasUrlParam("checkout_configuration_id");
 
     const passwordSetupToken =
       explicitPasswordToken || (plainTokenLooksLikePasswordSetup ? token : "");
@@ -1723,7 +1747,7 @@ async function boot() {
       renderSetPasswordScreen({
         token: passwordSetupToken,
         email: memberEmailFromUrl(),
-        message: "Set or reset your dashboard password. Your username is the same email used for your paid Monaco booking."
+        message: "Set or reset your dashboard password. Use the booking email that received this link, then choose a new password."
       });
       return;
     }
@@ -1743,8 +1767,8 @@ async function boot() {
     }
 
     const hasCheckoutReturn =
-      params.has("checkout_session_id") ||
-      params.has("session_id");
+      hasUrlParam("checkout_session_id") ||
+      hasUrlParam("session_id");
 
     if (hasCheckoutReturn) {
       const completed = await completeCheckout();
