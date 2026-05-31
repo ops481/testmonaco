@@ -524,7 +524,7 @@
     const API_BASE = "";
     const KEY_STORAGE = "monaco_admin_key";
     const REFUND_DONE_STORAGE = "monaco_refund_done_ids";
-    const FALLBACK_MAX_REFUNDS = 2;
+    const FALLBACK_MAX_REFUNDS = 100;
     const WHOP_PAYMENTS_URL = "https://whop.com/dashboard/payments";
 
     const adminKeyInput = document.getElementById("adminKey");
@@ -1084,8 +1084,6 @@
             <p class="subtle">Source: /api/admin/referrals · Loaded ${escapeHtml(loadedAt)}</p>
           </div>
           <div class="chip-row">
-            <span class="chip">${maxReferrals()} refunds max</span>
-            <span class="chip">${escapeHtml(ticketHalfLabel())} each</span>
           </div>
         </div>
 

@@ -84,7 +84,7 @@ const WHATSAPP_GROUP_INVITE_URL = cleanEnvUrl(process.env.WHATSAPP_GROUP_INVITE_
 const WHATSAPP_SUPPORT_NUMBER = cleanEnv(process.env.WHATSAPP_SUPPORT_NUMBER).replace(/\D/g, "");
 
 const TICKET_PRICE_CENTS = cleanEnvNumber(process.env.TICKET_PRICE_CENTS, 260000);
-const MAX_REFERRALS = cleanEnvNumber(process.env.MAX_REFERRALS, 2);
+const MAX_REFERRALS = 100;
 const CURRENCY = cleanEnv(process.env.CURRENCY || "EUR").toUpperCase() || "EUR";
 
 const PASSWORD_MIN_LENGTH = cleanEnvNumber(process.env.PASSWORD_MIN_LENGTH, 8);
