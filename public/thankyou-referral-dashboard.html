@@ -245,15 +245,23 @@ td { color: var(--fg); font-weight: 550; }
 }
 .referral-card h3 { margin-bottom: 7px; }
 .referral-support {
-  display: grid; align-content: start; gap: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
   background:
     radial-gradient(circle at 96% 0%, rgba(204,183,132,.20), transparent 34%),
     #fff;
 }
-.support-details { display: grid; gap: 10px; margin-top: 14px; }
+.support-details { display: grid; gap: 10px; margin-top: 0; }
 .support-detail { border-top: 1px solid var(--line); padding-top: 11px; }
 .support-detail span { display: block; color: var(--muted); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 800; }
 .support-detail strong { display: block; margin-top: 2px; font-size: 14px; word-break: break-word; }
+.support-progress-block {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.support-progress-block .referral-meta { margin-top: 14px; }
 .referral-progress {
   display: grid; align-content: space-between; gap: 14px; background: rgba(14,87,50,.055);
   border-color: rgba(14,87,50,.18);
@@ -1085,7 +1093,7 @@ async function loadMe() {
 
 
 <div class="referral-group">
-  <div class="referral-card feature referral-progress">
+  <div class="referral-card feature">
     <div>
       <h3>Invite a friend</h3>
       <p>Refer friends below. Rewards are issued after payment verification. Your first 2 successful referrals can earn you a full ticket refund.</p>
@@ -1121,32 +1129,6 @@ async function loadMe() {
         </div>
       </div>
     </div>
-
-    <div>
-      <div class="progress-top">
-        <strong>${d.paid_referrals}/${d.max_referrals}</strong>
-        <span>complete</span>
-      </div>
-
-      <div class="progress-track" aria-hidden="true">
-        <div
-          class="progress-fill"
-          style="width:${Math.min(100, Math.max(0, (d.paid_referrals / Math.max(1, d.max_referrals)) * 100))}%"
-        ></div>
-      </div>
-    </div>
-
-    <div class="referral-meta">
-      <div>
-        <span>Remaining</span>
-        <strong>${Math.max(0, d.max_referrals - d.paid_referrals)}</strong>
-      </div>
-
-      <div>
-        <span>Invites</span>
-        <strong>${d.referral_code ? "Ready" : "Pending"}</strong>
-      </div>
-    </div>
   </div>
 
   <div class="referral-card referral-support">
@@ -1164,6 +1146,32 @@ async function loadMe() {
       <div class="support-detail">
         <span>WhatsApp Message</span>
         <strong>+1 (603) 999-3344</strong>
+      </div>
+    </div>
+
+    <div class="support-progress-block">
+      <div class="progress-top">
+        <strong>${d.paid_referrals}/${d.max_referrals}</strong>
+        <span>referrals complete</span>
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <div
+          class="progress-fill"
+          style="width:${Math.min(100, Math.max(0, (d.paid_referrals / Math.max(1, d.max_referrals)) * 100))}%"
+        ></div>
+      </div>
+
+      <div class="referral-meta">
+        <div>
+          <span>Remaining</span>
+          <strong>${Math.max(0, d.max_referrals - d.paid_referrals)}</strong>
+        </div>
+
+        <div>
+          <span>Invites</span>
+          <strong>${d.referral_code ? "Ready" : "Pending"}</strong>
+        </div>
       </div>
     </div>
   </div>
