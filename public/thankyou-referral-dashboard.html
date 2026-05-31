@@ -444,6 +444,7 @@ footer { padding: 34px 0 42px; border-top: 1px solid var(--line); }
   passwordSet: "/api/referrals/password-set",
   passwordSetWithToken: "/api/referrals/password-set-with-token",
   passwordSetupToken: "/api/referrals/password-setup-token",
+  passwordSetupRequest: "/api/referrals/password-setup-request",
   inviteFriend: "/api/referrals/invite-friend"
 };
       const MAX_ATTEMPTS = 10;
@@ -1305,7 +1306,7 @@ function renderLogin(error = "") {
         <img src="ga-wordmark.png" alt="grow acquisition" class="login-logo" />
         <div class="panel-kicker">Member dashboard</div>
         <h2>Log in to your Monaco dashboard</h2>
-        <p>Use Google, or log in with the exact email you paid with and your dashboard password.</p>
+        <p>Use Google if you paid with that Gmail account, or use the exact email you paid with and your dashboard password.</p>
 
         ${error ? `<div class="state error login-error">${esc(error)}</div>` : ""}
 
@@ -1339,12 +1340,27 @@ function renderLogin(error = "") {
           <p class="small-note" id="passwordLoginNote">Your username is the same email used for your paid Monaco booking.</p>
         </form>
 
-        <p class="small-note">First time here? Use your secure setup link to create or reset your Monaco dashboard password.</p>
+        <div class="login-divider">first time here?</div>
+
+        <form class="login-form" id="passwordSetupRequestForm">
+          <label for="passwordSetupRequestEmail">Paid booking email</label>
+          <input
+            id="passwordSetupRequestEmail"
+            type="email"
+            autocomplete="username"
+            placeholder="your-booking-email@example.com"
+            required
+          />
+
+          <button class="secondary-btn" type="submit">Email me a secure setup link</button>
+          <p class="small-note" id="passwordSetupRequestNote">If you have paid, we will email a one-time setup link to this address. No browser storage is used.</p>
+        </form>
       </div>
     </div>
   `;
 
   bindPasswordLoginForm();
+  bindPasswordSetupRequestForm();
 }
 
 function renderSetPasswordScreen(options = {}) {
@@ -1499,6 +1515,81 @@ function bindSetupPasswordForm(options = {}) {
   });
 }
 
+
+async function requestPasswordSetupLink(email, note) {
+  const clean = String(email || "").trim().toLowerCase();
+
+  if (!clean) {
+    if (note) {
+      note.textContent = "Enter the email you used for your paid Monaco booking.";
+      note.style.color = "var(--error)";
+    }
+    return;
+  }
+
+  if (note) {
+    note.textContent = "Sending a secure setup link if this email has a paid booking...";
+    note.style.color = "";
+  }
+
+  try {
+    const response = await json(API.passwordSetupRequest, {
+      method: "POST",
+      body: JSON.stringify({ email: clean })
+    });
+
+    if (note) {
+      note.textContent =
+        response.message ||
+        "If this email belongs to a paid Monaco booking, a secure setup link has been sent.";
+      note.style.color = "var(--accent)";
+    }
+  } catch (err) {
+    if (note) {
+      note.textContent =
+        err.message ||
+        "Could not send the setup link. Continue with Google if this is your Gmail, or contact support.";
+      note.style.color = "var(--error)";
+    }
+  }
+}
+
+function bindPasswordSetupRequestForm() {
+  const form = $("passwordSetupRequestForm");
+  const emailInput = $("passwordSetupRequestEmail");
+  const passwordLoginEmail = $("passwordLoginEmail");
+  const note = $("passwordSetupRequestNote");
+
+  if (!form || !emailInput || !note) return;
+
+  if (passwordLoginEmail?.value && !emailInput.value) {
+    emailInput.value = passwordLoginEmail.value;
+  }
+
+  passwordLoginEmail?.addEventListener("input", () => {
+    if (!emailInput.value) emailInput.value = passwordLoginEmail.value;
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const button = form.querySelector("button");
+    const originalText = button?.textContent || "Email me a secure setup link";
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Sending...";
+    }
+
+    await requestPasswordSetupLink(emailInput.value, note);
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  });
+}
+
 function bindPasswordLoginForm() {
   const form = $("passwordLoginForm");
   const emailInput = $("passwordLoginEmail");
@@ -1544,12 +1635,19 @@ function bindPasswordLoginForm() {
       const me = await loadMe();
       render(normalise(me));
     } catch (err) {
-      if (err?.data?.code === "PASSWORD_NOT_SET" && err.data.can_set_password_now) {
-        renderSetPasswordScreen({
-          email: err.data.email || email,
-          sessionMode: true,
-          message: "No password exists yet for this paid email. Create your dashboard password now."
-        });
+      if (err?.data?.code === "PASSWORD_NOT_SET") {
+        const requestEmailInput = $("passwordSetupRequestEmail");
+        const requestNote = $("passwordSetupRequestNote");
+
+        if (requestEmailInput && !requestEmailInput.value) {
+          requestEmailInput.value = err.data.email || email;
+        }
+
+        await requestPasswordSetupLink(err.data.email || email, requestNote || note);
+
+        note.textContent =
+          "No dashboard password exists yet for this paid email. I sent a secure setup link if the email has a paid booking. If it is a Gmail address, you can also use Continue with Google.";
+        note.style.color = "var(--accent)";
         return;
       }
 
@@ -1646,7 +1744,18 @@ async function boot() {
             const completed = await completeCheckout();
 
             if (completed?.dashboard) {
-              render(normalise(completed));
+              const dashboard = normalise(completed);
+
+              if (!dashboard.password_set) {
+                renderSetPasswordScreen({
+                  email: dashboard.email,
+                  sessionMode: true,
+                  message: "Your payment is confirmed. Create your dashboard password now so you can come back later with your booking email."
+                });
+                return;
+              }
+
+              render(dashboard);
               return;
             }
           }
@@ -1672,8 +1781,6 @@ async function boot() {
           await json(API.logout, { method: "POST" });
         } catch {}
 
-        sessionStorage.removeItem("monaco_checkout_session_id");
-        localStorage.removeItem("monaco_checkout_session_id");
         window.location.href = "/monaco.html";
       });
 

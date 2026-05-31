@@ -366,6 +366,16 @@
       <button class="btn email-btn" id="thankyouPasswordSetupSubmit" type="submit">Create password and continue</button>
       <p class="email-login-note" id="thankyouPasswordSetupNote">Your username is the same email used for your paid Monaco booking.</p>
     </form>
+
+    <div class="login-divider" id="passwordRequestDivider">first time here?</div>
+
+    <form class="email-login-form password-request-form" id="thankyouPasswordRequestForm">
+      <label for="thankyouPasswordRequestEmail">Paid booking email</label>
+      <input id="thankyouPasswordRequestEmail" type="email" autocomplete="username" placeholder="your-booking-email@example.com" required />
+
+      <button class="btn email-btn" id="thankyouPasswordRequestSubmit" type="submit">Email me a secure setup link</button>
+      <p class="email-login-note" id="thankyouPasswordRequestNote">If you already paid, we will email a one-time setup link to your booking email. No browser storage is used.</p>
+    </form>
   </div>
 </div>
 
@@ -444,6 +454,10 @@
     var setupPasswordInput = document.getElementById('thankyouSetupPassword');
     var setupPasswordConfirmInput = document.getElementById('thankyouSetupPasswordConfirm');
     var setupPasswordNote = document.getElementById('thankyouPasswordSetupNote');
+    var passwordRequestDivider = document.getElementById('passwordRequestDivider');
+    var passwordRequestForm = document.getElementById('thankyouPasswordRequestForm');
+    var passwordRequestEmailInput = document.getElementById('thankyouPasswordRequestEmail');
+    var passwordRequestNote = document.getElementById('thankyouPasswordRequestNote');
     var syncNote = document.getElementById('paymentSyncNote');
     var confirmationText = document.getElementById('confirmationText');
 
@@ -459,6 +473,10 @@
 var bookingEmail =
   params.get('email') ||
   '';
+
+var loginUrl = checkoutId
+  ? '/thankyou-referral-dashboard.html?checkout_session_id=' + encodeURIComponent(checkoutId)
+  : '/thankyou-referral-dashboard.html';
 
     var dashboardPasswordSet = null;
     var hasCheckoutSessionCookie = false;
@@ -478,6 +496,11 @@ var bookingEmail =
       if (setupEmailInput) {
         setupEmailInput.placeholder = email;
         if (!setupEmailInput.value) setupEmailInput.value = email;
+      }
+
+      if (passwordRequestEmailInput) {
+        passwordRequestEmailInput.placeholder = email;
+        if (!passwordRequestEmailInput.value) passwordRequestEmailInput.value = email;
       }
     }
 
@@ -507,6 +530,8 @@ function showEmailLoginMode() {
   emailLoginDivider?.classList.remove('is-hidden');
   emailLoginForm?.classList.remove('is-hidden');
   passwordSetupForm?.classList.add('is-hidden');
+  passwordRequestDivider?.classList.remove('is-hidden');
+  passwordRequestForm?.classList.remove('is-hidden');
 
   setBookingEmail(bookingEmail);
 
@@ -527,6 +552,8 @@ function showPasswordSetupMode(message) {
   emailLoginDivider?.classList.remove('is-hidden');
   emailLoginForm?.classList.add('is-hidden');
   passwordSetupForm?.classList.remove('is-hidden');
+  passwordRequestDivider?.classList.add('is-hidden');
+  passwordRequestForm?.classList.add('is-hidden');
 
   setBookingEmail(bookingEmail);
 
@@ -539,6 +566,57 @@ function showPasswordSetupMode(message) {
     setupPasswordInput?.focus();
   }, 80);
 }
+
+async function requestPasswordSetupLink(email, noteElement) {
+  email = String(email || '').trim().toLowerCase();
+
+  if (!email) {
+    if (noteElement) {
+      noteElement.textContent = 'Enter the email you used for your paid Monaco booking.';
+      noteElement.style.color = '#8a1f1f';
+    }
+    return;
+  }
+
+  if (noteElement) {
+    noteElement.textContent = 'Sending a secure setup link if this email has a paid booking...';
+    noteElement.style.color = '';
+  }
+
+  try {
+    var response = await fetch('/api/referrals/password-setup-request', {
+      method: 'POST',
+      credentials: 'include',
+      cache: 'no-store',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email: email })
+    });
+
+    var data = await response.json().catch(function(){ return {}; });
+
+    if (!response.ok) {
+      throw new Error(data.error || data.message || 'Could not send setup link.');
+    }
+
+    if (noteElement) {
+      noteElement.textContent =
+        data.message ||
+        'If this email belongs to a paid Monaco booking, a secure setup link has been sent.';
+      noteElement.style.color = '#0e5732';
+    }
+  } catch (error) {
+    if (noteElement) {
+      noteElement.textContent =
+        error.message ||
+        'Could not send setup link. Continue with Google if this is your Gmail, or contact support.';
+      noteElement.style.color = '#8a1f1f';
+    }
+  }
+}
+
     function openDashboardLoginModal(event) {
       if (event) event.preventDefault();
       setBookingEmail(bookingEmail);
@@ -623,8 +701,23 @@ function showPasswordSetupMode(message) {
         var data = await response.json().catch(function(){ return {}; });
 
         if (!response.ok) {
-          if (data && data.code === 'PASSWORD_NOT_SET' && data.can_set_password_now) {
-            showPasswordSetupMode('No password exists yet for this paid email. Create your dashboard password now.');
+          if (data && data.code === 'PASSWORD_NOT_SET') {
+            if (checkoutId || hasCheckoutSessionCookie) {
+              showPasswordSetupMode('No password exists yet for this paid email. Create your dashboard password now.');
+              return;
+            }
+
+            if (passwordRequestEmailInput && !passwordRequestEmailInput.value) {
+              passwordRequestEmailInput.value = data.email || email;
+            }
+
+            await requestPasswordSetupLink(data.email || email, passwordRequestNote || emailLoginNote);
+
+            if (emailLoginNote) {
+              emailLoginNote.textContent =
+                'No dashboard password exists yet. I sent a secure setup link if this email has a paid booking. If it is a Gmail address, you can also use Continue with Google.';
+              emailLoginNote.style.color = '#0e5732';
+            }
             return;
           }
           throw new Error(data.error || data.message || 'Could not log in with that email and password.');
@@ -641,6 +734,30 @@ function showPasswordSetupMode(message) {
           submitBtn.disabled = false;
           submitBtn.textContent = originalText;
         }
+      }
+    });
+
+
+
+    passwordRequestForm?.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      var email = String(passwordRequestEmailInput?.value || '').trim().toLowerCase();
+      setBookingEmail(email);
+
+      var submitBtn = document.getElementById('thankyouPasswordRequestSubmit');
+      var originalText = submitBtn ? submitBtn.textContent : 'Email me a secure setup link';
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+      }
+
+      await requestPasswordSetupLink(email, passwordRequestNote);
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
     });
 
@@ -711,7 +828,9 @@ function showPasswordSetupMode(message) {
 
         window.location.href = '/thankyou-referral-dashboard.html';
       } catch (error) {
-        if (setupPasswordNote) {
+        if (!checkoutId && !hasCheckoutSessionCookie) {
+          await requestPasswordSetupLink(email, setupPasswordNote);
+        } else if (setupPasswordNote) {
           setupPasswordNote.textContent = error.message || 'Could not set your dashboard password.';
           setupPasswordNote.style.color = '#8a1f1f';
         }
@@ -769,6 +888,14 @@ function showPasswordSetupMode(message) {
 
           if (confirmationText) {
             confirmationText.textContent = 'Your spot in Monaco is secured. Your payment has been confirmed.';
+          }
+
+          if (dashboardPasswordSet !== true) {
+            setTimeout(function(){
+              showPasswordSetupMode('Your payment is confirmed. Create your dashboard password now so you can come back later with your booking email.');
+              loginModal?.classList.add('is-open');
+              loginModal?.setAttribute('aria-hidden', 'false');
+            }, 450);
           }
 
           return;

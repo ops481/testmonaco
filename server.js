@@ -347,8 +347,13 @@ app.get("/api/referrals/complete-checkout", async (req, res) => {
   try {
     requireEnv(["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"]);
 
-    const sessionId = cleanText(req.query.checkout_session_id || req.query.session_id, 200);
-
+    const sessionId = cleanText(
+  req.query.checkout_session_id ||
+    req.query.session_id ||
+    req.query.checkout_configuration_id ||
+    "",
+  200
+);
     if (!sessionId) {
       return res.status(400).json({ error: "Missing checkout_session_id." });
     }
@@ -574,6 +579,10 @@ app.post("/api/referrals/login", async (req, res) => {
 
 app.post("/api/referrals/password-login", passwordLoginHandler);
 
+app.post("/api/referrals/password-setup-request", passwordSetupRequestHandler);
+
+
+
 app.post("/api/referrals/password-set", async (req, res) => {
   try {
     const password = String(req.body?.password || "");
@@ -663,6 +672,57 @@ app.post("/api/referrals/password-set", async (req, res) => {
     res.status(500).json({ error: error.message || "Could not set password." });
   }
 });
+
+async function passwordSetupRequestHandler(req, res) {
+  try {
+    const email = cleanEmail(req.body?.email || req.query?.email || "");
+
+    if (!email) {
+      return res.status(400).json({
+        error: "Enter the email you used for your paid Monaco booking."
+      });
+    }
+
+    /*
+      Do not let this endpoint become an email-enumeration tool.
+      The public response is intentionally the same whether the email exists or not.
+    */
+    const genericResponse = {
+      ok: true,
+      message: "If that email belongs to a paid Monaco booking, a secure password setup link has been sent."
+    };
+
+    const customer = await getCustomer(email);
+
+    if (!customer || customer.status !== "paid") {
+      return res.json(genericResponse);
+    }
+
+    if (!GOOGLE_SCRIPT_URL) {
+      return res.status(503).json({
+        code: "PASSWORD_EMAIL_NOT_CONFIGURED",
+        error: "Password setup emails are not configured yet. Continue with Google if this is your Gmail, or contact support."
+      });
+    }
+
+    await revokeUnusedPasswordTokens(customer.email);
+
+    const token = await createPasswordSetupToken(customer.email);
+    const setupUrl = `${APP_URL}/thankyou-referral-dashboard.html?set_password_token=${encodeURIComponent(token)}`;
+
+    await sendPasswordSetupEmail({
+      customer,
+      setup_url: setupUrl
+    });
+
+    res.json(genericResponse);
+  } catch (error) {
+    console.error("password-setup-request failed:", error);
+    res.status(500).json({
+      error: error.message || "Could not send password setup link."
+    });
+  }
+}
 function signGoogleOAuthState(payload) {
   const body = Buffer
     .from(JSON.stringify(payload), "utf8")
@@ -1322,12 +1382,14 @@ async function passwordLoginHandler(req, res) {
     }
 
     if (!customer.password_hash) {
-      return res.status(409).json({
-        code: "PASSWORD_NOT_SET",
-        can_set_password_now: true,
-        error: "No dashboard password exists yet for this paid email."
-      });
-    }
+  return res.status(409).json({
+    code: "PASSWORD_NOT_SET",
+    email: customer.email,
+    can_set_password_now: true,
+    can_request_setup_link: true,
+    error: "No dashboard password exists yet for this paid email. Use Google if this is your Gmail, or request a secure setup link."
+  });
+}
 
     const valid = await verifyPassword(password, customer.password_hash);
 
@@ -2739,7 +2801,55 @@ async function createPasswordSetupToken(email) {
 
   return token;
 }
+async function revokeUnusedPasswordTokens(email) {
+  const clean = cleanEmail(email);
+  if (!clean) return;
 
+  const { error } = await db()
+    .from("monaco_password_tokens")
+    .update({ used_at: now() })
+    .eq("customer_email", clean)
+    .is("used_at", null);
+
+  if (error) throw error;
+}
+
+async function sendPasswordSetupEmail({ customer, setup_url }) {
+  if (!GOOGLE_SCRIPT_URL) {
+    throw new Error("Password setup emails are not configured.");
+  }
+
+  const response = await fetch(GOOGLE_SCRIPT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({
+      event_type: "monaco_password_setup_link",
+      email: customer.email,
+      full_name: customer.name || "",
+      setup_url,
+      expires_hours: Math.max(1, Math.round(PASSWORD_SETUP_TOKEN_TTL_MS / (1000 * 60 * 60))),
+      app: "monaco-content-retreat"
+    })
+  });
+
+  const text = await response.text();
+  let data = {};
+
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { raw: text };
+  }
+
+  if (!response.ok || data.ok === false) {
+    throw withDetails("Could not send password setup email.", data);
+  }
+
+  return data;
+}
 async function getPasswordToken(token) {
   const tokenHash = sha256(token);
 
