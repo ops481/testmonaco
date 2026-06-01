@@ -64,9 +64,7 @@ const WHOP_ENVIRONMENT = cleanEnv(process.env.WHOP_ENVIRONMENT || "sandbox").toL
 
 const WHOP_API_BASE =
   cleanEnvUrl(process.env.WHOP_API_BASE) ||
-  (WHOP_ENVIRONMENT === "sandbox"
-    ? "https://sandbox-api.whop.com/api/v1"
-    : "https://api.whop.com/api/v1");
+  "https://api.whop.com/api/v1";
 
 const WHOP_WEBHOOK_SECRET = cleanEnv(process.env.WHOP_WEBHOOK_SECRET);
 
