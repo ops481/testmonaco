@@ -1065,6 +1065,7 @@ function scheduleLeadProgressCapture() {
         checkout.className = "whop-checkout-embed";
         checkout.setAttribute("data-whop-checkout-environment", session.environment || "production");
         checkout.setAttribute("data-whop-checkout-session", session.session_id);
+        checkout.setAttribute("data-whop-checkout-return-url", session.return_url);
         checkout.setAttribute("data-whop-checkout-plan-id", session.plan_id || DEFAULT_PLAN_ID);
         checkout.setAttribute("data-whop-checkout-prefill-email", payload.email);
         checkout.setAttribute("data-whop-checkout-hide-email", "true");
