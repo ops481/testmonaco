@@ -212,22 +212,34 @@ app.post("/api/referrals/create-whop-session", async (req, res) => {
       app: "monaco-content-retreat"
     };
 
+    // const checkoutConfig = await whopFetch("/checkout_configurations", {
+    //   method: "POST",
+    //   body: {
+    //     mode: "payment",
+    //     plan: {
+    //       company_id: WHOP_COMPANY_ID,
+    //       initial_price: TICKET_PRICE_CENTS / 100,
+    //       plan_type: "one_time",
+    //       currency: CURRENCY.toLowerCase()
+    //     },
+    //     metadata,
+    //     redirect_url: redirectUrl,
+    //     source_url: sourceUrl,
+    //     allow_promo_codes: true
+    //   }
+    // });
+
     const checkoutConfig = await whopFetch("/checkout_configurations", {
-      method: "POST",
-      body: {
-        mode: "payment",
-        plan: {
-          company_id: WHOP_COMPANY_ID,
-          initial_price: TICKET_PRICE_CENTS / 100,
-          plan_type: "one_time",
-          currency: CURRENCY.toLowerCase()
-        },
-        metadata,
-        redirect_url: redirectUrl,
-        source_url: sourceUrl,
-        allow_promo_codes: true
-      }
-    });
+  method: "POST",
+  body: {
+    mode: "payment",
+    plan_id: WHOP_PLAN_ID,
+    metadata,
+    redirect_url: redirectUrl,
+    source_url: sourceUrl,
+    allow_promo_codes: true
+  }
+});
 
     const sessionId =
       checkoutConfig.id ||
@@ -265,14 +277,14 @@ app.post("/api/referrals/create-whop-session", async (req, res) => {
     });
 
     res.json({
-      session_id: sessionId,
-      checkout_configuration_id: sessionId,
-      plan_id: planId,
-      environment: WHOP_ENVIRONMENT,
-      return_url: redirectUrl,
-      purchase_url: checkoutConfig.purchase_url || checkoutConfig.purchaseUrl || "",
-      referral_code: referredByCode
-    });
+  session_id: sessionId,
+  checkout_configuration_id: sessionId,
+  plan_id: WHOP_PLAN_ID, // plan_id: planId,
+  environment: WHOP_ENVIRONMENT,
+  return_url: redirectUrl,
+  purchase_url: checkoutConfig.purchase_url || checkoutConfig.purchaseUrl || "",
+  referral_code: referredByCode
+});
   } catch (error) {
     console.error("create-whop-session failed:", error);
     res.status(500).json({
