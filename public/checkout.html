@@ -454,6 +454,63 @@
 }
 .co-btn[disabled] { opacity:.65; cursor:progress; transform:none; filter:grayscale(.15); }
 
+/* ===== FINAL WISTIA VIDEO CORNER/RADIUS FIX =====
+   Checkout page: matches the prior-event Wistia frame to the 4:3 Wistia media,
+   then clips every Wistia/video layer so dark corner slivers do not show. */
+.prior .video-wrap {
+  --video-radius: 24px;
+  width: min(100%, 760px) !important;
+  aspect-ratio: 4 / 3 !important;
+  border-radius: var(--video-radius) !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round var(--video-radius)) !important;
+  background: transparent !important;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  contain: paint;
+  isolation: isolate;
+}
+
+.prior .video-wrap wistia-player,
+.prior .video-wrap iframe,
+.prior .video-wrap video,
+.prior .video-wrap .hero-video,
+.prior .video-wrap .video-fallback,
+.prior .video-wrap .wistia_embed,
+.prior .video-wrap .wistia_responsive_wrapper,
+.prior .video-wrap .wistia_responsive_padding {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round var(--video-radius)) !important;
+  background-color: transparent !important;
+}
+
+.prior .video-wrap wistia-player[media-id='twl976n2o2']:not(:defined) {
+  padding-top: 0 !important;
+  background-size: cover !important;
+  border-radius: inherit !important;
+  overflow: hidden !important;
+  filter: blur(5px);
+}
+
+@media (max-width: 700px) {
+  .prior .video-wrap {
+    --video-radius: 18px;
+    width: min(100%, calc(100vw - 28px)) !important;
+    margin: 0 auto 18px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .prior .video-wrap {
+    --video-radius: 16px;
+    width: min(100%, calc(100vw - 24px)) !important;
+  }
+}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/intlTelInput.min.js"></script>
   <script async defer src="https://js.whop.com/static/checkout/loader.js"></script>

@@ -479,6 +479,62 @@
   .footer-links a { font-size: 14px; color: var(--muted); }
   .footer-links a:hover { color: var(--fg); }
   .copy { font-size: 13px; color: var(--muted); margin-top: 22px; }
+
+/* ===== FINAL WISTIA VIDEO CORNER/RADIUS FIX =====
+   Thank-you/referral page: keeps the gold-framed Wistia video consistently rounded
+   and clips every embedded layer so dark corner slivers do not show. */
+.ty .video-wrap {
+  --video-radius: 24px;
+  border-radius: var(--video-radius) !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round var(--video-radius)) !important;
+  background: transparent !important;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  contain: paint;
+  isolation: isolate;
+}
+
+.ty .video-wrap wistia-player,
+.ty .video-wrap iframe,
+.ty .video-wrap video,
+.ty .video-wrap .hero-video,
+.ty .video-wrap .video-fallback,
+.ty .video-wrap .wistia_embed,
+.ty .video-wrap .wistia_responsive_wrapper,
+.ty .video-wrap .wistia_responsive_padding {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round var(--video-radius)) !important;
+  background-color: transparent !important;
+}
+
+.ty .video-wrap wistia-player[media-id='tssg37xbj8']:not(:defined) {
+  padding-top: 0 !important;
+  background-size: cover !important;
+  border-radius: inherit !important;
+  overflow: hidden !important;
+  filter: blur(5px);
+}
+
+@media (max-width: 700px) {
+  .ty .video-wrap {
+    --video-radius: 18px;
+    width: min(100%, calc(100vw - 28px)) !important;
+    margin: 0 auto 22px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .ty .video-wrap {
+    --video-radius: 16px;
+    width: min(100%, calc(100vw - 24px)) !important;
+  }
+}
 </style>
 </head>
 <body>
