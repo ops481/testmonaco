@@ -219,7 +219,6 @@ app.post("/api/referrals/create-whop-session", async (req, res) => {
         plan: {
           company_id: WHOP_COMPANY_ID,
           initial_price: TICKET_PRICE_CENTS / 100,
-          plan_type: "one_time",
           currency: CURRENCY.toLowerCase()
         },
         metadata,
