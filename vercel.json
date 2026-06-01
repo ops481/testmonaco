@@ -12,6 +12,10 @@
   ],
   "routes": [
     {
+      "src": "/\\.well-known/apple-developer-merchantid-domain-association",
+      "dest": "https://whop.com/.well-known/apple-platform-integrator/apple-developer-merchantid-domain-association"
+    },
+    {
       "src": "/",
       "dest": "/public/monaco.html"
     },
