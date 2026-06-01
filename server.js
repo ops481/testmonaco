@@ -228,6 +228,7 @@ app.post("/api/referrals/create-whop-session", async (req, res) => {
     //     allow_promo_codes: true
     //   }
     // });
+const WHOP_PLAN_ID = cleanEnv(process.env.WHOP_PLAN_ID || "plan_qK4NTM5q8ICqJ");
 
     const checkoutConfig = await whopFetch("/checkout_configurations", {
   method: "POST",
