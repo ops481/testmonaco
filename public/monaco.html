@@ -1346,6 +1346,102 @@
 }
 
 
+
+/* ===== FINAL PHONE HERO VIDEO FIX =====
+   Keeps the hero Wistia embed in a true 16:9 frame on phones.
+   Put this at the very end of the <style> block so it wins over earlier mobile rules. */
+@media (max-width: 700px) {
+  .hero .video-wrap {
+    width: min(100%, 430px) !important;
+    max-width: calc(100vw - 28px) !important;
+    margin: 0 auto 16px !important;
+    aspect-ratio: 16 / 9 !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    background: #11150f !important;
+  }
+
+  .hero .video-wrap wistia-player,
+  .hero .video-wrap iframe,
+  .hero .video-wrap video,
+  .hero .video-wrap .hero-video {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .hero .video-wrap wistia-player:not(:defined) {
+    padding-top: 0 !important;
+    background-size: cover !important;
+  }
+
+  .hero .vplay {
+    width: 62px !important;
+    height: 62px !important;
+    font-size: 20px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero .video-wrap {
+    max-width: calc(100vw - 24px) !important;
+    border-radius: 12px !important;
+    margin-bottom: 14px !important;
+  }
+}
+
+
+/* ===== FINAL HERO VIDEO CORNER/RADIUS FIX =====
+   Matches the outside frame to the Wistia player radius and clips every layer,
+   which removes the little dark corner slivers on desktop and phone. */
+.hero .video-wrap {
+  --hero-video-radius: 24px;
+  border-radius: var(--hero-video-radius) !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round var(--hero-video-radius)) !important;
+  background: transparent !important;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  isolation: isolate;
+}
+
+.hero .video-wrap wistia-player,
+.hero .video-wrap iframe,
+.hero .video-wrap video,
+.hero .video-wrap .hero-video,
+.hero .video-wrap .wistia_embed,
+.hero .video-wrap .wistia_responsive_wrapper,
+.hero .video-wrap .wistia_responsive_padding {
+  border-radius: inherit !important;
+  overflow: hidden !important;
+  clip-path: inset(0 round var(--hero-video-radius)) !important;
+  background-color: transparent !important;
+}
+
+/* Override Wistia's temporary blurred swatch so it fills the rounded frame while loading. */
+.hero .video-wrap wistia-player[media-id='o692rxfxa5']:not(:defined) {
+  background-size: cover !important;
+  border-radius: inherit !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 700px) {
+  .hero .video-wrap {
+    --hero-video-radius: 18px;
+    border-radius: var(--hero-video-radius) !important;
+    clip-path: inset(0 round var(--hero-video-radius)) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero .video-wrap {
+    --hero-video-radius: 16px;
+    border-radius: var(--hero-video-radius) !important;
+    clip-path: inset(0 round var(--hero-video-radius)) !important;
+  }
+}
+
 </style>
 </head>
 <body>
