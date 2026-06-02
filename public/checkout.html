@@ -48,7 +48,11 @@
   .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 
   /* ===== TOP DEAL BAR + COUNTDOWN ===== */
-  .deal-bar { background: var(--accent); color: #fff; font-weight: 600; }
+  .deal-bar {
+  background: #b3131a;
+  color: #fff;
+  font-weight: 600;
+}
   .deal-bar .container {
     display: flex; align-items: center; justify-content: center;
     gap: 12px; padding-top: 7px; padding-bottom: 7px; flex-wrap: wrap;
@@ -64,7 +68,7 @@
   .cd i { font-size: 8px; font-style: normal; text-transform: uppercase; letter-spacing: .08em; opacity: .82; }
   @media (max-width: 700px) {
     /* text + countdown sit centered together on one row */
-    .deal-bar .container { flex-wrap: nowrap; justify-content: center; gap: 10px; padding-left: 16px; padding-right: 16px; }
+.deal-bar { background: #b3131a; color: #fff; font-weight: 600; }
     .deal-text { font-size: 11.5px; text-align: center; flex: 0 1 auto; min-width: 0; line-height: 1.25; }
     .countdown { flex-shrink: 0; }
     .cd { min-width: 34px; padding: 2px 4px; }
@@ -519,13 +523,9 @@
 
 <!-- ===== TOP DEAL BAR ===== -->
 <div class="deal-bar" id="dealBar">
-  <div class="container">
-    <span class="deal-text">Tickets are released in blocks, price increases in:</span>
-    <div class="countdown" id="countdown" aria-label="Time left">
-      <div class="cd"><span class="js-d">00</span><i>days</i></div>
-      <div class="cd"><span class="js-h">00</span><i>hrs</i></div>
-      <div class="cd"><span class="js-m">00</span><i>min</i></div>
-      <div class="cd"><span class="js-s">00</span><i>sec</i></div>
+  <div class="container deal-bar-inner">
+    <div class="deal-left">
+      <span class="deal-text">Based on overwhelming applications. We have 18 spots remaining.</span>
     </div>
   </div>
 </div>
