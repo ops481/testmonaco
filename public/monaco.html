@@ -44,7 +44,8 @@
   .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
 
   /* ===== TOP DEAL BAR + COUNTDOWN ===== */
-  .deal-bar { background: var(--accent); color: #fff; font-weight: 600; }
+ /* ===== TOP DEAL BAR ===== */
+.deal-bar { background: #b3131a; color: #fff; font-weight: 600; }
   .deal-bar .container {
     display: flex; align-items: center; justify-content: center;
     gap: 12px; padding-top: 7px; padding-bottom: 7px; flex-wrap: wrap;
@@ -60,7 +61,12 @@
   .cd i { font-size: 8px; font-style: normal; text-transform: uppercase; letter-spacing: .08em; opacity: .82; }
   @media (max-width: 700px) {
     /* text + countdown sit centered together on one row */
-    .deal-bar .container { flex-wrap: nowrap; justify-content: center; gap: 10px; padding-left: 16px; padding-right: 16px; }
+/* ===== TOP DEAL BAR ===== */
+.deal-bar {
+  background: #b3131a;
+  color: #fff;
+  font-weight: 600;
+}
     .deal-text { font-size: 11.5px; text-align: center; flex: 0 1 auto; min-width: 0; line-height: 1.25; }
     .countdown { flex-shrink: 0; }
     .cd { min-width: 34px; padding: 2px 4px; }
@@ -365,11 +371,7 @@
     .wp.open .wpc-desc { font-size: 11px; }
   }
   /* ===== TOP DEAL BAR + COUNTDOWN ===== */
-.deal-bar {
-  background: var(--accent);
-  color: #fff;
-  font-weight: 600;
-}
+
 
 .deal-bar-inner {
   display: flex;
@@ -1447,18 +1449,12 @@
 <body>
 
 <!-- ===== TOP DEAL BAR (live countdown to end of May) ===== -->
+<!-- ===== TOP DEAL BAR (availability notice) ===== -->
 <div class="deal-bar" id="dealBar">
   <div class="container deal-bar-inner">
     <div class="deal-left">
-      <span class="deal-text">Tickets are released in blocks, price increases in:</span>
-      <div class="countdown" id="countdown" aria-label="Time left">
-        <div class="cd"><span id="cdD">00</span><i>days</i></div>
-        <div class="cd"><span id="cdH">00</span><i>hrs</i></div>
-        <div class="cd"><span id="cdM">00</span><i>min</i></div>
-        <div class="cd"><span id="cdS">00</span><i>sec</i></div>
-      </div>
+      <span class="deal-text">Based on overwhelming applications. We have 25 spots remaining.</span>
     </div>
-
   </div>
 </div>
 
@@ -1954,30 +1950,6 @@
     else if (mql.addListener) mql.addListener(syncLayout);
   })();
 
-  /* Countdown to end of May (urgency) */
-  (function(){
-    var target = new Date(2026, 5, 7, 23, 59, 59).getTime(); // June 7, 2026 (month index 5 = June)
-    var dEl = document.getElementById('cdD'), hEl = document.getElementById('cdH'),
-        mEl = document.getElementById('cdM'), sEl = document.getElementById('cdS');
-    if (!dEl) return;
-    function pad(n){ return (n < 10 ? '0' : '') + n; }
-    function tick(){
-      var diff = target - Date.now();
-      if (diff <= 0){
-        dEl.textContent = hEl.textContent = mEl.textContent = sEl.textContent = '00';
-        var t = document.querySelector('.deal-text');
-        if (t) t.innerHTML = '<strong>The current rate has ended.</strong>';
-        return;
-      }
-      var s = Math.floor(diff / 1000);
-      dEl.textContent = pad(Math.floor(s / 86400));
-      hEl.textContent = pad(Math.floor((s % 86400) / 3600));
-      mEl.textContent = pad(Math.floor((s % 3600) / 60));
-      sEl.textContent = pad(s % 60);
-    }
-    tick();
-    setInterval(tick, 1000);
-  })();
 
   /* Team videos: click play -> starts WITH sound (one at a time) */
   (function(){
