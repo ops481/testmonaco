@@ -10,7 +10,7 @@
 </script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Checkout · Monaco Content Retreat · Grow Acquisition</title>
+<title>Waitlist · Monaco Content Retreat · Grow Acquisition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -55,9 +55,9 @@
 }
   .deal-bar .container {
     display: flex; align-items: center; justify-content: center;
-    gap: 12px; padding-top: 7px; padding-bottom: 7px; flex-wrap: wrap;
+    gap: 12px; padding-top: 15px; padding-bottom: 15px; flex-wrap: wrap;
   }
-  .deal-text { font-size: 14px; }
+  .deal-text { font-size: 15px; text-align: center; letter-spacing: .02em; }
   .deal-text strong { font-weight: 800; }
   .countdown { display: flex; gap: 5px; }
   .cd {
@@ -69,7 +69,8 @@
   @media (max-width: 700px) {
     /* text + countdown sit centered together on one row */
 .deal-bar { background: #b3131a; color: #fff; font-weight: 600; }
-    .deal-text { font-size: 11.5px; text-align: center; flex: 0 1 auto; min-width: 0; line-height: 1.25; }
+    .deal-bar .container { padding-top: 12px; padding-bottom: 12px; }
+    .deal-text { font-size: 12.5px; text-align: center; flex: 0 1 auto; min-width: 0; line-height: 1.3; }
     .countdown { flex-shrink: 0; }
     .cd { min-width: 34px; padding: 2px 4px; }
     .cd span { font-size: 12px; }
@@ -517,7 +518,9 @@
 }
 </style>
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/intlTelInput.min.js"></script>
+  <!-- Waitlist mode: Whop checkout loader is commented out until enrollments reopen.
   <script async defer src="https://js.whop.com/static/checkout/loader.js"></script>
+  -->
 </head>
 <body>
 
@@ -525,7 +528,7 @@
 <div class="deal-bar" id="dealBar">
   <div class="container deal-bar-inner">
     <div class="deal-left">
-      <span class="deal-text">Based on overwhelming applications. We have 3 spots remaining.</span>
+      <span class="deal-text"><strong>ENROLLMENTS CLOSED</strong> - JOIN THE WAITLIST FOR A CHANCE TO TAKE A SPOT.</span>
     </div>
   </div>
 </div>
@@ -542,15 +545,15 @@
 <main class="checkout">
   <div class="container">
     <div class="co-head">
-      <h1 class="co-title">Complete your booking.</h1>
-      <h2 class="sum-title">Order Summary</h2>
+      <h1 class="co-title">Secure your chance.</h1>
+      <h2 class="sum-title">What's Included</h2>
     </div>
 
     <form class="co-grid" id="checkoutForm">
 
-      <!-- LEFT: information + payment capture -->
+      <!-- LEFT: waitlist information capture -->
       <section class="co-form">
-        <span class="grp-label">Your details</span>
+        <span class="grp-label">Waitlist details</span>
 
         <div class="field">
           <label for="fname">Full name</label>
@@ -595,14 +598,17 @@
 
         <div class="referral-note" id="referralNote"></div>
 
+        <!-- PAYMENT LINE COMMENTED OUT FOR WAITLIST MODE.
         <div class="pay-line">
           <span>Your ticket to the Monaco Content Retreat</span>
           <strong>&euro;2,600</strong>
         </div>
+        -->
 
-        <button type="submit" class="btn co-btn" id="checkoutButton">Secure your spot</button>
+        <button type="submit" class="btn co-btn" id="checkoutButton">Join waitlist</button>
         <div class="co-error" id="checkoutMessage" role="alert"></div>
 
+     <!-- WHOP CHECKOUT POPUP COMMENTED OUT FOR WAITLIST MODE.
      <div class="whop-checkout-shell" id="whopShell" aria-live="polite">
   <div class="whop-popup-card">
     <button class="whop-popup-close" id="whopClose" type="button" aria-label="Close checkout">&times;</button>
@@ -611,6 +617,7 @@
     <p class="secure-note">After payment, you will be redirected to your referral dashboard.</p>
   </div>
 </div>
+     -->
       </section>
 
       <!-- RIGHT: order summary -->
@@ -623,9 +630,14 @@
           </div>
           <div class="st-stub">
             <span class="hole top"></span><span class="hole bottom"></span>
+            <!-- ORIGINAL PAID TICKET STUB COMMENTED OUT FOR WAITLIST MODE.
             <div class="stub-admit">Admit one</div>
             <div class="stub-price">&euro;2,600</div>
             <div class="stub-sub">per seat</div>
+            -->
+            <div class="stub-admit">Waitlist</div>
+            <div class="stub-price">Closed</div>
+            <div class="stub-sub">apply for a spot</div>
           </div>
         </div>
 
@@ -788,18 +800,13 @@
     setInterval(tick, 1000);
   })();
 
-  /* Working backend checkout: referral capture + Whop embedded payment */
+  /* Waitlist submission: sends the form to a Google Apps Script web app, which forwards it to Airtable. */
   (function() {
-    var CHECKOUT_ID = "whop-embedded-checkout";
-    var WHOP_LOADER_URL = "https://js.whop.com/static/checkout/loader.js";
-    var DEFAULT_PLAN_ID = "plan_qK4NTM5q8ICqJ";
+    var WAITLIST_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAycekmY72U-3j2Yjou375okcCX-kMafHs__CN3OHBtt1S8eOcyOef2ULtuuPLJ-m9/exec";
     var REFERRAL_STORAGE_KEY = "monaco_referral_code";
-    var VISITOR_ID_STORAGE_KEY = "monaco_checkout_visitor_id";
+    var VISITOR_ID_STORAGE_KEY = "monaco_waitlist_visitor_id";
 
-    var CHECKOUT_LEAD_URL = "/api/referrals/checkout-lead";
-
-    var preparing = false;
-    var preparedSignature = "";
+    var submitting = false;
     var phoneInputInstance = null;
 
     function $(id) { return document.getElementById(id); }
@@ -901,200 +908,71 @@
       return rawPhone;
     }
 
-function formPayload() {
-  return {
-    full_name: value("fname"),
-    email: value("email").toLowerCase(),
-    phone: fullPhoneNumber(),
-    company: value("company"),
-    instagram: normalizeInstagram(value("instagram")),
-    lead_source: value("leadSource") || (getReferralCode() ? "referral" : ""),
-    referral_code: getReferralCode(),
-    referred_by: getReferralCode(),
-    visitor_id: getVisitorId(),
-    source_url: window.location.href
-  };
-}
-
-function validatePayload(payload) {
-  if (!payload.full_name) return "Enter your full name.";
-  if (!isValidEmail(payload.email)) return "Enter a valid email.";
-  if (!payload.lead_source) return "Select where you came from.";
-  return "";
-}
-
-var lastLeadCaptureSignature = "";
-var leadCaptureTimer = null;
-
-function hasUsablePhone(phone) {
-  return String(phone || "").replace(/\D/g, "").length >= 7;
-}
-
-function canCaptureLeadProgress(payload) {
-  // Capture as soon as we have ANY useful contact route.
-  // Priority later is email, then Instagram, then phone.
-  return (
-    isValidEmail(payload.email) ||
-    Boolean(payload.instagram) ||
-    hasUsablePhone(payload.phone)
-  );
-}
-
-function sendLeadToAirtable(payload, checkoutStatus) {
-  if (!CHECKOUT_LEAD_URL) return;
-  if (!canCaptureLeadProgress(payload)) return;
-
-  var leadPayload = Object.assign(
-    {
-      event_type: "checkout_progress",
-      checkout_status: checkoutStatus || "Details started"
-    },
-    payload
-  );
-
-  var signature = JSON.stringify(leadPayload);
-  if (signature === lastLeadCaptureSignature) return;
-  lastLeadCaptureSignature = signature;
-
-  var body = JSON.stringify(leadPayload);
-
-  try {
-    if (navigator.sendBeacon) {
-      var blob = new Blob([body], { type: "application/json;charset=UTF-8" });
-      var queued = navigator.sendBeacon(CHECKOUT_LEAD_URL, blob);
-      if (queued) return;
+    function formPayload() {
+      return {
+        event_type: "waitlist_submission",
+        waitlist_status: "Submitted",
+        full_name: value("fname"),
+        email: value("email").toLowerCase(),
+        phone: fullPhoneNumber(),
+        company: value("company"),
+        instagram: normalizeInstagram(value("instagram")),
+        lead_source: value("leadSource") || (getReferralCode() ? "referral" : ""),
+        referral_code: getReferralCode(),
+        referred_by: getReferralCode(),
+        visitor_id: getVisitorId(),
+        source_url: window.location.href,
+        submitted_at: new Date().toISOString()
+      };
     }
 
-    fetch(CHECKOUT_LEAD_URL, {
-      method: "POST",
-      keepalive: true,
-      credentials: "include",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-      body: body
-    }).catch(function(error) {
-      console.warn("Could not send checkout lead to backend:", error);
-    });
-  } catch (error) {
-    console.warn("Could not send checkout lead to backend:", error);
-  }
-}
-
-function captureLeadProgressNow() {
-  var payload = formPayload();
-
-  if (!canCaptureLeadProgress(payload)) return;
-
-  sendLeadToAirtable(payload, "Details started");
-}
-
-function scheduleLeadProgressCapture() {
-  clearTimeout(leadCaptureTimer);
-  leadCaptureTimer = setTimeout(captureLeadProgressNow, 800);
-}
-
-    async function jsonFetch(url, options) {
-      var res = await fetch(url, {
-        credentials: "include",
-        cache: "no-store",
-        headers: { "Accept": "application/json", "Content-Type": "application/json" },
-        ...(options || {})
-      });
-      var text = await res.text();
-      var data = {};
-      try { data = text ? JSON.parse(text) : {}; }
-      catch(e) { throw new Error("The server returned invalid JSON."); }
-      if (!res.ok) throw new Error(data.error || data.message || "Request failed.");
-      return data;
+    function validatePayload(payload) {
+      if (!payload.full_name) return "Enter your full name.";
+      if (!isValidEmail(payload.email)) return "Enter a valid email.";
+      if (!payload.lead_source) return "Select where you came from.";
+      return "";
     }
 
-    async function ensureWhopLoader() {
-      if (window.WhopCheckout || document.querySelector('script[src="' + WHOP_LOADER_URL + '"]')) return;
-      await new Promise(function(resolve, reject) {
-        var script = document.createElement("script");
-        script.src = WHOP_LOADER_URL;
-        script.async = true;
-        script.defer = true;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    }
-
-    async function prepareCheckout(event) {
+    async function submitWaitlist(event) {
       event.preventDefault();
-      if (preparing) return;
+      if (submitting) return;
 
       var payload = formPayload();
       var error = validatePayload(payload);
       if (error) { setMessage(error, true); return; }
 
-      // Upgrade the same abandoned-lead record from "Details started" to "Payment opened".
-      sendLeadToAirtable(payload, "Payment opened");
-
-      var signature = JSON.stringify(payload);
-      if (signature === preparedSignature && $(CHECKOUT_ID)) {
-        $("whopShell").classList.add("is-ready");
+      if (!WAITLIST_SCRIPT_URL || WAITLIST_SCRIPT_URL.indexOf("PASTE_YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE") !== -1) {
+        setMessage("Waitlist is not connected yet. Add your Google Apps Script Web App URL in WAITLIST_SCRIPT_URL.", true);
         return;
       }
 
-      preparing = true;
-      preparedSignature = signature;
+      submitting = true;
       var button = $("checkoutButton");
-      if (button) { button.disabled = true; button.textContent = "Opening payment..."; }
+      if (button) { button.disabled = true; button.textContent = "Joining waitlist..."; }
       setMessage("");
 
       try {
-        var session = await jsonFetch("/api/referrals/create-whop-session", {
+        // mode:"no-cors" avoids browser CORS issues with Apps Script web apps.
+        // The request still reaches Apps Script, but the browser cannot read the response body.
+        await fetch(WAITLIST_SCRIPT_URL, {
           method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain" },
           body: JSON.stringify(payload)
         });
 
-        sessionStorage.setItem("monaco_checkout_session_id", session.session_id);
-        localStorage.setItem("monaco_checkout_session_id", session.session_id);
-
-        await ensureWhopLoader();
-
-        var mount = $("whopMount");
-        mount.innerHTML = "";
-
-        var checkout = document.createElement("div");
-        checkout.id = CHECKOUT_ID;
-        checkout.className = "whop-checkout-embed";
-        checkout.setAttribute("data-whop-checkout-environment", session.environment || "production");
-        checkout.setAttribute("data-whop-checkout-session", session.session_id);
-        checkout.setAttribute("data-whop-checkout-return-url", session.return_url);
-        checkout.setAttribute("data-whop-checkout-plan-id", session.plan_id || DEFAULT_PLAN_ID);
-        checkout.setAttribute("data-whop-checkout-prefill-email", payload.email);
-        checkout.setAttribute("data-whop-checkout-hide-email", "true");
-        checkout.setAttribute("data-whop-checkout-disable-email", "true");
-        checkout.setAttribute("data-whop-checkout-theme-accent-color", "gold");
-        checkout.setAttribute("data-whop-checkout-theme", "light");
-        checkout.setAttribute("data-whop-checkout-color-scheme", "light");
-        checkout.setAttribute("data-whop-checkout-theme", "light");
-        mount.appendChild(checkout);
-
-        $("whopShell").classList.add("is-ready");
-      
-        if (window.WhopCheckout && window.WhopCheckout.setup) window.WhopCheckout.setup();
+        setMessage("You’re on the waitlist — we’ll be in touch if a spot opens.", false);
+        var form = $("checkoutForm");
+        if (form) form.reset();
+        updateReferralNote();
       } catch(error) {
         console.error(error);
-        preparedSignature = "";
-        setMessage(error.message || "Could not open checkout.", true);
+        setMessage(error.message || "Could not join the waitlist. Please try again.", true);
       } finally {
-        preparing = false;
-        if (button) { button.disabled = false; button.textContent = "Confirm details & open payment"; }
+        submitting = false;
+        if (button) { button.disabled = false; button.textContent = "Join waitlist"; }
       }
     }
-var whopClose = $("whopClose");
-if (whopClose) {
-  whopClose.addEventListener("click", function() {
-    var shell = $("whopShell");
-    if (shell) shell.classList.remove("is-ready");
-  });
-}
 
     var phoneInput = $("phone");
     if (phoneInput && window.intlTelInput) {
@@ -1125,24 +1003,366 @@ if (whopClose) {
     }
 
     var form = $("checkoutForm");
-    if (form) {
-      form.addEventListener("submit", prepareCheckout);
-
-      ["fname", "email", "phone", "company", "instagram", "leadSource"].forEach(function(id) {
-        var field = $(id);
-        if (!field) return;
-
-        field.addEventListener("input", scheduleLeadProgressCapture);
-        field.addEventListener("change", scheduleLeadProgressCapture);
-        field.addEventListener("blur", captureLeadProgressNow);
-      });
-
-      window.addEventListener("pagehide", captureLeadProgressNow);
-      document.addEventListener("visibilitychange", function() {
-        if (document.visibilityState === "hidden") captureLeadProgressNow();
-      });
-    }
+    if (form) form.addEventListener("submit", submitWaitlist);
   })();
+
+  /* ORIGINAL WHOP CHECKOUT + REFERRAL PAYMENT FLOW COMMENTED OUT FOR NOW.
+     Re-enable this section when enrollments reopen and payment checkout is needed again. */
+//   /* Working backend checkout: referral capture + Whop embedded payment */
+//   (function() {
+//     var CHECKOUT_ID = "whop-embedded-checkout";
+//     var WHOP_LOADER_URL = "https://js.whop.com/static/checkout/loader.js";
+//     var DEFAULT_PLAN_ID = "plan_qK4NTM5q8ICqJ";
+//     var REFERRAL_STORAGE_KEY = "monaco_referral_code";
+//     var VISITOR_ID_STORAGE_KEY = "monaco_checkout_visitor_id";
+// 
+//     var CHECKOUT_LEAD_URL = "/api/referrals/checkout-lead";
+// 
+//     var preparing = false;
+//     var preparedSignature = "";
+//     var phoneInputInstance = null;
+// 
+//     function $(id) { return document.getElementById(id); }
+// 
+//     function getVisitorId() {
+//       var existing =
+//         localStorage.getItem(VISITOR_ID_STORAGE_KEY) ||
+//         sessionStorage.getItem(VISITOR_ID_STORAGE_KEY) ||
+//         "";
+// 
+//       if (existing) return existing;
+// 
+//       var id = "visitor_" + Date.now() + "_" + Math.random().toString(36).slice(2, 12);
+//       localStorage.setItem(VISITOR_ID_STORAGE_KEY, id);
+//       sessionStorage.setItem(VISITOR_ID_STORAGE_KEY, id);
+//       return id;
+//     }
+// 
+//     function isValidEmail(email) {
+//       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || ""));
+//     }
+// 
+//     function cleanReferralCode(value) {
+//       return String(value || "")
+//         .trim()
+//         .replace(/[^a-zA-Z0-9_-]/g, "")
+//         .slice(0, 80)
+//         .toUpperCase();
+//     }
+// 
+//     function getReferralCode() {
+//       var params = new URLSearchParams(window.location.search);
+//       var fromUrl = params.get("r") || params.get("ref") || params.get("referral_code") || "";
+//       var cleaned = cleanReferralCode(fromUrl);
+//       if (cleaned) {
+//         localStorage.setItem(REFERRAL_STORAGE_KEY, cleaned);
+//         sessionStorage.setItem(REFERRAL_STORAGE_KEY, cleaned);
+//         return cleaned;
+//       }
+//       return cleanReferralCode(
+//         sessionStorage.getItem(REFERRAL_STORAGE_KEY) ||
+//         localStorage.getItem(REFERRAL_STORAGE_KEY) ||
+//         ""
+//       );
+//     }
+// 
+//     function updateReferralNote() {
+//       var note = $("referralNote");
+//       var code = getReferralCode();
+//       if (!note) return;
+//       if (code) {
+//         var leadSource = $("leadSource");
+//         if (leadSource && !leadSource.value) leadSource.value = "referral";
+//         note.style.display = "block";
+//         note.textContent = "Referral code applied: " + code;
+//       } else {
+//         note.style.display = "none";
+//         note.textContent = "";
+//       }
+//     }
+// 
+//     function setMessage(message, isError) {
+//       var el = $("checkoutMessage");
+//       if (!el) return;
+//       el.style.display = message ? "block" : "none";
+//       el.classList.toggle("is-success", Boolean(message && !isError));
+//       el.textContent = message || "";
+//     }
+// 
+//     function value(id) {
+//       var el = $(id);
+//       return el ? el.value.trim() : "";
+//     }
+// 
+//     function normalizeInstagram(value) {
+//       var handle = String(value || "").trim();
+//       if (!handle) return "";
+//       handle = handle.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "");
+//       handle = handle.replace(/^instagram\.com\//i, "");
+//       handle = handle.replace(/^@+/, "");
+//       handle = handle.split(/[/?#]/)[0].trim();
+//       return handle ? "@" + handle : "";
+//     }
+// 
+//     function fullPhoneNumber() {
+//       var rawPhone = value("phone");
+//       if (!rawPhone) return "";
+// 
+//       if (phoneInputInstance) {
+//         var intlNumber = phoneInputInstance.getNumber();
+//         if (intlNumber) return intlNumber;
+// 
+//         var selectedCountry = phoneInputInstance.getSelectedCountryData();
+//         if (selectedCountry && selectedCountry.dialCode) {
+//           return "+" + selectedCountry.dialCode + " " + rawPhone.replace(/^\+/, "").trim();
+//         }
+//       }
+// 
+//       return rawPhone;
+//     }
+// 
+// function formPayload() {
+//   return {
+//     full_name: value("fname"),
+//     email: value("email").toLowerCase(),
+//     phone: fullPhoneNumber(),
+//     company: value("company"),
+//     instagram: normalizeInstagram(value("instagram")),
+//     lead_source: value("leadSource") || (getReferralCode() ? "referral" : ""),
+//     referral_code: getReferralCode(),
+//     referred_by: getReferralCode(),
+//     visitor_id: getVisitorId(),
+//     source_url: window.location.href
+//   };
+// }
+// 
+// function validatePayload(payload) {
+//   if (!payload.full_name) return "Enter your full name.";
+//   if (!isValidEmail(payload.email)) return "Enter a valid email.";
+//   if (!payload.lead_source) return "Select where you came from.";
+//   return "";
+// }
+// 
+// var lastLeadCaptureSignature = "";
+// var leadCaptureTimer = null;
+// 
+// function hasUsablePhone(phone) {
+//   return String(phone || "").replace(/\D/g, "").length >= 7;
+// }
+// 
+// function canCaptureLeadProgress(payload) {
+//   // Capture as soon as we have ANY useful contact route.
+//   // Priority later is email, then Instagram, then phone.
+//   return (
+//     isValidEmail(payload.email) ||
+//     Boolean(payload.instagram) ||
+//     hasUsablePhone(payload.phone)
+//   );
+// }
+// 
+// function sendLeadToAirtable(payload, checkoutStatus) {
+//   if (!CHECKOUT_LEAD_URL) return;
+//   if (!canCaptureLeadProgress(payload)) return;
+// 
+//   var leadPayload = Object.assign(
+//     {
+//       event_type: "checkout_progress",
+//       checkout_status: checkoutStatus || "Details started"
+//     },
+//     payload
+//   );
+// 
+//   var signature = JSON.stringify(leadPayload);
+//   if (signature === lastLeadCaptureSignature) return;
+//   lastLeadCaptureSignature = signature;
+// 
+//   var body = JSON.stringify(leadPayload);
+// 
+//   try {
+//     if (navigator.sendBeacon) {
+//       var blob = new Blob([body], { type: "application/json;charset=UTF-8" });
+//       var queued = navigator.sendBeacon(CHECKOUT_LEAD_URL, blob);
+//       if (queued) return;
+//     }
+// 
+//     fetch(CHECKOUT_LEAD_URL, {
+//       method: "POST",
+//       keepalive: true,
+//       credentials: "include",
+//       headers: {
+//         "Accept": "application/json",
+//         "Content-Type": "application/json"
+//       },
+//       body: body
+//     }).catch(function(error) {
+//       console.warn("Could not send checkout lead to backend:", error);
+//     });
+//   } catch (error) {
+//     console.warn("Could not send checkout lead to backend:", error);
+//   }
+// }
+// 
+// function captureLeadProgressNow() {
+//   var payload = formPayload();
+// 
+//   if (!canCaptureLeadProgress(payload)) return;
+// 
+//   sendLeadToAirtable(payload, "Details started");
+// }
+// 
+// function scheduleLeadProgressCapture() {
+//   clearTimeout(leadCaptureTimer);
+//   leadCaptureTimer = setTimeout(captureLeadProgressNow, 800);
+// }
+// 
+//     async function jsonFetch(url, options) {
+//       var res = await fetch(url, {
+//         credentials: "include",
+//         cache: "no-store",
+//         headers: { "Accept": "application/json", "Content-Type": "application/json" },
+//         ...(options || {})
+//       });
+//       var text = await res.text();
+//       var data = {};
+//       try { data = text ? JSON.parse(text) : {}; }
+//       catch(e) { throw new Error("The server returned invalid JSON."); }
+//       if (!res.ok) throw new Error(data.error || data.message || "Request failed.");
+//       return data;
+//     }
+// 
+//     async function ensureWhopLoader() {
+//       if (window.WhopCheckout || document.querySelector('script[src="' + WHOP_LOADER_URL + '"]')) return;
+//       await new Promise(function(resolve, reject) {
+//         var script = document.createElement("script");
+//         script.src = WHOP_LOADER_URL;
+//         script.async = true;
+//         script.defer = true;
+//         script.onload = resolve;
+//         script.onerror = reject;
+//         document.head.appendChild(script);
+//       });
+//     }
+// 
+//     async function prepareCheckout(event) {
+//       event.preventDefault();
+//       if (preparing) return;
+// 
+//       var payload = formPayload();
+//       var error = validatePayload(payload);
+//       if (error) { setMessage(error, true); return; }
+// 
+//       // Upgrade the same abandoned-lead record from "Details started" to "Payment opened".
+//       sendLeadToAirtable(payload, "Payment opened");
+// 
+//       var signature = JSON.stringify(payload);
+//       if (signature === preparedSignature && $(CHECKOUT_ID)) {
+//         $("whopShell").classList.add("is-ready");
+//         return;
+//       }
+// 
+//       preparing = true;
+//       preparedSignature = signature;
+//       var button = $("checkoutButton");
+//       if (button) { button.disabled = true; button.textContent = "Opening payment..."; }
+//       setMessage("");
+// 
+//       try {
+//         var session = await jsonFetch("/api/referrals/create-whop-session", {
+//           method: "POST",
+//           body: JSON.stringify(payload)
+//         });
+// 
+//         sessionStorage.setItem("monaco_checkout_session_id", session.session_id);
+//         localStorage.setItem("monaco_checkout_session_id", session.session_id);
+// 
+//         await ensureWhopLoader();
+// 
+//         var mount = $("whopMount");
+//         mount.innerHTML = "";
+// 
+//         var checkout = document.createElement("div");
+//         checkout.id = CHECKOUT_ID;
+//         checkout.className = "whop-checkout-embed";
+//         checkout.setAttribute("data-whop-checkout-environment", session.environment || "production");
+//         checkout.setAttribute("data-whop-checkout-session", session.session_id);
+//         checkout.setAttribute("data-whop-checkout-return-url", session.return_url);
+//         checkout.setAttribute("data-whop-checkout-plan-id", session.plan_id || DEFAULT_PLAN_ID);
+//         checkout.setAttribute("data-whop-checkout-prefill-email", payload.email);
+//         checkout.setAttribute("data-whop-checkout-hide-email", "true");
+//         checkout.setAttribute("data-whop-checkout-disable-email", "true");
+//         checkout.setAttribute("data-whop-checkout-theme-accent-color", "gold");
+//         checkout.setAttribute("data-whop-checkout-theme", "light");
+//         checkout.setAttribute("data-whop-checkout-color-scheme", "light");
+//         checkout.setAttribute("data-whop-checkout-theme", "light");
+//         mount.appendChild(checkout);
+// 
+//         $("whopShell").classList.add("is-ready");
+//       
+//         if (window.WhopCheckout && window.WhopCheckout.setup) window.WhopCheckout.setup();
+//       } catch(error) {
+//         console.error(error);
+//         preparedSignature = "";
+//         setMessage(error.message || "Could not open checkout.", true);
+//       } finally {
+//         preparing = false;
+//         if (button) { button.disabled = false; button.textContent = "Confirm details & open payment"; }
+//       }
+//     }
+// var whopClose = $("whopClose");
+// if (whopClose) {
+//   whopClose.addEventListener("click", function() {
+//     var shell = $("whopShell");
+//     if (shell) shell.classList.remove("is-ready");
+//   });
+// }
+// 
+//     var phoneInput = $("phone");
+//     if (phoneInput && window.intlTelInput) {
+//       phoneInputInstance = window.intlTelInput(phoneInput, {
+//         initialCountry: "gb",
+//         separateDialCode: true,
+//         nationalMode: true,
+//         autoPlaceholder: "aggressive",
+//         showSearchBox: true,
+//         loadUtils: function() {
+//           return import("https://cdn.jsdelivr.net/npm/intl-tel-input@25.12.5/build/js/utils.js");
+//         }
+//       });
+//     }
+// 
+//     updateReferralNote();
+// 
+//     var instagramInput = $("instagram");
+//     if (instagramInput) {
+//       instagramInput.addEventListener("input", function() {
+//         if (instagramInput.value && instagramInput.value.charAt(0) !== "@") {
+//           instagramInput.value = "@" + instagramInput.value.replace(/^@+/, "");
+//         }
+//       });
+//       instagramInput.addEventListener("blur", function() {
+//         instagramInput.value = normalizeInstagram(instagramInput.value);
+//       });
+//     }
+// 
+//     var form = $("checkoutForm");
+//     if (form) {
+//       form.addEventListener("submit", prepareCheckout);
+// 
+//       ["fname", "email", "phone", "company", "instagram", "leadSource"].forEach(function(id) {
+//         var field = $(id);
+//         if (!field) return;
+// 
+//         field.addEventListener("input", scheduleLeadProgressCapture);
+//         field.addEventListener("change", scheduleLeadProgressCapture);
+//         field.addEventListener("blur", captureLeadProgressNow);
+//       });
+// 
+//       window.addEventListener("pagehide", captureLeadProgressNow);
+//       document.addEventListener("visibilitychange", function() {
+//         if (document.visibilityState === "hidden") captureLeadProgressNow();
+//       });
+//     }
+//   })();
 </script>
 <script>
   window.va = window.va || function () {
