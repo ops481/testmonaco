@@ -481,8 +481,19 @@ app.post("/api/whop/webhook", async (req, res) => {
     body_sha256: sha256(rawBody)
   });
 }
+const whopPlanId = String(
+  object?.plan?.id ||
+    object?.plan_id ||
+    object?.planId ||
+    event?.data?.plan?.id ||
+    event?.data?.plan_id ||
+    ""
+);
 
-    if (successfulPaymentDetected) {
+const correctWhopPlan =
+  WHOP_PLAN_ID && whopPlanId === WHOP_PLAN_ID;
+
+    if (successfulPaymentDetected && correctWhopPlan) {
       console.log("WHOP WEBHOOK ACCEPTED AS PAID:", {
         event_type: eventType,
         object_path: objectPath,
